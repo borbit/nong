@@ -37,9 +37,14 @@
 	    	overwrite="true"/>
 	</target>
 	
-	<target name="update">
-		<exec executable="/etc/init.d/nginx">
-			<arg value="reload"/>
-		</exec>
+	<target name="restart" depends="restart-nginx">
+		<echo>Restart complete.</echo>
+	</target>
+	
+	<target name="restart-nginx">
+        <echo>Reloading nginx configs.</echo>
+        <exec executable="/etc/init.d/nginx">
+            <arg value="reload"/>
+        </exec>
 	</target>
 </project>
