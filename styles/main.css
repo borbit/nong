@@ -1,0 +1,29 @@
+body {
+    background:#000;
+}
+
+#field {
+    overflow:hidden;
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin:-300px 0 0 -400px;
+    height:600px;
+    width:800px;
+    border:1px solid #fff;
+}
+
+.platform {
+    position:absolute;
+    height:148px;
+    width:38px;
+    border:1px solid #fff;
+}
+
+.disk {
+    position:absolute;
+    height:50px;
+    width:50px;
+    background:#fff;
+    -webkit-border-radius:27px;
+}
