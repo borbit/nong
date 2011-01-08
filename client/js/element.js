@@ -1,15 +1,18 @@
-Pong.Element = function(area) {
+Pong.Element = function element(area) {
     var observer = Pong.Observer();
-    observer.register(Pong.Element.Events.changingStarted);
-    observer.register(Pong.Element.Events.changingFinished);
+    observer.register(element.events.changed);
+    observer.register(element.events.changingStarted);
+    observer.register(element.events.changingFinished);
 
     return {
         area: area,
-        observer: observer
+        observer: observer,
+        subscribe: observer.subscribe
     }
 };
 
-Pong.Element.Events = {
+Pong.Element.events = {
+    changed: 'changed',
     changingStarted: 'changingStarted',
     changingFinished: 'changingFinished'
 };

@@ -20,10 +20,11 @@ body {
     border:1px solid #fff;
 }
 
-.disk {
+.boll {
     position:absolute;
+    top:100px;
+    left:100px;
     height:50px;
     width:50px;
     background:#fff;
-    -webkit-border-radius:27px;
 }

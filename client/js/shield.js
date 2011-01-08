@@ -1,13 +1,16 @@
 Pong.Shield = function(x, y, domNode, publisher) {
-    var element = Pong.Element(Pong.Area(domNode, {
+    var area = Pong.Area(domNode, {
         x: x, y: y,
         width: 38,
         height: 148
-    }));
+    });
 
+    var element = Pong.Element(area);
     var moveUp = false;
     var moveDown = false;
     var speed = 500;
+
+    render();
 
     publisher.subscribe(publisher.events.moveUp, function() {
         moveUp = true;
@@ -27,25 +30,23 @@ Pong.Shield = function(x, y, domNode, publisher) {
 
     function process() {
         if(moveUp) {
-            element.area.y -= parseInt(speed / Pong.Constants.FPS);
+            area.y -= parseInt(speed / Pong.Constants.FPS);
         }
 
         if(moveDown) {
-            element.area.y += parseInt(speed / Pong.Constants.FPS);
+            area.y += parseInt(speed / Pong.Constants.FPS);
         }
     }
 
     function render() {
         element.area.domNode.css({
-            top: element.area.y,
-            left: element.area.x
+            top: area.y,
+            left: area.x
         });
     }
 
-    return {
+    return $.extend(element, {
         render: render,
-        process: process,
-        area: element.area,
-        subscribe: element.observer.subscribe
-    };
+        process: process
+    });
 };
