@@ -1,0 +1,45 @@
+<project name="pong" default="help">
+    <property file="config/config.local" />
+    <property file="config/config" />
+	    
+	<property name="PROJECT_ROOT" value="${basedir}"/>	
+	
+	<target name="help">
+		<echo>No help for you!</echo>
+	    <echoproperties/>
+	</target>
+	
+	<target name="config" depends="config-nginx">
+		<echo>Configuration complete.</echo>
+	</target>
+	
+	<target name="config-nginx">
+		<echo>Generating nginx.conf</echo>
+		<copy
+			file="config/nginx.conf.in"
+			tofile="config/nginx.conf"
+			overwrite="true">
+		    <filterchain>
+		        <expandproperties/>
+		    </filterchain>
+		</copy>
+	</target>
+	
+	<target name="install" depends="install-nginx">
+		<echo>Installation complete.</echo>
+	</target>
+	
+	<target name="install-nginx">
+	    <echo>Installing nginx.conf</echo>
+	    <symlink
+	    	link="${NGINX_CONFIG}"
+	    	resource="${PROJECT_ROOT}/config/nginx.conf"
+	    	overwrite="true"/>
+	</target>
+	
+	<target name="update">
+		<exec executable="/etc/init.d/nginx">
+			<arg value="reload"/>
+		</exec>
+	</target>
+</project>
