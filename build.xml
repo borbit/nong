@@ -9,7 +9,7 @@
 	    <echoproperties/>
 	</target>
 	
-	<target name="config" depends="config-nginx">
+	<target name="config" depends="config-nginx,config-node">
 		<echo>Configuration complete.</echo>
 	</target>
 	
@@ -25,6 +25,18 @@
 		</copy>
 	</target>
 	
+	<target name="config-node">
+	    <echo>Generating config.js</echo>
+		<copy
+            file="config/config.js.in"
+            tofile="config/config.js"
+            overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+	</target>
+	
 	<target name="install" depends="install-nginx">
 		<echo>Installation complete.</echo>
 	</target>
@@ -36,7 +48,7 @@
 	    	resource="${PROJECT_ROOT}/config/nginx.conf"
 	    	overwrite="true"/>
 	</target>
-	
+		
 	<target name="restart" depends="restart-nginx">
 		<echo>Restart complete.</echo>
 	</target>

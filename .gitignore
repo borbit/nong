@@ -1,3 +1,5 @@
 config/config.local
 config/nginx.conf
+config/config.js
+node_modules
 

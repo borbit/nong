@@ -1,0 +1,3 @@
+var config  = exports
+config.WS_PORT = ${WS_PORT};
+config.PIDFILE = '${NODE_PIDFILE}';
