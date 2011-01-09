@@ -1,75 +1,77 @@
-Pong.Stage = function(area, gameLoop, renderLoop) {
+Pong.Stage = function(gameLoop, renderLoop) {
+
+    var region = Pong.Region({width: 800, height: 600});
     var balls = [];
     var shields = [];
-    var lastElementId = 0;
 
     function addShield(shield) {
         addElement(shield);
         shields.push(shield);
+        return this;
     }
 
     function addBall(ball) {
 
         ball.subscribe(Pong.Element.events.changed, function() {
 
-            var ballLeft = ball.area.x,
-                ballTop = ball.area.y,
-                ballRight = ball.area.x + ball.area.width,
-                ballBottom = ball.area.y + ball.area.height;
+            var ballLeft = ball.region.x,
+                ballTop = ball.region.y,
+                ballRight = ball.region.x + ball.region.width,
+                ballBottom = ball.region.y + ball.region.height;
             
             for(var i = 0, shield; i < shields.length; i++) {
                 shield = shields[i];
 
-                var shieldLeft = shield.area.x,
-                    shieldTop = shield.area.y,
-                    shieldRight = shield.area.x + shield.area.width,
-                    shieldBottom = shield.area.y + shield.area.height;
+                var shieldLeft = shield.region.x,
+                    shieldTop = shield.region.y,
+                    shieldRight = shield.region.x + shield.region.width,
+                    shieldBottom = shield.region.y + shield.region.height;
 
                 if (ballRight > shieldLeft && ballLeft < shieldRight &&
                     ballBottom > shieldTop && ballTop < shieldBottom) {
 
                     if(ballRight > shieldRight) {
-                        ball.area.x = shieldRight;
-                        ball.setVX(ball.getVX() * -1);
+                        ball.region.x = shieldRight;
+                        ball.vx = ball.vx * -1;
                     }
 
                     if(ballLeft < shieldLeft) {
-                        ball.area.x = shieldLeft - ball.area.width;
-                        ball.setVX(ball.getVX() * -1);
+                        ball.region.x = shieldLeft - ball.region.width;
+                        ball.vx = ball.vx * -1;
                     }
                 }
             }
 
-            if (ballRight > area.x + area.width) {
-                ball.area.x = area.x + area.width - ball.area.width;
-                ball.setVX(ball.getVX() * -1);
+            if (ballRight > region.x + region.width) {
+                ball.region.x = region.x + region.width - ball.region.width;
+                ball.vx = ball.vx * -1;
             }
 
-            if (ballBottom > area.y + area.height) {
-                ball.area.y = area.y + area.height - ball.area.height;
-                ball.setVY(ball.getVY() * -1);
+            if (ballBottom > region.y + region.height) {
+                ball.region.y = region.y + region.height - ball.region.height;
+                ball.vy = ball.vy * -1;
             }
 
-            if (ballLeft < area.x) {
-                ball.area.x = area.x;
-                ball.setVX(ball.getVX() * -1);
+            if (ballLeft < region.x) {
+                ball.region.x = region.x;
+                ball.vx = ball.vx * -1;
             }
 
-            if (ballTop < area.y) {
-                ball.area.y = area.y;
-                ball.setVY(ball.getVY() * -1);
+            if (ballTop < region.y) {
+                ball.region.y = region.y;
+                ball.vy = ball.vy * -1;
             }
         });
 
         balls.push(ball);
         addElement(ball);
+        return this;
     }
 
     function addElement(element) {
-        element.id = lastElementId++;
         element.subscribe(Pong.Element.events.changingStarted, function() {
             gameLoop.addElement(element);
-            renderLoop.addElement(element);
+            renderLoop.addElement(element.id);
         });
         element.subscribe(Pong.Element.events.changingFinished, function() {
             gameLoop.removeElement(element.id);
@@ -78,7 +80,7 @@ Pong.Stage = function(area, gameLoop, renderLoop) {
 
         if(element.active) {
             gameLoop.addElement(element);
-            renderLoop.addElement(element);
+            renderLoop.addElement(element.id);
         }
     }
 

@@ -1,11 +1,13 @@
-Pong.Element = function element(area) {
+Pong.Element = function element(region) {
     var observer = Pong.Observer();
     observer.register(element.events.changed);
     observer.register(element.events.changingStarted);
     observer.register(element.events.changingFinished);
 
     return {
-        area: area,
+        id: getUniqId(),
+        region: region,
+        active: false,
         observer: observer,
         subscribe: observer.subscribe
     }

@@ -1,40 +1,29 @@
 $(function() {
     var stageNode = $('<div id="field"></div>');
+    var shield1Node = $('<div class="shield" style="top:250px;left:40px;"></div>');
+    var shield2Node = $('<div class="shield" style="top:250px;left:750px;"></div>');
+    var ballNode = $('<div class="boll"></div>');
 
-    var shield1Node = $('<div class="shield"></div>');
-    var shield2Node = $('<div class="shield"></div>');
-    var shield3Node = $('<div class="shield"></div>');
-    
-    var ball1Node = $('<div class="boll"></div>');
-    var ball2Node = $('<div class="boll"></div>');
-    var ball3Node = $('<div class="boll"></div>');
-
-    stageNode.appendTo(document.body)
+    stageNode.append(ballNode)
              .append(shield1Node)
              .append(shield2Node)
-             .append(shield3Node)
-             .append(ball1Node)
-             .append(ball2Node)
-             .append(ball3Node);
+             .appendTo(document.body);
 
-    var stage = Pong.Stage(Pong.Area(fieldNode, {
-        width: 800,
-        height: 600
-    }), Pong.GameLoop(), Pong.RenderLoop());
+    var shield1 = Pong.Shield(40, 250, Pong.ClientEvents);
+    var shield2 = Pong.Shield(750, 250, Pong.ClientEvents);
+    var ball = Pong.Ball(500, 100);
 
-    var shield1 = Pong.Shield(40 , 200, shield1Node, Pong.ClientEvents);
-    var shield2 = Pong.Shield(720, 200, shield2Node, Pong.ClientEvents);
-    var shield3 = Pong.Shield(420, 200, shield3Node, Pong.ClientEvents);
-    
-    var ball1 = Pong.Ball(500, 100, ball1Node);
-    var ball2 = Pong.Ball(300, 400, ball2Node);
-    var ball3 = Pong.Ball(400, 500, ball3Node);
+    var gameLoop = Pong.GameLoop();
+    var renderLoop = Pong.RenderLoop();
 
-    stage.addShield(shield1);
-    stage.addShield(shield2);
-    stage.addShield(shield3);
-    stage.addBall(ball1);
-    stage.addBall(ball2);
-    stage.addBall(ball3);
-    stage.start();
+    renderLoop.addRenderer(Pong.Renderers.Shield(shield1, shield1Node))
+              .addRenderer(Pong.Renderers.Shield(shield2, shield2Node))
+              .addRenderer(Pong.Renderers.Ball(ball, ballNode));
+
+    var stage = Pong.Stage(gameLoop, renderLoop);
+
+    stage.addShield(shield1)
+         .addShield(shield2)
+         .addBall(ball)
+         .start();
 });
