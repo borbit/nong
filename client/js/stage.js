@@ -1,4 +1,4 @@
-Pong.Field = function(area, gameLoop, renderLoop) {
+Pong.Stage = function(area, gameLoop, renderLoop) {
     var balls = [];
     var shields = [];
     var lastElementId = 0;
@@ -27,8 +27,16 @@ Pong.Field = function(area, gameLoop, renderLoop) {
 
                 if (ballRight > shieldLeft && ballLeft < shieldRight &&
                     ballBottom > shieldTop && ballTop < shieldBottom) {
-                    ball.setVX(ball.getVX() * -1);
-                    continue;
+
+                    if(ballRight > shieldRight) {
+                        ball.area.x = shieldRight;
+                        ball.setVX(ball.getVX() * -1);
+                    }
+
+                    if(ballLeft < shieldLeft) {
+                        ball.area.x = shieldLeft - ball.area.width;
+                        ball.setVX(ball.getVX() * -1);
+                    }
                 }
             }
 

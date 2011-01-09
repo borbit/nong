@@ -1,8 +1,8 @@
 Pong.Ball = function(x, y, domNode, publisher) {
     var area = Pong.Area(domNode, {
         x: x, y: y,
-        width: 50,
-        height: 50
+        width: 10,
+        height: 10
     });
     
     var element = Pong.Element(area);

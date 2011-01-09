@@ -1,8 +1,8 @@
 Pong.Shield = function(x, y, domNode, publisher) {
     var area = Pong.Area(domNode, {
         x: x, y: y,
-        width: 38,
-        height: 148
+        width: 10,
+        height: 80
     });
 
     var element = Pong.Element(area);
