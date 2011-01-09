@@ -4,4 +4,8 @@ server {
     location / {
         root ${PROJECT_ROOT}/client;
     }
+
+    location /shared/ {
+        root ${PROJECT_ROOT};
+    }
 }
