@@ -10,7 +10,7 @@ Pong.RenderLoop = function() {
                     renderers[elements[i]].render();
                 }
             }
-        }, 1000 / Pong.Constants.FPS);
+        }, 1000 / Pong.Globals.FPS);
     }
 
     function stop() {

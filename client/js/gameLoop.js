@@ -7,7 +7,7 @@ Pong.GameLoop = function() {
             for(var i in elements) {
                 elements[i].process();
             }
-        }, 1000 / Pong.Constants.FPS);
+        }, 1000 / Pong.Globals.FPS);
     }
 
     function stop() {

@@ -1,4 +1,6 @@
-Pong.Observer = function() {
+(function(ns, undefined) {
+
+ns.Observer = function() {
     var triggers = {};
 
     function register(eventName) {
@@ -49,3 +51,5 @@ Pong.Observer = function() {
 
     return self;
 };
+
+}((typeof exports === 'undefined') ? window.Pong : exports));

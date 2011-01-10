@@ -1,11 +1,19 @@
-Pong.Shield = function(x, y, publisher) {
-    var region = Pong.Region({
+(function(ns, undefined) {
+
+var hasRequire = (typeof require !== 'undefined'),
+    Functions = (hasRequire) ? require('functions') : ns.Functions,
+    Globals = (hasRequire) ? require('globals') : ns.Globals,
+    Element = (hasRequire) ? require('element') : ns.Element,
+    Region = (hasRequire) ? require('region') : ns.Region;
+    
+ns.Shield = function(x, y, publisher) {
+    var region = Region({
         x: x, y: y,
         width: 10,
         height: 80
     });
 
-    var element = Pong.Element(region);
+    var element = Element(region);
     var moveUp = false;
     var moveDown = false;
     var speed = 500;
@@ -32,14 +40,16 @@ Pong.Shield = function(x, y, publisher) {
 
     function process() {
         if(moveUp) {
-            region.y -= parseInt(speed / Pong.Constants.FPS);
+            region.y -= parseInt(speed / Globals.FPS);
         }
         if(moveDown) {
-            region.y += parseInt(speed / Pong.Constants.FPS);
+            region.y += parseInt(speed / Globals.FPS);
         }
     }
 
-    return $.extend(element, {
+    return Functions.extend(element, {
         process: process
     });
 };
+
+}((typeof exports === 'undefined') ? window.Pong : exports));
