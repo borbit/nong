@@ -8,7 +8,8 @@ if(typeof exports === 'undefined') {
     namespace = exports;
 }
 
-(function(ns, undefined) {
+(function(ns) {
     ns.Globals= {};
     ns.Globals.FPS = 50;
+    ns.Globals.RFPS = 0;
 })(namespace);

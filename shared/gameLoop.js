@@ -7,9 +7,10 @@ ns.GameLoop = function() {
     var timerId = null;
     var elements = [];
     var updaters = {};
+    var prevTick = 0;
 
     function start() {
-        timerId = setInterval(tick, 1000 / Globals.FPS);
+        timerId = setInterval(tick, parseInt(1000 / Globals.FPS));
     }
 
     function stop() {
@@ -19,11 +20,15 @@ ns.GameLoop = function() {
     }
 
     function tick() {
+        Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
+
         for(var i = 0, len = elements.length; i < len; i++) {
             if(updaters[elements[i]] != null) {
                 updaters[elements[i]].update();
             }
         }
+
+        prevTick = +(new Date());
     }
 
     function addElement(elementId) {

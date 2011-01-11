@@ -40,10 +40,10 @@ ns.Updaters.Shield = function(shield, publisher) {
 
     function update() {
         if(moveUp) {
-            shield.region.y -= parseInt(speed / Globals.FPS);
+            shield.region.y -= parseInt(speed / Globals.RFPS);
         }
         if(moveDown) {
-            shield.region.y += parseInt(speed / Globals.FPS);
+            shield.region.y += parseInt(speed / Globals.RFPS);
         }
         if(moveUp || moveDown) {
             observer.changed();
@@ -63,8 +63,8 @@ ns.Updaters.Ball = function(ball) {
     observer.register(ns.Updaters.events.changed);
 
     function update() {
-        ball.region.x += ball.vx * speed / Globals.FPS;
-        ball.region.y += ball.vy * speed / Globals.FPS;
+        ball.region.x += ball.vx * speed / Globals.RFPS;
+        ball.region.y += ball.vy * speed / Globals.RFPS;
         observer.changed();
     }
 

@@ -28,3 +28,11 @@ body {
     width:10px;
     background:#fff;
 }
+
+#fps {
+    position:absolute;
+    top:0px;
+    right:0px;
+    padding:10px;
+    color:#fff;
+}
