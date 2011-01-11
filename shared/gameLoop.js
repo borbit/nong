@@ -1,4 +1,4 @@
-(function(ns, undefined) {
+(function(ns) {
 
 var hasRequire = (typeof require !== 'undefined');
 var Globals = (hasRequire) ? require('globals') : ns.Globals;

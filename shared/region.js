@@ -1,7 +1,7 @@
-(function(ns, undefined) {
+(function(ns) {
 
 ns.Region = function(options) {
-    return $.extend({
+    return ns.Functions.extend({
         x: 0, y: 0,
         width: 0,
         height: 0
