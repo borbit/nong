@@ -3,26 +3,39 @@
 var hasRequire = (typeof require !== 'undefined');
 var Region = (hasRequire) ? require('region') : ns.Region;
     
-ns.Stage = function(gameLoop, renderLoop) {
+ns.Stage = function() {
 
+    var gameLoop = Pong.GameLoop();
     var region = Region({width: 800, height: 600});
     var balls = [];
     var shields = [];
 
-    function addShield(shield) {
-        addElement(shield);
+    function addShield(shield, publisher) {
+        var updater = ns.Updaters.Shield(shield, publisher);
+
+        updater.subscribe(ns.Updaters.events.changingStarted, function() {
+            gameLoop.addElement(shield.id);
+        });
+        updater.subscribe(ns.Updaters.events.changingFinished, function() {
+            gameLoop.removeElement(shield.id);
+        });
+
+        gameLoop.addUpdater(updater);
         shields.push(shield);
-        return this;
+        return updater;
     }
 
     function addBall(ball) {
-        ball.subscribe(ns.Element.events.changed, function() {
+        var updater = Pong.Updaters.Ball(ball)
+
+        updater.subscribe(ns.Updaters.events.changed, function() {
             detectCollision(ball);
         });
 
+        gameLoop.addUpdater(updater);
+        gameLoop.addElement(ball.id);
         balls.push(ball);
-        addElement(ball);
-        return this;
+        return updater;
     }
 
     function detectCollision(ball) {
@@ -75,30 +88,12 @@ ns.Stage = function(gameLoop, renderLoop) {
         }
     }
 
-    function addElement(element) {
-        element.subscribe(ns.Element.events.changingStarted, function() {
-            gameLoop.addElement(element);
-            renderLoop.addElement(element.id);
-        });
-        element.subscribe(ns.Element.events.changingFinished, function() {
-            gameLoop.removeElement(element.id);
-            renderLoop.removeElement(element.id);
-        });
-
-        if(element.active) {
-            gameLoop.addElement(element);
-            renderLoop.addElement(element.id);
-        }
-    }
-
     function start() {
         gameLoop.start();
-        renderLoop.start();
     }
 
     function stop() {
         gameLoop.stop();
-        renderLoop.stop();
     }
 
     return {
