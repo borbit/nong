@@ -2,61 +2,53 @@
 
 var hasRequire = (typeof require !== 'undefined'),
     Globals = hasRequire ? require('globals') : ns.Globals,
-    Observer = (hasRequire) ? require('observer') : ns.Observer;
+    Observer = hasRequire ? require('observer') : ns.Observer;
 
 ns.Updaters = {};
 ns.Updaters.events = {
-    changed: 'changed',
-    changingStarted: 'changingStarted',
-    changingFinished: 'changingFinished'
+    changed: 'changed'
 };
 
-ns.Updaters.Shield = function(shield, publisher) {
+ns.Updaters.Shield = function(shield) {
     var speed = 500;
-    var moveUp = false;
-    var moveDown = false;
+    var movingUp = false;
+    var movingDown = false;
     var observer = Observer();
     observer.register(ns.Updaters.events.changed);
-    observer.register(ns.Updaters.events.changingStarted);
-    observer.register(ns.Updaters.events.changingFinished);
-
-    publisher.subscribe(publisher.events.moveUp, function() {
-        if(!moveUp) {
-            moveUp = true;
-        }
-
-        observer.changingStarted();
-    });
-    publisher.subscribe(publisher.events.moveDown, function() {
-        if(!moveDown) {
-            moveDown = true;
-        }
-
-        observer.changingStarted();
-    });
-    publisher.subscribe(publisher.events.stop, function() {
-        moveUp = false;
-        moveDown = false;
-        observer.changingFinished();
-    });
 
     function update() {
-        if(moveUp) {
+        if(movingUp) {
             shield.region.y -= parseInt(speed / Globals.RFPS);
         }
-
-        if(moveDown) {
+        if(movingDown) {
             shield.region.y += parseInt(speed / Globals.RFPS);
         }
-
-        if(moveUp || moveDown) {
+        if(movingUp || movingDown) {
             observer.changed();
         }
     }
 
+    function moveUp() {
+        movingUp = true;
+        movingDown = false;
+    }
+
+    function moveDown() {
+        movingUp = false;
+        movingDown = true;
+    }
+
+    function stop() {
+        movingUp = false;
+        movingDown = true;
+    }
+
     return {
-        element: shield,
+        stop: stop,
+        moveUp: moveUp,
+        moveDown: moveDown,
         update: update,
+        element: shield,
         subscribe: observer.subscribe
     };
 };
@@ -77,10 +69,6 @@ ns.Updaters.Ball = function(ball) {
         update: update,
         subscribe: observer.subscribe
     };
-};
-
-ns.Updaters.Ball.events = {
-    changed: 'changed'
 };
 
 }((typeof exports === 'undefined') ? window.Pong : exports));

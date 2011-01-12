@@ -1,41 +1,50 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined');
-var Region = (hasRequire) ? require('region') : ns.Region;
+var hasRequire = (typeof require !== 'undefined'),
+    Region = hasRequire ? require('region') : ns.Region,
+    Observer = hasRequire ? require('observer') : ns.Observer;
 
 ns.Stage = function() {
-
+    var balls = [], shields = [];
     var gameLoop = Pong.GameLoop();
     var region = Region({width: 800, height: 600});
-    var balls = [];
-    var shields = [];
+    var observer = Observer();
+    observer.register(ns.Stage.events.changed);
 
     function addShield(shield, publisher) {
-        var updater = ns.Updaters.Shield(shield, publisher);
+        var updater = ns.Updaters.Shield(shield);
 
-        updater.subscribe(ns.Updaters.events.changingStarted, function() {
+        publisher.subscribe(publisher.events.moveUp, function() {
+            updater.moveUp();
             gameLoop.addElement(shield.id);
         });
-        updater.subscribe(ns.Updaters.events.changingFinished, function() {
+        publisher.subscribe(publisher.events.moveDown, function() {
+            updater.moveDown();
+            gameLoop.addElement(shield.id);
+        });
+        publisher.subscribe(publisher.events.stop, function() {
+            updater.stop();
             gameLoop.removeElement(shield.id);
+        });
+        updater.subscribe(ns.Updaters.events.changed, function() {
+            observer.changed(shield);
         });
 
         gameLoop.addUpdater(updater);
         shields.push(shield);
-        return updater;
     }
 
-    function addBall(ball) {
+    function addBall(ball, publisher) {
         var updater = Pong.Updaters.Ball(ball)
-
+        
         updater.subscribe(ns.Updaters.events.changed, function() {
             detectCollision(ball);
+            observer.changed(ball);
         });
 
         gameLoop.addUpdater(updater);
         gameLoop.addElement(ball.id);
         balls.push(ball);
-        return updater;
     }
 
     function calcCollisionOffset(ball, shield) {
@@ -112,8 +121,13 @@ ns.Stage = function() {
     return {
         start: start,
         addBall: addBall,
-        addShield: addShield
+        addShield: addShield,
+        subscribe: observer.subscribe
     };
+};
+
+ns.Stage.events = {
+    changed: 'changed'
 };
 
 }((typeof exports === 'undefined') ? window.Pong : exports));

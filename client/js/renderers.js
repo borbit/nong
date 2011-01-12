@@ -1,10 +1,16 @@
 (function() {
-    Pong.View = function() {
+    Pong.View = function(stage) {
+        var renderers = {};
+
+        stage.subscribe(Pong.Stage.events.changed, function(element) {
+            if(renderers[element.id]) {
+                renderers[element.id].render(element);
+            }
+        });
+
         return {
-            addRenderer: function(updater, renderer) {
-                updater.subscribe(Pong.Updaters.events.changed, function() {
-                    renderer.render(updater.element);
-                });
+            addRenderer: function(elementId, renderer) {
+                renderers[elementId] = renderer;
             }
         };
     };
