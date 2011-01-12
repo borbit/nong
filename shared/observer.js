@@ -1,4 +1,4 @@
-(function(ns, undefined) {
+(function(ns) {
 
 ns.Observer = function() {
     var triggers = {};
@@ -16,6 +16,7 @@ ns.Observer = function() {
         if(triggers[eventName] == null) {
            return false;
         }
+        
         return true;
     }
 

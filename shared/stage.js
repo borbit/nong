@@ -1,8 +1,8 @@
-(function(ns, undefined) {
+(function(ns) {
 
 var hasRequire = (typeof require !== 'undefined');
 var Region = (hasRequire) ? require('region') : ns.Region;
-    
+
 ns.Stage = function() {
 
     var gameLoop = Pong.GameLoop();
@@ -73,7 +73,7 @@ ns.Stage = function() {
                     ball.vx = ball.vx * -1;
                 }
 
-                if(ballLeft < shieldLeft) {
+                if (ballLeft < shieldLeft) {
                     ball.region.x = shieldLeft - ball.region.width;
                     ball.vx = ball.vx * -1;
                 }

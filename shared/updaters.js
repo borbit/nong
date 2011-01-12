@@ -1,4 +1,4 @@
-(function(ns, undefined) {
+(function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
     Globals = hasRequire ? require('globals') : ns.Globals,
@@ -19,17 +19,19 @@ ns.Updaters.Shield = function(shield, publisher) {
     observer.register(ns.Updaters.events.changed);
     observer.register(ns.Updaters.events.changingStarted);
     observer.register(ns.Updaters.events.changingFinished);
-    
+
     publisher.subscribe(publisher.events.moveUp, function() {
         if(!moveUp) {
             moveUp = true;
         }
+
         observer.changingStarted();
     });
     publisher.subscribe(publisher.events.moveDown, function() {
         if(!moveDown) {
             moveDown = true;
         }
+
         observer.changingStarted();
     });
     publisher.subscribe(publisher.events.stop, function() {
@@ -42,9 +44,11 @@ ns.Updaters.Shield = function(shield, publisher) {
         if(moveUp) {
             shield.region.y -= parseInt(speed / Globals.RFPS);
         }
+
         if(moveDown) {
             shield.region.y += parseInt(speed / Globals.RFPS);
         }
+
         if(moveUp || moveDown) {
             observer.changed();
         }

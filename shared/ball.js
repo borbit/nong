@@ -10,7 +10,7 @@ ns.Ball = function(x, y) {
         width: 10,
         height: 10
     });
-    
+
     var element = Element(region);
     element.vx = 0.5;
     element.vy = 0.5;

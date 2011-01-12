@@ -1,4 +1,4 @@
-(function(ns, undefined) {
+(function(ns) {
 
 var hasRequire = (typeof require !== 'undefined');
 var Functions = (hasRequire) ? require('functions') : ns.Functions;
