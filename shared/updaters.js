@@ -58,7 +58,7 @@ ns.Updaters.Shield = function(shield, publisher) {
 };
 
 ns.Updaters.Ball = function(ball) {
-    var speed = 400;
+    var speed = 700;
     var observer = Observer();
     observer.register(ns.Updaters.events.changed);
 

@@ -38,6 +38,16 @@ ns.Stage = function() {
         return updater;
     }
 
+    function calcCollisionOffset(ball, shield) {
+        var ballCenter = parseInt(ball.region.y + ball.region.height / 2 - shield.region.y);
+        var collOffset = parseInt(ballCenter / (shield.region.height / 100)) - 50;
+
+        if(collOffset < 0) {
+            collOffset *= -1;
+        }
+        return collOffset;
+    }
+
     function detectCollision(ball) {
         var ballLeft = ball.region.x,
             ballTop = ball.region.y,
@@ -54,6 +64,9 @@ ns.Stage = function() {
 
             if (ballRight > shieldLeft && ballLeft < shieldRight &&
                 ballBottom > shieldTop && ballTop < shieldBottom) {
+
+                var offset = calcCollisionOffset(ball, shield);
+                ball.vy = ball.vy >= 0 ? offset/100 : offset/100*-1;
 
                 if(ballRight > shieldRight) {
                     ball.region.x = shieldRight;
