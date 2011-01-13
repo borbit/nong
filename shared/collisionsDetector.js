@@ -82,18 +82,6 @@ ns.CollisionsDetector = function(stageRegion) {
         }
     }
 
-    function calcCollisionOffset(ball, shield) {
-        var ballCenter = parseInt(ball.region.y + ball.region.height / 2 - shield.region.y, 10);
-        var collOffset = parseInt(ballCenter / (shield.region.height / 100), 10) - 50;
-
-        if(collOffset < 0) {
-            collOffset *= -1;
-        }
-
-        return collOffset;
-    }
-
-
     return {
         addBall: addBall,
         addShield: addShield,
