@@ -6,8 +6,9 @@ ns.Observer = function() {
     function register(eventName) {
         if(triggers[eventName] == null) {
            triggers[eventName] = [];
-           self[eventName] = function(args) {
-                fire(eventName, args);
+           self[eventName] = function() {
+               var args = Array.prototype.slice.call(arguments);
+               fire(eventName, args);
            };
         }
     }
@@ -16,7 +17,7 @@ ns.Observer = function() {
         if(triggers[eventName] == null) {
            return false;
         }
-        
+
         return true;
     }
 
@@ -24,7 +25,7 @@ ns.Observer = function() {
         if(triggers[eventName] != null) {
             var count = triggers[eventName].length;
             for(var j = 0; j < count; j++) {
-                triggers[eventName][j].call(null, args);
+                triggers[eventName][j].apply(null, args);
             }
         }
     }
