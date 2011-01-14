@@ -25,6 +25,7 @@ ns.GameLoop = function() {
         for(var i = 0, len = elements.length; i < len; i++) {
             if(updaters[elements[i]] != null) {
                 updaters[elements[i]].update();
+                //@todo fire event
             }
         }
 
