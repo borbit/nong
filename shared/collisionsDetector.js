@@ -24,7 +24,7 @@ ns.CollisionsDetector = function(stageRegion) {
             top: regionObject.region.y,
             right: regionObject.region.x + regionObject.region.width,
             bottom: regionObject.region.y + regionObject.region.height,
-            _regionObject: regionObject
+            _element: regionObject
         };
     }
 
@@ -52,15 +52,15 @@ ns.CollisionsDetector = function(stageRegion) {
 
     function detectCollisionWithStage(ball) {
         if (ball.right > stage.right) {
-            observer.stageRightEdgeHitted(ball._regionObject);
+            observer.stageRightEdgeHitted(ball._element);
         } else if (ball.left < stage.left) {
-            observer.stageLeftEdgeHitted(ball._regionObject);
+            observer.stageLeftEdgeHitted(ball._element);
         }
 
         if (ball.bottom > stage.bottom) {
-            observer.stageBottomEdgeHitted(ball._regionObject);
+            observer.stageBottomEdgeHitted(ball._element);
         } else if (ball.top < stage.top) {
-            observer.stageTopEdgeHitted(ball._regionObject);
+            observer.stageTopEdgeHitted(ball._element);
         }
     }
 
@@ -69,9 +69,9 @@ ns.CollisionsDetector = function(stageRegion) {
             ball.bottom > shield.top && ball.top < shield.bottom) {
 
             if(ball.right > shield.right) {
-                observer.shieldRightEdgeHitted(ball._regionObject, shield._regionObject);
+                observer.shieldRightEdgeHitted(ball._element, shield._element);
             } else if (ball.left < shield.left) {
-                observer.shieldLeftEdgeHitted(ball._regionObject, shield._regionObject);
+                observer.shieldLeftEdgeHitted(ball._element, shield._element);
             }
         }
     }

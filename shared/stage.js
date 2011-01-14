@@ -2,6 +2,7 @@
 
 var hasRequire = (typeof require !== 'undefined'),
     Region = hasRequire ? require('region') : ns.Region,
+    GameLoop = hasRequire ? require('gameLoop') : ns.GameLoop,
     CollisionsDetector = hasRequire ? require('collisionsDetector') : ns.CollisionsDetector,
     Observer = hasRequire ? require('observer') : ns.Observer;
 
@@ -9,13 +10,17 @@ ns.Stage = function() {
     var balls = [];
     var shields = [];
 
-    var gameLoop = Pong.GameLoop();
+    var gameLoop = GameLoop();
     var region = Region({width: 800, height: 600});
     var observer = Observer();
     var collisions = CollisionsDetector({region: region});
 
     observer.register(ns.Stage.events.changed);
     subscribeForCollisionEvents();
+
+    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function() {
+        collisions.detect();
+    });
 
     function addShield(shield, publisher) {
         var updater = ns.Updaters.Shield(shield);
@@ -48,7 +53,6 @@ ns.Stage = function() {
         var updater = Pong.Updaters.Ball(ball);
 
         updater.subscribe(ns.Updaters.events.changed, function() {
-            collisions.detect(ball);
             observer.changed(ball);
         });
 

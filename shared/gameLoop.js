@@ -2,12 +2,17 @@
 
 var hasRequire = (typeof require !== 'undefined');
 var Globals = (hasRequire) ? require('globals') : ns.Globals;
+var Observer = hasRequire ? require('observer') : ns.Observer;
 
 ns.GameLoop = function() {
+    var observer = Observer();
+
     var timerId = null;
     var elements = [];
     var updaters = {};
     var prevTick = 0;
+
+    observer.register(ns.GameLoop.events.tickWithUpdates);
 
     function start() {
         timerId = setInterval(tick, parseInt(1000 / Globals.FPS));
@@ -25,7 +30,7 @@ ns.GameLoop = function() {
         for(var i = 0, len = elements.length; i < len; i++) {
             if(updaters[elements[i]] != null) {
                 updaters[elements[i]].update();
-                //@todo fire event
+                observer.tickWithUpdates();
             }
         }
 
@@ -51,8 +56,13 @@ ns.GameLoop = function() {
         stop: stop,
         addUpdater: addUpdater,
         addElement: addElement,
-        removeElement: removeElement
+        removeElement: removeElement,
+        subscribe: observer.subscribe
     }
+};
+
+ns.GameLoop.events = {
+    tickWithUpdates: 'tickWithUpdates'
 };
 
 }((typeof exports === 'undefined') ? window.Pong : exports));
