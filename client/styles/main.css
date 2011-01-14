@@ -1,13 +1,65 @@
 body {
     background:#000;
+    font-family:Arial;
 }
 
-#stage {
-    overflow:hidden;
+#binder {
     position:absolute;
     top:50%;
     left:50%;
-    margin:-300px 0 0 -400px;
+    margin:-350px 0 0 -400px;
+    height:650px;
+    width:800px;
+}
+
+/*.username.me {
+    border-bottom:1px dotted #aaa;
+}*/
+
+.score {
+    height:50px;
+    line-height:50px;
+    color:#fff;
+    font-size:30px;
+}
+
+/*.score .username {
+    display:block;
+    font-size:12px;
+}*/
+
+.score .number {
+    display:block;
+    width:35px;
+    font-size:20px;
+}
+
+.score .left span {
+    float:right;
+}
+.score .right span {
+    float:left;
+}
+
+.score .left,
+.score .right {
+    float:left;
+    width:385px;
+    text-align:right;
+}
+.score .right {
+    text-align:left;
+}
+.score .center {
+    float:left;
+    width:30px;
+    font-size:14px;
+    text-align:center;
+}
+
+#stage {
+    position:absolute;
+    overflow:hidden;
     height:600px;
     width:800px;
     border:1px solid #fff;

@@ -12,5 +12,5 @@ if(typeof exports === 'undefined') {
 
     ns.Globals= {};
     ns.Globals.FPS = 50;
-    ns.Globals.RFPS = 0;
+    ns.Globals.RFPS = 50;
 })();

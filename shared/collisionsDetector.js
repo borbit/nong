@@ -69,15 +69,9 @@ ns.CollisionsDetector = function(stageRegion) {
             ball.bottom > shield.top && ball.top < shield.bottom) {
 
             if(ball.right > shield.right) {
-                observer.shieldRightEdgeHitted({
-                    ball: ball._regionObject,
-                    shield: shield._regionObject
-                });
+                observer.shieldRightEdgeHitted(ball._regionObject, shield._regionObject);
             } else if (ball.left < shield.left) {
-                observer.shieldLeftEdgeHitted({
-                    ball: ball._regionObject,
-                    shield: shield._regionObject
-                });
+                observer.shieldLeftEdgeHitted(ball._regionObject, shield._regionObject);
             }
         }
     }

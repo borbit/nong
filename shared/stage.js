@@ -40,7 +40,6 @@ ns.Stage = function() {
         });
 
         gameLoop.addUpdater(updater);
-
         collisions.addShield(shield);
         shields.push(shield);
     }
@@ -81,22 +80,15 @@ ns.Stage = function() {
             ball.vy = ball.vy * -1;
         });
 
-
-        collisions.subscribe(CollisionsDetector.events.shield.leftEdge, function(elements) {
-            var ball = elements.ball;
-            var shield = elements.shield;
+        collisions.subscribe(CollisionsDetector.events.shield.leftEdge, function(ball, shield) {
             var offset = calcCollisionOffset(ball, shield);
-
             ball.region.x = shield.region.x - ball.region.width;
             ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
             ball.vx = ball.vx * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.shield.rightEdge, function(elements) {
-            var ball = elements.ball;
-            var shield = elements.shield;
+        collisions.subscribe(CollisionsDetector.events.shield.rightEdge, function(ball, shield) {
             var offset = calcCollisionOffset(ball, shield);
-
             ball.region.x = shield.region.x + shield.region.width;
             ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
             ball.vx = ball.vx * -1;

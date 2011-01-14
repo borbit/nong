@@ -1,16 +1,18 @@
 (function() {
     Pong.View = function(stage) {
         var renderers = {};
+        var nodes = {};
 
         stage.subscribe(Pong.Stage.events.changed, function(element) {
-            if(renderers[element.id]) {
-                renderers[element.id].render(element);
+            if(renderers[element.id] && nodes[element.id]) {
+                renderers[element.id].render(element, nodes[element.id]);
             }
         });
 
         return {
-            addRenderer: function(elementId, renderer) {
+            addRenderer: function(elementId, node, renderer) {
                 renderers[elementId] = renderer;
+                nodes[elementId] = node;
             }
         };
     };
@@ -23,19 +25,15 @@
     }
 
     Pong.Renderers = {};
-    Pong.Renderers.Ball = function(node) {
+    Pong.Renderers.Ball = function() {
         return {
-            render: function(element) {
-                updateCoordinates(element, node)
-            }
+            render: updateCoordinates
         };
     };
 
-    Pong.Renderers.Shield = function(node) {
+    Pong.Renderers.Shield = function() {
         return {
-            render: function(element) {
-                updateCoordinates(element, node)
-            }
+            render: updateCoordinates
         };
     };
     
