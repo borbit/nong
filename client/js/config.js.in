@@ -1,0 +1,3 @@
+Pong.Config = {
+    WS_BACKEND: 'ws://${SERVER_NAME}:${WS_PORT}/'
+};

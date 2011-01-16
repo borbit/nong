@@ -23,7 +23,7 @@ function connect() {
     
     console.log('Connecting...');
     
-    ws = new WebSocket('ws://pong.dev:8080/');
+    ws = new WebSocket(Pong.Config.WS_BACKEND);
     state = STATE_CONNECTING;
     _connecting();
     

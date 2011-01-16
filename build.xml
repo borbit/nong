@@ -9,9 +9,21 @@
 	    <echoproperties/>
 	</target>
 	
-	<target name="config" depends="config-nginx,config-node">
+	<target name="config" depends="config-frontend,config-nginx,config-node">
 		<echo>Configuration complete.</echo>
 	</target>
+	
+    <target name="config-frontend">
+        <echo>Generating client/js/config.js</echo>
+        <copy
+            file="client/js/config.js.in"
+            tofile="client/js/config.js"
+            overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+    </target>
 	
 	<target name="config-nginx">
 		<echo>Generating nginx.conf</echo>
