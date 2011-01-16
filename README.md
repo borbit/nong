@@ -5,8 +5,8 @@ Installation
 ------------
 
 Prerequisites:
-# nginx
-# node & npm
+* nginx
+* node & npm
 
 Steps:
 
@@ -23,9 +23,9 @@ Steps:
 Running
 -------
 
-1. Run `node server/server.js &`
+    node server/server.js &
 
 Stopping
 --------
 
-1. Run `kill \`cat server/server.pid\``
+    kill `cat server/server.pid`
