@@ -1,4 +1,4 @@
-Pong
+Nong
 ====
 
 Installation
@@ -15,17 +15,23 @@ Steps:
 3. Override any properties you wish from `config/config` in `config/config.local`.
 4. Run `ant config`.
    This will generate various configs.
-5. Run `npm bundle`.
-   This will automatically download required node modules into `node_modules` dir.
-6. Run `sudo ant install`.
-   This will symlink nginx config in a proper place.
+5. Run `sudo ant install`.
+   This will symlink nginx config in a proper place (but won't reload it just yet).
+6. Run `npm link`.
+   This will automatically download required node modules.
+   As a side effect, it will also install Nong locally, but we shouldn't worry about this for now.
+7. Run `sudo ant restart`.
+   At this step nginx will reload it's configs, so frontend will become available.
+   Next step would be to run backend websocket server.
    
-Running
--------
+Running Backend
+---------------
 
     node server/server.js &
+    sudo ant restart
 
-Stopping
---------
+Stopping Backend
+----------------
 
     kill `cat server/server.pid`
+    sudo ant restart
