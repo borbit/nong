@@ -23,7 +23,7 @@ process.on('exit', function() {
 
 // gracefully exit on uncaught exception
 process.on('uncaughtException', function(err) {
-    console.log('Uncaught exception: ' + err);
+    console.log(err.stack);
     process.exit(1);
 });
 
