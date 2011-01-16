@@ -1,10 +1,5 @@
-// adding `node_modules` to require.paths
-var path = require('path');
-var root = path.normalize(__dirname + '/..');
-require.paths.unshift(root + '/node_modules');
-
 var fs = require('fs');
-var ws = require('websocket-server');
+var ws_server = require('./ws-server');
 
 var config = require('../config/config.js');
 
@@ -40,18 +35,7 @@ process.on('SIGINT', stop);
 process.on('SIGTERM', stop);
 
 // creating websocket server
-var server = ws.createServer();
-server.addListener('connection', function(conn) {
-    console.log('New connection!');
-    
-    conn.addListener('message', function(message) {
-        console.log('Got message: ' + message);
-    });
-});
-
-server.addListener('close', function(conn) {
-    console.log('Disconnected.');
-});
+var server = ws_server.createServer();
 
 // listening for websocket connections
 server.listen(config.WS_PORT);

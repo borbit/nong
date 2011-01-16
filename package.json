@@ -1,6 +1,20 @@
-{ "name" : "pong"
+{ "name" : "nong"
+, "description" : "A two-paddles-one-ball multiplayer game"
+, "author" : "Serge Borbit <serge.borbit@gmail.com>"
+, "contrubutors" :
+  [ "Taras Kunch <ukrkunik@gmail.com>"
+  , "Anton Onishchenko <anton.onishchenko@gmail.com>"
+  , "George Miroshnykov <george.miroshnykov@gmail.com>"
+  ]
 , "version" : "0.0.1"
+, "engines" : { "node" : ">=0.3.3" }
+, repositories:
+  { "type" : "git"
+  , "url" : "http://github.com/borbit/pong.git"
+  }
 , "dependencies" :
   { "websocket-server" : "~1.4.01"
+  , "websocket-client" : "~1.0.0"
+  , "nodeunit" : "~0.5.0"
   }
 }
