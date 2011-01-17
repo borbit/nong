@@ -1,7 +1,6 @@
 (function(ns) {
 
-ns.Functions = {};
-ns.Functions.getUniqId = (function() {
+ns.getUniqId = (function() {
     var lastElementId = 0;
 
     return function() {
@@ -9,7 +8,7 @@ ns.Functions.getUniqId = (function() {
     };
 })();
 
-ns.Functions.extend = function(first, second) {
+ns.extend = function(first, second) {
     for(var i in second) {
         first[i] = second[i];
     }
@@ -17,4 +16,8 @@ ns.Functions.extend = function(first, second) {
     return first;
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+ns.isUndefined = function(value) {
+    return typeof value === 'undefined';
+};
+
+}((typeof exports === 'undefined') ? window.Pong.Functions = {} : exports));

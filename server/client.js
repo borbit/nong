@@ -19,27 +19,26 @@ Client.prototype.setGame = function(game) {
 
 Client.prototype.send = function(packet) {
     var payload = {
-        name: packet.getName(),
-        data: packet.getData()
+        name: packet.name(),
+        data: packet.data()
     };
     this.connection.send(JSON.stringify(payload));
-    console.log('Sent packet: ' + packet.getName());
+    console.log('Sent packet: ' + packet.name());
 };
 
 Client.prototype._processMessage = function(message) {
     var payload = JSON.parse(message);
     var packet = this._createPacket(payload);
-    var packetName = packet.getName();
+    var packetName = packet.name();
     console.log('Received packet: ' + packetName);
     switch (packetName) {
-        case 'JoinLeft':
+        case packets.Names.JOIN_LEFT:
             this._processJoinLeft(packet);
             break;
             
-        case 'JoinRight':
+        case packets.Names.JOIN_RIGHT:
             this._processJoinRight(packet);
             break;
-
         
         default:
             throw 'Unknown packet: ' + packetName;
@@ -61,6 +60,6 @@ Client.prototype._createPacket = function(payload) {
     }
     
     var packet = new packets[name];
-    packet.setData(payload.data);
+    packet.data(payload.data);
     return packet;
 }

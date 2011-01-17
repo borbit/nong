@@ -87,7 +87,7 @@ function joinRight() {
 function _processMessage(message) {
     var payload = JSON.parse(message.data);
     var packet = _createPacket(payload);
-    var packetName = packet.getName();
+    var packetName = packet.name();
     console.log('Received packet: ' + packetName);
     switch (packetName) {
         case 'GameState':
@@ -100,16 +100,16 @@ function _processMessage(message) {
 }
 
 function _processGameState(packet) {
-    var gameState = packet.getGameState();
+    var gameState = packet.gameState();
     if (gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
-        var leftPlayerState = packet.getLeftPlayerState();
+        var leftPlayerState = packet.leftPlayerState();
         if (leftPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-left').removeAttr('disabled');
         } else {
             $('#join-left').attr('disabled', 'disabled');
         }
         
-        var rightPlayerState = packet.getRightPlayerState();
+        var rightPlayerState = packet.rightPlayerState();
         if (rightPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-right').removeAttr('disabled');
         } else {
@@ -125,14 +125,14 @@ function _createPacket(payload) {
     }
     
     var packet = new Pong.Packets[name];
-    packet.setData(payload.data);
+    packet.data(payload.data);
     return packet;
 }
 
 function _sendPacket(packet) {
     var payload = {
-        name: packet.getName(),
-        data: packet.getData()
+        name: packet.name(),
+        data: packet.data()
     };
     var jsonPayload = JSON.stringify(payload);
     console.log('Sending packet: ' + jsonPayload);

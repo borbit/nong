@@ -1,107 +1,81 @@
 (function(ns) {
     var hasRequire = (typeof require !== 'undefined'),
-        constants = hasRequire ? require('constants') : window.Pong.Constants;
+        constants = hasRequire ? require('constants') : window.Pong.Constants,
+        functions = hasRequire ? require('./functions') : window.Pong.Functions;
+
+    ns.Names = {
+        GAME_STATE: 'GameState',
+        JOIN_RIGHT: 'JoinRight',
+        JOIN_LEFT: 'JoinLeft'
+    };
+
+    ns.Packet = function(packetName) {
+        var packetData = {};
+
+        return {
+            name: function(name) {
+                if(!functions.isUndefined(name))  {
+                    packetName = _name;
+                } else {
+                    return packetName;
+                }
+            },
+            data: function(data) {
+                if(!functions.isUndefined(data))  {
+                    packetData = functions.extend(packetData, data);
+                } else {
+                    return packetData;
+                }
+            }
+        };
+    };
     
     ns.GameState = function() {
-        var gameState           = constants.GAME_STATE_IN_PROGRESS;
-        var leftPlayerState     = constants.PLAYER_STATE_FREE;
-        var rightPlayerState    = constants.PLAYER_STATE_FREE;
-        
-        function setGameState(state) {
-            gameState = state;
-        }
-        
-        function getGameState() {
-            return gameState;
-        }
-        
-        function setLeftPlayerState(state) {
-            leftPlayerState = state;
-        }
-        
-        function getLeftPlayerState() {
-            return leftPlayerState;
-        }
-        
-        function setRightPlayerState(state) {
-            rightPlayerState = state;
-        }
-        
-        function getRightPlayerState() {
-            return rightPlayerState;
-        }
-        
-        function getName() {
-            return 'GameState';
-        }
-        
-        function getData() {
-            return {
-                gameState: gameState,
-                leftPlayerState: leftPlayerState,
-                rightPlayerState: rightPlayerState
-            };
-        }
-        
-        function setData(data) {
-            gameState           = data.gameState;
-            leftPlayerState     = data.leftPlayerState;
-            rightPlayerState    = data.rightPlayerState;
-        }
-        
-        var self = {
-            setGameState: setGameState,
-            getGameState: getGameState,
-            setLeftPlayerState: setLeftPlayerState,
-            getLeftPlayerState: getLeftPlayerState,
-            setRightPlayerState: setRightPlayerState,
-            getRightPlayerState: getRightPlayerState,
-            getName: getName,
-            getData: getData,
-            setData: setData
-        };
+        var packet = ns.Packet(ns.Names.GAME_STATE);
 
-        return self;
+        packet.data({
+            gameState: constants.GAME_STATE_IN_PROGRESS,
+            leftPlayerState: constants.PLAYER_STATE_FREE,
+            rightPlayerState: constants.PLAYER_STATE_FREE
+        });
+        
+        function gameState(state) {
+            if(!functions.isUndefined(state))  {
+                packet.data({gameState: state});
+            } else {
+                return packet.data().gameState;
+            }
+        }
+        
+        function leftPlayerState(state) {
+            if(!functions.isUndefined(state))  {
+                packet.data({leftPlayerState: state});
+            } else {
+                return packet.data().leftPlayerState;
+            }
+        }
+        
+        function rightPlayerState(state) {
+            if(!functions.isUndefined(state))  {
+                packet.data({rightPlayerState: state});
+            } else {
+                return packet.data().rightPlayerState;
+            }
+        }
+        
+        return functions.extend(packet, {
+            gameState: gameState,
+            leftPlayerState: leftPlayerState,
+            rightPlayerState: rightPlayerState
+        });
     };
     
     ns.JoinLeft = function() {
-        function getName() {
-            return 'JoinLeft';
-        }
-        
-        function getData() {
-            return {};
-        }
-        
-        function setData() {
-        }
-        
-        var self = {
-            getName: getName,
-            getData: getData,
-            setData: setData
-        };
-        return self;
+        return ns.Packet(ns.Names.JOIN_LEFT);
     };
     
     ns.JoinRight = function() {
-        function getName() {
-            return 'JoinRight';
-        }
-        
-        function getData() {
-            return {};
-        }
-        
-        function setData() {
-        }
-        
-        var self = {
-            getName: getName,
-            getData: getData,
-            setData: setData
-        };
-        return self;
+        return ns.Packet(ns.Names.JOIN_RIGHT);
     };
     
 }((typeof exports === 'undefined') ? window.Pong.Packets = {} : exports));

@@ -60,9 +60,9 @@ exports.joinRight = function(client) {
 function getGameStatePacket()
 {
     var gameStatePacket = packets.GameState();
-    gameStatePacket.setGameState(gameState);
-    gameStatePacket.setLeftPlayerState(leftPlayerState);
-    gameStatePacket.setRightPlayerState(rightPlayerState);
+    gameStatePacket.gameState(gameState);
+    gameStatePacket.leftPlayerState(leftPlayerState);
+    gameStatePacket.rightPlayerState(rightPlayerState);
     return gameStatePacket;
 }
 
