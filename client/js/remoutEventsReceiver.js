@@ -1,8 +1,8 @@
 Pong.RemoutEventsReceiver = (function() {
     var events = {
-        stop: 'stop',
-        moveUp: 'moveUp',
-        moveDown: 'moveDown'
+        STATE_DISCONNECTED: 'disconnected',
+        STATE_CONNECTING: 'connecting',
+        STATE_CONNECTED: 'connected'
     };
 
     var observer = Pong.Observer();

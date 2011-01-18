@@ -1,12 +1,13 @@
 $(function() {
     $('#connect').bind('click', ws.connect);
     $('#disconnect').bind('click', ws.disconnect);
-    $('#join-left').bind('click', joinLeft);
-    $('#join-right').bind('click', joinRight);
+    $('#join-left').bind('click', remout.joinLeft);
+    $('#join-right').bind('click', remout.joinRight);
     console.log('Initialization complete');
 });
 
 var ws = Pong.ClientWSAdapter();
+var remout = Pong.RemoutEventsPublisher(ws);
 
 ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
     $('#connect').attr('disabled', 'disabled');
@@ -38,15 +39,3 @@ ws.subscribe(Pong.WSAdapter.events.GAMESTATE, function(packet) {
         }
     }
 });
-
-function _connecting() {
-    $('#connect').attr('disabled', 'disabled');
-}
-
-function joinLeft() {
-    ws.sendPacket(Pong.Packets.JoinLeft());
-}
-
-function joinRight() {
-    ws.sendPacket(Pong.Packets.JoinRight());
-}
