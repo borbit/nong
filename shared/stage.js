@@ -21,36 +21,35 @@ ns.Stage = function() {
         collisions.detect();
     });
 
-    function addShield(shield, publisher) {
-        var updater = ns.Updaters.Shield(shield);
+    function addShield(shield, receiver) {
+        var updater = ns.Updaters.Shield(shield, region);
 
-        publisher.subscribe(publisher.events.moveUp, function() {
+        receiver.subscribe(receiver.events.moveUp, function() {
             if(shield.region.y > region.y) {
                 updater.moveUp();
                 gameLoop.addElement(shield.id);
             }
         });
 
-        publisher.subscribe(publisher.events.moveDown, function() {
+        receiver.subscribe(receiver.events.moveDown, function() {
             if(shield.region.y + shield.region.height < region.y + region.height) {
                 updater.moveDown();
                 gameLoop.addElement(shield.id);
             }
         });
 
-        publisher.subscribe(publisher.events.stop, function() {
+        receiver.subscribe(receiver.events.stop, function() {
             updater.stop();
             gameLoop.removeElement(shield.id);
         });
 
         updater.subscribe(ns.Updaters.events.changed, function() {
             observer.changed(shield);
-            
-            if(shield.region.y <= region.y || shield.region.y +
-               shield.region.height >= region.y + region.height) {
-                updater.stop();
-                gameLoop.removeElement(shield.id);
-            }
+        });
+
+        updater.subscribe(ns.Updaters.events.stopped, function() {
+            updater.stop();
+            gameLoop.removeElement(shield.id);
         });
 
         gameLoop.addUpdater(updater);

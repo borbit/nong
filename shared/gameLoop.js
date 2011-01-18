@@ -44,7 +44,9 @@ ns.GameLoop = function() {
     }
 
     function removeElement(elementId) {
-        elements.splice(elements.indexOf(elementId), 1);
+        if (elements.indexOf(elementId) != -1) {
+            elements.splice(elements.indexOf(elementId), 1);
+        }
     }
 
     function addUpdater(updater) {

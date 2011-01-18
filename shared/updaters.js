@@ -6,25 +6,30 @@ var hasRequire = (typeof require !== 'undefined'),
 
 ns.Updaters = {};
 ns.Updaters.events = {
-    changed: 'changed'
+    changed: 'changed',
+    stopped: 'stopped'
 };
 
-ns.Updaters.Shield = function(shield) {
+ns.Updaters.Shield = function(shield, stageRegion) {
     var speed = 500;
     var movingUp = false;
     var movingDown = false;
     var observer = Observer();
     observer.register(ns.Updaters.events.changed);
+    observer.register(ns.Updaters.events.stopped);
 
     function update() {
+        var delta = parseInt(speed / Globals.RFPS);
         if(movingUp) {
-            shield.region.y -= parseInt(speed / Globals.RFPS);
+            shield.region.y -= Math.min(delta, Math.abs(stageRegion.top() - shield.region.top()));
+            observer.changed();
         }
         if(movingDown) {
-            shield.region.y += parseInt(speed / Globals.RFPS);
-        }
-        if(movingUp || movingDown) {
+            shield.region.y += Math.min(delta, Math.abs(stageRegion.bottom() - shield.region.bottom()));
             observer.changed();
+        }
+        if ((shield.region.top() == stageRegion.top()) || (shield.region.bottom() == stageRegion.bottom())) {
+            observer.stopped();
         }
     }
 
@@ -40,7 +45,7 @@ ns.Updaters.Shield = function(shield) {
 
     function stop() {
         movingUp = false;
-        movingDown = true;
+        movingDown = false;
     }
 
     return {
