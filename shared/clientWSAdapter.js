@@ -5,12 +5,12 @@ Pong.ClientWSAdapter = function() {
     var STATE_CONNECTED = 'connected';
 
     var ws = null;
-    var state = STATE_CONNECTING;
+    var state = STATE_DISCONNECTED;
     var observer = Pong.Observer();
 
     observer.register(Pong.WSAdapter.events.CONNECTED);
     observer.register(Pong.WSAdapter.events.DISCONNECTED);
-    observer.register(Pong.WSAdapter.events.GAMESTATE);
+    observer.register(Pong.WSAdapter.events.MESSAGE);
 
     function connect() {
         ws = new WebSocket(Pong.Config.WS_BACKEND);
@@ -34,6 +34,8 @@ Pong.ClientWSAdapter = function() {
             state = STATE_DISCONNECTED;
             observer.disconnected();
         };
+
+        state = STATE_CONNECTING
     }
 
     function disconnect() {
@@ -47,39 +49,17 @@ Pong.ClientWSAdapter = function() {
     }
 
     function processMessage(message) {
-        var payload = JSON.parse(message.data);
-        var packet = createPacket(payload);
-        
-        if(observer.isRegistered(packet.name())) {
-            observer.fire(packet.name(), [packet]);
-        }
+        observer.message(JSON.parse(message.data));
     }
 
-    function createPacket(payload) {
-        var PacketClass = Pong.Packets[payload.name];
-
-        if(PacketClass == null) {
-            throw 'Unknown packet: ' + payload.name;
-        }
-        
-        var packet = PacketClass();
-        packet.data(payload.data);
-        return packet;
-     }
-
-     function sendPacket(packet) {
-        var payload = JSON.stringify({
-            name: packet.name(),
-            data: packet.data()
-        });
-        console.log('Sending packet: ' + payload);
-        ws.send(payload);
+    function sendMessage(message) {
+        ws.send(message);
     }
 
     return {
         connect: connect,
         disconnect: disconnect,
-        sendPacket: sendPacket,
+        sendMessage: sendMessage,
         subscribe: observer.subscribe
     };
 
@@ -89,5 +69,5 @@ Pong.WSAdapter = {};
 Pong.WSAdapter.events = {
     DISCONNECTED: 'disconnected',
     CONNECTED: 'connected',
-    GAMESTATE: 'GameState'
+    MESSAGE: 'message'
 };
