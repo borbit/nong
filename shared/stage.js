@@ -9,7 +9,6 @@ var hasRequire = (typeof require !== 'undefined'),
 ns.Stage = function() {
     var balls = [];
     var shields = [];
-
     var gameLoop = GameLoop();
     var region = Region({width: 800, height: 600});
     var observer = Observer();
@@ -26,13 +25,17 @@ ns.Stage = function() {
         var updater = ns.Updaters.Shield(shield);
 
         publisher.subscribe(publisher.events.moveUp, function() {
-            updater.moveUp();
-            gameLoop.addElement(shield.id);
+            if(shield.region.y > region.y) {
+                updater.moveUp();
+                gameLoop.addElement(shield.id);
+            }
         });
 
         publisher.subscribe(publisher.events.moveDown, function() {
-            updater.moveDown();
-            gameLoop.addElement(shield.id);
+            if(shield.region.y + shield.region.height < region.y + region.height) {
+                updater.moveDown();
+                gameLoop.addElement(shield.id);
+            }
         });
 
         publisher.subscribe(publisher.events.stop, function() {
@@ -42,6 +45,12 @@ ns.Stage = function() {
 
         updater.subscribe(ns.Updaters.events.changed, function() {
             observer.changed(shield);
+            
+            if(shield.region.y <= region.y || shield.region.y +
+               shield.region.height >= region.y + region.height) {
+                updater.stop();
+                gameLoop.removeElement(shield.id);
+            }
         });
 
         gameLoop.addUpdater(updater);

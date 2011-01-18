@@ -1,105 +1,26 @@
 $(function() {
-    $('#connect').bind('click', connect);
-    $('#disconnect').bind('click', disconnect);
+    $('#connect').bind('click', ws.connect);
+    $('#disconnect').bind('click', ws.disconnect);
     $('#join-left').bind('click', joinLeft);
     $('#join-right').bind('click', joinRight);
-    
     console.log('Initialization complete');
 });
 
-var ws = null;
+var ws = Pong.ClientWSAdapter();
 
-var STATE_DISCONNECTED  = 'disconnected';
-var STATE_CONNECTING    = 'connecting';
-var STATE_CONNECTED     = 'connected';
-
-var state = STATE_DISCONNECTED;
-
-function connect() {
-    if (state != STATE_DISCONNECTED) {
-        console.log('ERROR: Wrong connection state: ' + state);
-        return;
-    }
-    
-    console.log('Connecting...');
-    
-    ws = new WebSocket(Pong.Config.WS_BACKEND);
-    state = STATE_CONNECTING;
-    _connecting();
-    
-    ws.onopen = function() {
-        console.log('WebSocket connected');
-        state = STATE_CONNECTED;
-        _connected();
-    };
-    ws.onmessage = function(message) {
-        console.log('Received: ' + message.data);
-        _processMessage(message);
-    };
-    ws.onerror = function(error) {
-        console.log('WebSocket error: ' + error);
-        state = STATE_DISCONNECTED;
-        _disconnected();
-    };
-    ws.onclose = function() {
-        console.log('WebSocket disconnected');
-        state = STATE_DISCONNECTED;
-        _disconnected();
-    };
-}
-
-function disconnect() {
-    if (state != STATE_CONNECTED) {
-        console.log('ERROR: Wrong connection state: ' + state);
-        return;
-    }
-    
-    console.log('Disconnecting...');
-    ws.close();
-}
-
-function _connecting() {
-    $('#connect').attr('disabled', 'disabled');
-}
-
-function _connected() {
+ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
     $('#connect').attr('disabled', 'disabled');
     $('#disconnect').removeAttr('disabled');
-}
+});
 
-function _disconnected() {
+ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
     $('#connect').removeAttr('disabled');
     $('#disconnect').attr('disabled', 'disabled');
     $('#join-left').attr('disabled', 'disabled');
     $('#join-right').attr('disabled', 'disabled');
-}
+});
 
-function joinLeft() {
-    var packet = Pong.Packets.JoinLeft();
-    _sendPacket(packet);
-}
-
-function joinRight() {
-    var packet = Pong.Packets.JoinRight();
-    _sendPacket(packet);
-}
-
-function _processMessage(message) {
-    var payload = JSON.parse(message.data);
-    var packet = _createPacket(payload);
-    var packetName = packet.name();
-    console.log('Received packet: ' + packetName);
-    switch (packetName) {
-        case 'GameState':
-            _processGameState(packet);
-            break;
-        
-        default:
-            throw 'Unknown packet: ' + packetName;
-    }
-}
-
-function _processGameState(packet) {
+ws.subscribe(Pong.WSAdapter.events.GAMESTATE, function(packet) {
     var gameState = packet.gameState();
     if (gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
         var leftPlayerState = packet.leftPlayerState();
@@ -108,7 +29,7 @@ function _processGameState(packet) {
         } else {
             $('#join-left').attr('disabled', 'disabled');
         }
-        
+
         var rightPlayerState = packet.rightPlayerState();
         if (rightPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-right').removeAttr('disabled');
@@ -116,25 +37,16 @@ function _processGameState(packet) {
             $('#join-right').attr('disabled', 'disabled');
         }
     }
+});
+
+function _connecting() {
+    $('#connect').attr('disabled', 'disabled');
 }
 
-function _createPacket(payload) {
-    var name = payload.name;
-    if (typeof Pong.Packets[name] === 'undefined') {
-        throw 'Unknown packet: ' + name;
-    }
-    
-    var packet = new Pong.Packets[name];
-    packet.data(payload.data);
-    return packet;
+function joinLeft() {
+    ws.sendPacket(Pong.Packets.JoinLeft());
 }
 
-function _sendPacket(packet) {
-    var payload = {
-        name: packet.name(),
-        data: packet.data()
-    };
-    var jsonPayload = JSON.stringify(payload);
-    console.log('Sending packet: ' + jsonPayload);
-    ws.send(jsonPayload);
+function joinRight() {
+    ws.sendPacket(Pong.Packets.JoinRight());
 }
