@@ -1,12 +1,14 @@
 $(function() {
     $('#connect').bind('click', ws.connect);
     $('#disconnect').bind('click', ws.disconnect);
-    $('#join-left').bind('click', joinLeft);
-    $('#join-right').bind('click', joinRight);
+    $('#join-left').bind('click', publisher.joinLeft);
+    $('#join-right').bind('click', publisher.joinRight);
     console.log('Initialization complete');
 });
 
 var ws = Pong.ClientWSAdapter();
+var publisher = Pong.RemoutEventsPublisher(ws);
+var receiver = Pong.RemoutEventsReceiver(ws);
 
 ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
     $('#connect').attr('disabled', 'disabled');
@@ -20,17 +22,16 @@ ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
     $('#join-right').attr('disabled', 'disabled');
 });
 
-ws.subscribe(Pong.WSAdapter.events.GAMESTATE, function(packet) {
-    var gameState = packet.gameState();
-    if (gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
-        var leftPlayerState = packet.leftPlayerState();
+receiver.subscribe(Pong.RemoutEventsReceiver.events.GAMESTATE, function(packetData) {
+    if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
+        var leftPlayerState = packetData.leftPlayerState;
         if (leftPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-left').removeAttr('disabled');
         } else {
             $('#join-left').attr('disabled', 'disabled');
         }
 
-        var rightPlayerState = packet.rightPlayerState();
+        var rightPlayerState = packetData.rightPlayerState;
         if (rightPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-right').removeAttr('disabled');
         } else {
@@ -38,15 +39,3 @@ ws.subscribe(Pong.WSAdapter.events.GAMESTATE, function(packet) {
         }
     }
 });
-
-function _connecting() {
-    $('#connect').attr('disabled', 'disabled');
-}
-
-function joinLeft() {
-    ws.sendPacket(Pong.Packets.JoinLeft());
-}
-
-function joinRight() {
-    ws.sendPacket(Pong.Packets.JoinRight());
-}
