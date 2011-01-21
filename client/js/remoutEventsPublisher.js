@@ -7,6 +7,14 @@ Pong.RemoutEventsPublisher = function(ws) {
     function joinRight() {
         sendPacket(Pong.Packets.JoinRight());
     }
+    
+    function sendGameState(gameState, leftPlayerState, rightPlayerState) {
+        var packet = Pong.Packets.GameState();
+        packet.gameState(gameState);
+        packet.leftPlayerState(leftPlayerState);
+        packet.rightPlayerState(rightPlayerState);
+        sendPacket(packet);
+    }
 
     function sendPacket(packet) {
         var payload = JSON.stringify({

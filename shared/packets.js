@@ -78,4 +78,12 @@
         return ns.Packet(ns.Names.JOIN_RIGHT);
     };
     
+    ns.factory = function(packetName) {
+        if (typeof ns[packetName] === 'undefined') {
+            return false;
+        }
+        
+        return ns[packetName].call(null);
+    };
+    
 }((typeof exports === 'undefined') ? window.Pong.Packets = {} : exports));

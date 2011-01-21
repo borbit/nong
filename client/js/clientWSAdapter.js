@@ -1,5 +1,4 @@
 Pong.ClientWSAdapter = function() {
-    
     var STATE_DISCONNECTED = 'disconnected';
     var STATE_CONNECTING = 'connecting';
     var STATE_CONNECTED = 'connected';

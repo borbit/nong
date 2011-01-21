@@ -1,25 +1,25 @@
 var ws = require('websocket-server');
-var game = require('./game');
-var Client = require('./client').Client;
+var wsClient = require('./ws-client');
+var Emitter = require('events').EventEmitter;
+
+var events = exports.events = {
+    CLIENT: 'client'
+};
 
 exports.createServer = function() {
     var server = ws.createServer();
-    server.addListener('connection', function(connection) {
-        var client = new Client(connection);
-        game.join(client);
-        /*
-        conn.addListener('message', function(message) {
-            console.log('Got message: ' + message);
-            conn.send(message);
-            conn.close();
-        });
-        
-        conn.addListener('close', function(conn) {
-            console.log('Disconnected.');
-        });
-        
-        conn.send('Hello!');
-        */
+    var emitter = new Emitter();
+    
+    server.addListener('connection', function(connection) {        
+        emitter.emit(events.CLIENT, wsClient.createClient(connection));
     });
-    return server;
+    
+    function addEventListener(event, callback) {
+        emitter.on(event, callback);
+    }
+    
+    return {
+        on: addEventListener,
+        listen: server.listen
+    };
 }

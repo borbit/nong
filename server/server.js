@@ -1,14 +1,14 @@
 var fs = require('fs');
-var ws_server = require('./ws-server');
-
 var config = require('../config/config.js');
+var wsServer = require('./ws-server');
+var handlers = require('./handlers');
 
 // checking if pidfile exists
 try {
     fs.statSync(config.PIDFILE);
     console.log('Looks like pong server is already running.');
     console.log('If you\'re sure it isn\'t, remove ' + config.PIDFILE);
-    return;
+    stop();
 } catch (e) {
     // creating it if it 
     fs.writeFileSync(config.PIDFILE, process.pid.toString());
@@ -35,8 +35,13 @@ process.on('SIGINT', stop);
 process.on('SIGTERM', stop);
 
 // creating websocket server
-var server = ws_server.createServer();
+var server = wsServer.createServer();
+
+server.on(wsServer.events.CLIENT, function(client) {
+    handlers.handle(client);
+});
 
 // listening for websocket connections
 server.listen(config.WS_PORT);
+
 console.log('Websocket server listening on port ' + config.WS_PORT);
