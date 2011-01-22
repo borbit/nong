@@ -10,7 +10,7 @@ exports.createClient = function(connection) {
     var emitter = new Emitter();
     
     connection.addListener('message', function(message) {
-        emitter.emit(events.PACKET, createPacket(message));
+        emitter.emit(events.PACKET, packets.unserialize(message));
     });
     
     connection.addListener('close', function() {
@@ -31,7 +31,3 @@ exports.createClient = function(connection) {
         on: addEventListener
     };
 };
-
-function createPacket(payload) {
-    return packets.unserialize(payload);
-}

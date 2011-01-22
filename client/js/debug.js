@@ -7,8 +7,8 @@ $(function() {
 });
 
 var ws = Pong.ClientWSAdapter();
-var publisher = Pong.RemoutEventsPublisher(ws);
-var receiver = Pong.RemoutEventsReceiver(ws);
+var publisher = Pong.RemoteEventsPublisher(ws);
+var receiver = Pong.RemoteEventsReceiver(ws);
 
 ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
     publisher.joinGame('only');
@@ -24,7 +24,7 @@ ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
     $('#join-right').attr('disabled', 'disabled');
 });
 
-receiver.subscribe(Pong.RemoutEventsReceiver.events.GAMESTATE, function(packetData) {
+receiver.subscribe(Pong.RemoteEventsReceiver.events.GAMESTATE, function(packetData) {
     if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
         var leftPlayerState = packetData.leftPlayerState;
         if (leftPlayerState == Pong.Constants.PLAYER_STATE_FREE) {

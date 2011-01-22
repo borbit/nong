@@ -1,4 +1,4 @@
-Pong.RemoutEventsPublisher = function(ws) {
+Pong.RemoteEventsPublisher = function(ws) {
     
     function joinGame(name) {
         var packet = Pong.Packets.JoinGame();
