@@ -45,6 +45,8 @@ $(function() {
     
     statusMessage.text('CONNECTING').show();
     ws.connect();
+    menu.hide();
+    createGame();
     
     function createGame() {
         var shield1 = Pong.Shield(40, 250);

@@ -3,7 +3,7 @@
 var hasRequire = (typeof require !== 'undefined'),
     Region = hasRequire ? require('region') : ns.Region,
     GameLoop = hasRequire ? require('gameLoop') : ns.GameLoop,
-    CollisionsDetector = hasRequire ? require('collisionsDetector') : ns.CollisionsDetector,
+    Collisions = hasRequire ? require('collisions') : ns.Collisions,
     Observer = hasRequire ? require('observer') : ns.Observer;
 
 ns.Stage = function() {
@@ -12,7 +12,7 @@ ns.Stage = function() {
     var gameLoop = GameLoop();
     var region = Region({width: 800, height: 600});
     var observer = Observer();
-    var collisions = CollisionsDetector({region: region});
+    var collisions = Collisions(region);
 
     observer.register(ns.Stage.events.changed);
     subscribeForCollisionEvents();
@@ -72,34 +72,34 @@ ns.Stage = function() {
     }
 
     function subscribeForCollisionEvents() {
-        collisions.subscribe(CollisionsDetector.events.stage.leftEdge, function(ball) {
+        collisions.subscribe(Collisions.events.stage.leftEdge, function(ball) {
             ball.region.x = region.x;
             ball.vx = ball.vx * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.stage.topEdge, function(ball) {
+        collisions.subscribe(Collisions.events.stage.topEdge, function(ball) {
             ball.region.y = region.y;
             ball.vy = ball.vy * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.stage.rightEdge, function(ball) {
+        collisions.subscribe(Collisions.events.stage.rightEdge, function(ball) {
             ball.region.x = region.x + region.width - ball.region.width;
             ball.vx = ball.vx * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.stage.bottomEdge, function(ball) {
+        collisions.subscribe(Collisions.events.stage.bottomEdge, function(ball) {
             ball.region.y = region.y + region.height - ball.region.height;
             ball.vy = ball.vy * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.shield.leftEdge, function(ball, shield) {
+        collisions.subscribe(Collisions.events.shield.leftEdge, function(ball, shield) {
             var offset = calcCollisionOffset(ball, shield);
             ball.region.x = shield.region.x - ball.region.width;
             ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
             ball.vx = ball.vx * -1;
         });
 
-        collisions.subscribe(CollisionsDetector.events.shield.rightEdge, function(ball, shield) {
+        collisions.subscribe(Collisions.events.shield.rightEdge, function(ball, shield) {
             var offset = calcCollisionOffset(ball, shield);
             ball.region.x = shield.region.x + shield.region.width;
             ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
