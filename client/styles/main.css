@@ -121,3 +121,17 @@ body {
 #menu .joined.right {
     right:100px;
 }
+
+#menu .status {
+    display:none;
+    position:absolute;
+    top:50%;
+    left:50%;
+    margin:-20px 0 0 -100px;
+    height:40px;
+    width:200px;
+    line-height:40px;
+    font-size:30px;
+    text-align:center;
+    color:#fff;
+}

@@ -2,22 +2,29 @@ $(function() {
     var ws = Pong.ClientWSAdapter(),
         publisher = Pong.RemoutEventsPublisher(ws),
         receiver = Pong.RemoutEventsReceiver(ws),
-        
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
         waitingMessage = $('#menu .waiting'),
-        joinedMessage = $('#menu .joined');
+        joinedMessage = $('#menu .joined'),
+        statusMessage = $('#menu .status'),
+        menu = $('#menu');
     
     joinButtonLeft.click(publisher.joinLeft);
     joinButtonRight.click(publisher.joinRight);
     
     ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
+        statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
     });
 
     ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
-        
+        menu.show();
+        joinButtonLeft.hide();
+        joinButtonRight.hide();
+        waitingMessage.hide();
+        joinedMessage.hide(); 
+        statusMessage.text('DISCONNECTED').show();
     });
     
     receiver.subscribe(Pong.RemoutEventsReceiver.events.GAMESTATE, function(packetData) {
@@ -31,10 +38,12 @@ $(function() {
                 joinedMessage.addClass('right').show();
             }
         } else if(packetData.gameState == Pong.Constants.GAME_STATE_IN_PROGRESS) {
+            menu.hide();
             createGame();
         }
     });
     
+    statusMessage.text('CONNECTING').show();
     ws.connect();
     
     function createGame() {
