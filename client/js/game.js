@@ -2,6 +2,7 @@ $(function() {
     var ws = Pong.ClientWSAdapter(),
         publisher = Pong.RemoteEventsPublisher(ws),
         receiver = Pong.RemoteEventsReceiver(ws),
+
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
         waitingMessage = $('#menu .waiting'),
@@ -13,6 +14,7 @@ $(function() {
     joinButtonRight.click(publisher.joinRight);
     
     ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
+        publisher.joinGame('only');
         statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
@@ -45,8 +47,6 @@ $(function() {
     
     statusMessage.text('CONNECTING').show();
     ws.connect();
-    menu.hide();
-    createGame();
     
     function createGame() {
         var shield1 = Pong.Shield(40, 250);

@@ -1,18 +1,17 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Region = hasRequire ? require('region') : ns.Region,
-    GameLoop = hasRequire ? require('gameLoop') : ns.GameLoop,
-    Collisions = hasRequire ? require('collisions') : ns.Collisions,
-    Observer = hasRequire ? require('observer') : ns.Observer;
+    Region = hasRequire ? require('region').Region : ns.Region,
+    GameLoop = hasRequire ? require('gameLoop').GameLoop : ns.GameLoop,
+    Collisions = hasRequire ? require('collisions').Collisions : ns.Collisions,
+    Observer = hasRequire ? require('observer').Observer : ns.Observer;
 
 ns.Stage = function() {
-    var balls = [];
-    var shields = [];
-    var gameLoop = GameLoop();
-    var region = Region({width: 800, height: 600});
-    var observer = Observer();
-    var collisions = Collisions(region);
+    var balls = [], shields = [],
+        region = Region({width: 800, height: 600}),
+        gameLoop = GameLoop(),
+        observer = Observer(),
+        collisions = Collisions(region);
 
     observer.register(ns.Stage.events.changed);
     subscribeForCollisionEvents();

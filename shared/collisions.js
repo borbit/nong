@@ -1,7 +1,7 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Observer = hasRequire ? require('observer') : ns.Observer;
+    Observer = hasRequire ? require('observer').Observer : ns.Observer;
 
 ns.Collisions = function(stageRegion) {
     var observer = Observer();

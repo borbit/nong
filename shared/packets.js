@@ -1,6 +1,6 @@
 (function(ns) {
     var hasRequire = (typeof require !== 'undefined'),
-        constants = hasRequire ? require('constants') : window.Pong.Constants,
+        constants = hasRequire ? require('./constants') : window.Pong.Constants,
         functions = hasRequire ? require('./functions') : window.Pong.Functions;
     
     var packets = {};
