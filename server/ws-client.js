@@ -10,7 +10,7 @@ exports.createClient = function(connection) {
     var emitter = new Emitter();
     
     connection.addListener('message', function(message) {
-        emitter.emit(events.PACKET, createPacket(JSON.parse(message)));
+        emitter.emit(events.PACKET, createPacket(message));
     });
     
     connection.addListener('close', function() {
@@ -18,11 +18,8 @@ exports.createClient = function(connection) {
     });
     
     function send(packet) {
-        var payload = {
-            name: packet.name(),
-            data: packet.data()
-        };
-        connection.send(JSON.stringify(payload));
+        var payload = packets.serialize(packet);
+        connection.send(payload);
     }
     
     function addEventListener(event, callback) {
@@ -36,12 +33,5 @@ exports.createClient = function(connection) {
 };
 
 function createPacket(payload) {
-    var packet = packets.factory(payload.name);
-    
-    if (!packet) {
-        throw 'Unknown packet: ' + payload.name;
-    }
-    
-    packet.data(payload.data);
-    return packet;
+    return packets.unserialize(payload);
 }

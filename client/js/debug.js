@@ -11,6 +11,8 @@ var publisher = Pong.RemoutEventsPublisher(ws);
 var receiver = Pong.RemoutEventsReceiver(ws);
 
 ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
+    publisher.joinGame('only');
+    
     $('#connect').attr('disabled', 'disabled');
     $('#disconnect').removeAttr('disabled');
 });

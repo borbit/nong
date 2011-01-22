@@ -2,7 +2,7 @@
 
 var hasRequire = (typeof require !== 'undefined'),
     Globals = hasRequire ? require('globals') : ns.Globals,
-    Observer = hasRequire ? require('observer') : ns.Observer;
+    Observer = hasRequire ? require('observer').Observer : ns.Observer;
 
 ns.Updaters = {};
 ns.Updaters.events = {

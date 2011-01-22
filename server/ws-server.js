@@ -1,25 +1,32 @@
 var ws = require('websocket-server');
 var wsClient = require('./ws-client');
-var Emitter = require('events').EventEmitter;
-
-var events = exports.events = {
-    CLIENT: 'client'
-};
+var packets = require('../shared/packets');
 
 exports.createServer = function() {
     var server = ws.createServer();
-    var emitter = new Emitter();
+    var games = {};
+    var clients = [];
     
     server.addListener('connection', function(connection) {
-        emitter.emit(events.CLIENT, wsClient.createClient(connection));
+        var client = wsClient.createClient(connection);
+        clients.push(client);
+        client.on(wsClient.events.PACKET, function(packet){
+            if (packet.id() == packets.JoinGame.id) {
+                var game = games[packet.data().name];
+                game.addClient(client);
+            }
+        });
     });
     
-    function addEventListener(event, callback) {
-        emitter.on(event, callback);
+    function addGame(name, game) {
+        if (games[name] != null) {
+            throw 'Game name already taken';
+        }
+        games[name] = game;
     }
     
     return {
-        on: addEventListener,
-        listen: server.listen
+        listen: server.listen,
+        addGame: addGame
     };
 }

@@ -8,21 +8,13 @@ Pong.RemoutEventsReceiver = function(ws) {
     function processMessage(payload) {
         var packet = createPacket(payload);
 
-        if(observer.isRegistered(packet.name())) {
-            observer.fire(packet.name(), [packet.data()]);
+        if (observer.isRegistered(packet.id())) {
+            observer.fire(packet.id(), [packet.data()]);
         }
     }
 
     function createPacket(payload) {
-        var PacketClass = Pong.Packets[payload.name];
-
-        if(PacketClass == null) {
-            throw 'Unknown packet: ' + payload.name;
-        }
-
-        var packet = PacketClass();
-        packet.data(payload.data);
-        return packet;
+        return Pong.Packets.unserialize(payload);
      }
 
     return {

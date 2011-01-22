@@ -3,7 +3,7 @@ require('log4js')();
 var fs = require('fs');
 var config = require('../config/config.js');
 var wsServer = require('./ws-server');
-var handlers = require('./handlers');
+var game = require('./game');
 
 // checking if pidfile exists
 try {
@@ -38,10 +38,7 @@ process.on('SIGTERM', stop);
 
 // creating websocket server
 var server = wsServer.createServer();
-
-server.on(wsServer.events.CLIENT, function(client) {
-    handlers.handle(client);
-});
+server.addGame('only', game.createGame());
 
 // listening for websocket connections
 server.listen(config.WS_PORT);
