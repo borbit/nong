@@ -21,7 +21,6 @@ Pong.RemoutEventsPublisher = function(ws) {
             name: packet.name(),
             data: packet.data()
         });
-        console.log('Sending packet: ' + payload);
         ws.sendMessage(payload);
     }
 

@@ -1,8 +1,8 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined');
-var Globals = (hasRequire) ? require('globals') : ns.Globals;
-var Observer = hasRequire ? require('observer') : ns.Observer;
+var Globals = (hasRequire) ? require('globals').Globals : ns.Globals;
+var Observer = hasRequire ? require('observer').Observer : ns.Observer;
 
 ns.GameLoop = function() {
     var observer = Observer();

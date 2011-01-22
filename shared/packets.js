@@ -1,7 +1,7 @@
 (function(ns) {
     var hasRequire = (typeof require !== 'undefined'),
-        constants = hasRequire ? require('constants') : window.Pong.Constants,
-        functions = hasRequire ? require('./functions') : window.Pong.Functions;
+        constants = hasRequire ? require('constants').Constants : window.Pong.Constants,
+        functions = hasRequire ? require('./functions').Functions : window.Pong.Functions;
 
     ns.Names = {
         GAME_STATE: 'GameState',
