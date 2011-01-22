@@ -10,11 +10,12 @@
 , "engines" : { "node" : ">=0.3.3" }
 , repositories:
   { "type" : "git"
-  , "url" : "http://github.com/borbit/pong.git"
+  , "url" : "http://github.com/borbit/nong.git"
   }
 , "dependencies" :
   { "websocket-server" : "~1.4.01"
   , "websocket-client" : "~1.0.0"
   , "nodeunit" : "~0.5.0"
+  , "log4js" : "~0.2.3"
   }
 }

@@ -1,3 +1,5 @@
+require('log4js')();
+
 var fs = require('fs');
 var config = require('../config/config.js');
 var wsServer = require('./ws-server');

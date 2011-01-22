@@ -10,7 +10,7 @@ exports.createServer = function() {
     var server = ws.createServer();
     var emitter = new Emitter();
     
-    server.addListener('connection', function(connection) {        
+    server.addListener('connection', function(connection) {
         emitter.emit(events.CLIENT, wsClient.createClient(connection));
     });
     

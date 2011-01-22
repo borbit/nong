@@ -1,5 +1,5 @@
 # this options can be redefined in config.local
-SERVER_NAME = pong.dev
-NGINX_CONFIG = /etc/nginx/sites-enabled/pong.dev
+SERVER_NAME = nong.dev
+NGINX_CONFIG = /etc/nginx/sites-enabled/nong.dev
 WS_PORT = 8080
 NODE_PIDFILE = server/server.pid
