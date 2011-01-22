@@ -1,52 +1,49 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Region = hasRequire ? require('region').Region : ns.Region,
-    GameLoop = hasRequire ? require('gameLoop').GameLoop : ns.GameLoop,
-    Collisions = hasRequire ? require('collisions').Collisions : ns.Collisions,
-    Observer = hasRequire ? require('observer').Observer : ns.Observer;
+    Region = hasRequire ? require('./region').Region : ns.Region,
+    GameLoop = hasRequire ? require('./gameLoop').GameLoop : ns.GameLoop,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
+    Collisions = hasRequire ? require('./collisions').Collisions : ns.Collisions,
+    Updaters = hasRequire ? require('./updaters').Updaters : ns.Updaters;
 
-ns.Stage = function() {
+ns.Stage = function Stage() {
     var balls = [], shields = [],
         region = Region({width: 800, height: 600}),
         gameLoop = GameLoop(),
         observer = Observer(),
         collisions = Collisions(region);
 
-    observer.register(ns.Stage.events.changed);
     subscribeForCollisionEvents();
 
-    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function() {
+    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function(elements) {
+        observer.fire(Stage.events.changed, elements);
         collisions.detect();
     });
 
     function addShield(shield, receiver) {
-        var updater = ns.Updaters.Shield(shield, region);
+        var updater = Updaters.Shield(shield, region);
 
-        receiver.subscribe(receiver.events.moveUp, function() {
+        receiver.subscribe(receiver.events.MOVEUP, function() {
             if(shield.region.y > region.y) {
                 updater.moveUp();
                 gameLoop.addElement(shield.id);
             }
         });
 
-        receiver.subscribe(receiver.events.moveDown, function() {
+        receiver.subscribe(receiver.events.MOVEDOWN, function() {
             if(shield.region.y + shield.region.height < region.y + region.height) {
                 updater.moveDown();
                 gameLoop.addElement(shield.id);
             }
         });
 
-        receiver.subscribe(receiver.events.stop, function() {
+        receiver.subscribe(receiver.events.STOP, function() {
             updater.stop();
             gameLoop.removeElement(shield.id);
         });
 
-        updater.subscribe(ns.Updaters.events.changed, function() {
-            observer.changed(shield);
-        });
-
-        updater.subscribe(ns.Updaters.events.stopped, function() {
+        updater.subscribe(Updaters.events.stopped, function() {
             updater.stop();
             gameLoop.removeElement(shield.id);
         });
@@ -54,20 +51,18 @@ ns.Stage = function() {
         gameLoop.addUpdater(updater);
         collisions.addShield(shield);
         shields.push(shield);
+        return this;
     }
 
     function addBall(ball, publisher) {
-        var updater = Pong.Updaters.Ball(ball);
-
-        updater.subscribe(ns.Updaters.events.changed, function() {
-            observer.changed(ball);
-        });
+        var updater = Updaters.Ball(ball);
 
         gameLoop.addUpdater(updater);
         gameLoop.addElement(ball.id);
 
         collisions.addBall(ball);
         balls.push(ball);
+        return this;
     }
 
     function subscribeForCollisionEvents() {
@@ -126,6 +121,7 @@ ns.Stage = function() {
     }
 
     return {
+        stop: stop,
         start: start,
         addBall: addBall,
         addShield: addShield,

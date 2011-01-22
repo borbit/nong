@@ -4,9 +4,12 @@
         functions = hasRequire ? require('./functions') : window.Pong.Functions;
     
     var packets = {};
-    packets.add = function(packet) {
-        packets[packet.id] = packet;
-    };
+    
+    function createPacket(id, cntr) {
+        cntr.id = id;
+        packets[id] = cntr;
+        return cntr;
+    }
     
     ns.Packet = function(packetId) {
         var packetData = {};
@@ -29,7 +32,7 @@
         };
     };
     
-    ns.GameState = function() {
+    ns.GameState = createPacket('GameState', function() {
         var packet = ns.Packet(ns.GameState.id);
 
         packet.data({
@@ -67,11 +70,9 @@
             leftPlayerState: leftPlayerState,
             rightPlayerState: rightPlayerState
         });
-    };
-    ns.GameState.id = 'GameState';
-    packets.add(ns.GameState);
+    });
     
-    ns.JoinGame = function() {
+    ns.JoinGame = createPacket('JoinGame', function() {
         var packet = ns.Packet(ns.JoinGame.id);
         
         function name(name) {
@@ -85,21 +86,41 @@
         return functions.extend(packet, {
             name: name
         });
-    };
-    ns.JoinGame.id = 'JoinGame';
-    packets.add(ns.JoinGame);
+    });
     
-    ns.JoinLeft = function() {
+    ns.JoinLeft = createPacket('JoinLeft', function() {
         return ns.Packet(ns.JoinLeft.id);
-    };
-    ns.JoinLeft.id = 'JoinLeft';
-    packets.add(ns.JoinLeft);
+    });
     
-    ns.JoinRight = function() {
+    ns.JoinRight = createPacket('JoinRight', function() {
         return ns.Packet(ns.JoinRight.id);
-    };
-    ns.JoinRight.id = 'JoinRight';
-    packets.add(ns.JoinRight);
+    });
+    
+    ns.ShieldMoveUp = createPacket('ShieldMoveUp', function() {
+        return ns.Packet(ns.ShieldMoveUp.id);
+    });
+    
+    ns.ShieldMoveDown = createPacket('ShieldMoveDown', function() {
+        return ns.Packet(ns.ShieldMoveDown.id);
+    });
+    
+    ns.ShieldStop = createPacket('ShieldStop', function() {
+        return ns.Packet(ns.ShieldStop.id);
+    });
+    
+    ns.GameSnapshot = createPacket('GameSnapshot', function() {
+        var packet = ns.Packet(ns.GameSnapshot.id);
+        
+        function addElementData(elementId, data) {
+            var tmp = {};
+            tmp[elementId] = data;
+            packet.data(tmp);
+        }
+        
+        return functions.extend(packet, {
+            addElementData: addElementData
+        });
+    });
     
     ns.serialize = function(packet) {
         return JSON.stringify({

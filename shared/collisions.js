@@ -1,21 +1,13 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Observer = hasRequire ? require('observer').Observer : ns.Observer;
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
 ns.Collisions = function(stageRegion) {
-    var observer = Observer();
-
     var balls = [];
     var shields = [];
-
-    observer.register(ns.Collisions.events.stage.leftEdge);
-    observer.register(ns.Collisions.events.stage.topEdge);
-    observer.register(ns.Collisions.events.stage.rightEdge);
-    observer.register(ns.Collisions.events.stage.bottomEdge);
-
-    observer.register(ns.Collisions.events.shield.leftEdge);
-    observer.register(ns.Collisions.events.shield.rightEdge);
+    var observer = Observer();
+    var events = ns.Collisions.events;
 
     function addBall(ball) {
         balls.push(ball);
@@ -41,15 +33,15 @@ ns.Collisions = function(stageRegion) {
 
     function detectCollisionWithStage(ball) {
         if (ball.region.right() > stageRegion.right()) {
-            observer.stageRightEdgeHitted(ball);
+            observer.fire(events.stage.rightEdge, ball);
         } else if (ball.region.left() < stageRegion.left()) {
-            observer.stageLeftEdgeHitted(ball);
+            observer.fire(events.stage.leftEdge, ball);
         }
 
         if (ball.region.bottom() > stageRegion.bottom()) {
-            observer.stageBottomEdgeHitted(ball);
+            observer.fire(events.stage.bottomEdge, ball);
         } else if (ball.region.top() < stageRegion.top()) {
-            observer.stageTopEdgeHitted(ball);
+            observer.fire(events.stage.topEdge, ball);
         }
     }
 
@@ -60,9 +52,9 @@ ns.Collisions = function(stageRegion) {
             ball.region.top() < shield.region.bottom()) {
 
             if(ball.region.right() > shield.region.right()) {
-                observer.shieldRightEdgeHitted(ball, shield);
+                observer.fire(events.shield.rightEdge, ball, shield);
             } else if (ball.region.left() < shield.region.left()) {
-                observer.shieldLeftEdgeHitted(ball, shield);
+                observer.fire(events.shield.leftEdge, ball, shield);
             }
         }
     }

@@ -1,8 +1,8 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Globals = hasRequire ? require('globals') : ns.Globals,
-    Observer = hasRequire ? require('observer').Observer : ns.Observer;
+    Globals = hasRequire ? require('./globals') : ns.Globals,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
 ns.Updaters = {};
 ns.Updaters.events = {
@@ -15,21 +15,19 @@ ns.Updaters.Shield = function(shield, stageRegion) {
     var movingUp = false;
     var movingDown = false;
     var observer = Observer();
-    observer.register(ns.Updaters.events.changed);
-    observer.register(ns.Updaters.events.stopped);
 
     function update() {
         var delta = parseInt(speed / Globals.RFPS);
         if(movingUp) {
             shield.region.y -= Math.min(delta, Math.abs(stageRegion.top() - shield.region.top()));
-            observer.changed();
+            observer.fire(ns.Updaters.events.changed);
         }
         if(movingDown) {
             shield.region.y += Math.min(delta, Math.abs(stageRegion.bottom() - shield.region.bottom()));
-            observer.changed();
+            observer.fire(ns.Updaters.events.changed);
         }
         if ((shield.region.top() == stageRegion.top()) || (shield.region.bottom() == stageRegion.bottom())) {
-            observer.stopped();
+            observer.fire(ns.Updaters.events.stopped);
         }
     }
 
@@ -61,12 +59,11 @@ ns.Updaters.Shield = function(shield, stageRegion) {
 ns.Updaters.Ball = function(ball) {
     var speed = 700;
     var observer = Observer();
-    observer.register(ns.Updaters.events.changed);
 
     function update() {
         ball.region.x += ball.vx * speed / Globals.RFPS;
         ball.region.y += ball.vy * speed / Globals.RFPS;
-        observer.changed();
+        observer.fire(ns.Updaters.events.changed);
     }
 
     return {

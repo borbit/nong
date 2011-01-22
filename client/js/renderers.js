@@ -3,9 +3,9 @@
         var renderers = {};
         var nodes = {};
 
-        stage.subscribe(Pong.Stage.events.changed, function(element) {
-            if(renderers[element.id] && nodes[element.id]) {
-                renderers[element.id].render(element, nodes[element.id]);
+        stage.subscribe(Pong.Stage.events.changed, function(elements) {
+            for(var i = 0, len = elements.length; i < len; i++) {
+                renderers[elements[i].id].render(elements[i], nodes[elements[i].id]);
             }
         });
 

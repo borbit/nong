@@ -1,28 +1,24 @@
 Pong.ClientEvents = (function() {
     var events = {
-        stop: 'stop',
-        moveUp: 'moveUp',
-        moveDown: 'moveDown'
+        STOP: 'stop',
+        MOVEUP: 'moveUp',
+        MOVEDOWN: 'moveDown'
     };
 
     var observer = Pong.Observer();
-    observer.register(events.stop);
-    observer.register(events.moveUp);
-    observer.register(events.moveDown);
 
     $(window).keydown(function(event) {
         if(event.which == 38) {
-            observer.moveUp();
+            observer.fire(events.MOVEUP);
         }
-
         if(event.which == 40) {
-            observer.moveDown();
+            observer.fire(events.MOVEDOWN);
         }
     });
 
     $(window).keyup(function(event) {
         if(event.which == 38 || event.which == 40) {
-            observer.stop();
+            observer.fire(events.STOP);
         }
     });
 

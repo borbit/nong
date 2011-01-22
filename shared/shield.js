@@ -1,8 +1,8 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Element = hasRequire ? require('element').Element : ns.Element,
-    Region = hasRequire ? require('region').Region : ns.Region;
+    Element = hasRequire ? require('./element').Element : ns.Element,
+    Region = hasRequire ? require('./region').Region : ns.Region;
 
 ns.Shield = function(x, y) {
     var region = Region({

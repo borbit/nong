@@ -1,7 +1,7 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined');
-var Functions = (hasRequire) ? require('functions') : ns.Functions;
+var hasRequire = (typeof require !== 'undefined'),
+    Functions = (hasRequire) ? require('./functions') : ns.Functions;
 
 ns.Element = function element(region) {
     return {

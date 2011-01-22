@@ -3,7 +3,7 @@ Pong.RemoteEventsReceiver = function(ws) {
 
     ws.subscribe(Pong.WSAdapter.events.MESSAGE, function(payload) {
         var packet = Pong.Packets.unserialize(payload);
-        observer.fire(packet.id(), [packet.data()]);
+        observer.fire(packet.id(), packet.data());
     });
 
     return {

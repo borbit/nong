@@ -1,5 +1,8 @@
 (function(ns) {
 
+var hasRequire = (typeof require !== 'undefined'),
+    Functions = hasRequire ? require('./functions') : ns.Functions;
+        
 ns.Region = function(options) {
     function left() {
         return this.x;
@@ -13,7 +16,7 @@ ns.Region = function(options) {
     function bottom() {
         return this.y + this.height
     }
-    return ns.Functions.extend({
+    return Functions.extend({
         x: 0, y: 0,
         width: 0,
         height: 0,
