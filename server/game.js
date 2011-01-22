@@ -1,83 +1,83 @@
 var util = require('util');
-var wsClient = require('./ws-client');
 var constants = require('../shared/constants');
-var packets = require('../shared/packets');
+var Emitter = require('events').EventEmitter;
+
+var events = exports.events = {
+    STATE_CHANGED: 'stateChanged'
+};
 
 exports.createGame = function() {
-    var clients = [];
-    
     var leftPlayer = null;
-    var leftPlayerState = constants.PLAYER_STATE_FREE;
-    
     var rightPlayer = null;
+    var leftPlayerState = constants.PLAYER_STATE_FREE;
     var rightPlayerState = constants.PLAYER_STATE_FREE;
-    
-    var gameState = constants.GAME_STATE_WAITING_FOR_PLAYERS;
-    
-    
-    function addClient(client) {
-        clients.push(client);
-        client.on(wsClient.events.PACKET, function(packet) {
-            handlePacket(packet, client);
-        });
-        client.send(getGameStatePacket());
-    }
-    
-    function removeClient(client) {
-        // TODO
-    }
+    var emitter = new Emitter();
 
-    function joinLeft(client) {
+    function joinLeftPlayer(client) {
+        if (leftPlayerState != constants.PLAYER_STATE_FREE) {
+            return false;
+        }
+        
         leftPlayer = client;
         leftPlayerState = constants.PLAYER_STATE_CONNECTED;
-        broadcast(getGameStatePacket());
-    };
-    function joinRight(client) {
+        emitter.emit(events.STATE_CHANGED);
+    }
+    
+    function joinRightPlayer(client) {
+        if (rightPlayerState != constants.PLAYER_STATE_FREE) {
+            return false;
+        }
+        
         rightPlayer = client;
         rightPlayerState = constants.PLAYER_STATE_CONNECTED;
-        broadcast(getGameStatePacket());
-    };
-    function freeLeft() {
-        leftPlayerState = constants.PLAYER_STATE_FREE;
-        broadcast(getGameStatePacket());
-    };
-    function freeRight() {
-        rightPlayerState = constants.PLAYER_STATE_FREE;
-        broadcast(getGameStatePacket());
-    };
+        emitter.emit(events.STATE_CHANGED);
+    }
     
-    function handlePacket(packet, client) {
-        switch (packet.id()) {
-            case packets.JoinLeft.id:
-                joinLeft(client);
-                break;
-                
-            case packets.JoinRight.id:
-                joinRight(client);
-                break;
+    function freeLeftPlayer() {
+        if (leftPlayerState == constants.PLAYER_STATE_FREE) {
+            return false;
         }
+        
+        leftPlayer = null;
+        leftPlayerState = constants.PLAYER_STATE_FREE;
+        emitter.emit(events.STATE_CHANGED);
     }
     
-    function getGameStatePacket() {
-        var gameStatePacket = packets.GameState();
-        gameStatePacket.gameState(gameState);
-        gameStatePacket.leftPlayerState(leftPlayerState);
-        gameStatePacket.rightPlayerState(rightPlayerState);
-        return gameStatePacket; 
+    function freeRightPlayer() {
+        if (rightPlayerState == constants.PLAYER_STATE_FREE) {
+            return false;
+        }
+        
+        rightPlayer = null;
+        rightPlayerState = constants.PLAYER_STATE_FREE;
+        emitter.emit(events.STATE_CHANGED);
     }
     
-    function broadcast(packet) {
-        clients.forEach(function(client) {
-            client.send(packet);
-        });
+    function getState() {
+        var gameState = constants.GAME_STATE_WAITING_FOR_PLAYERS;
+        
+        if (leftPlayerState == constants.PLAYER_STATE_CONNECTED && 
+            rightPlayerState == constants.PLAYER_STATE_CONNECTED) {
+            gameState = constants.GAME_STATE_IN_PROGRESS;
+        }
+        
+        return {
+            game: gameState,
+            leftPlayer: leftPlayerState,
+            rightPlayer: rightPlayerState
+        };
+    }
+    
+    function addEventsListener(event, callback) {
+        emitter.on(event, callback);
     }
         
     return {
-        addClient: addClient,
-        removeClient: removeClient,
-        joinLeft: joinLeft,
-        joinRight: joinRight,
-        freeLeft: freeLeft,
-        freeRight: freeRight
+        on: addEventsListener,
+        getState: getState,
+        joinLeftPlayer: joinLeftPlayer,
+        joinRightPlayer: joinRightPlayer,
+        freeLeftPlayer: freeLeftPlayer,
+        freeRightPlayer: freeRightPlayer
     };
 };

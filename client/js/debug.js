@@ -24,8 +24,8 @@ ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
     $('#join-right').attr('disabled', 'disabled');
 });
 
-receiver.subscribe(Pong.RemoteEventsReceiver.events.GAMESTATE, function(packetData) {
-    if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
+receiver.subscribe(Pong.Packets.GameState.id, function(packetData) {
+    //if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
         var leftPlayerState = packetData.leftPlayerState;
         if (leftPlayerState == Pong.Constants.PLAYER_STATE_FREE) {
             $('#join-left').removeAttr('disabled');
@@ -39,5 +39,5 @@ receiver.subscribe(Pong.RemoteEventsReceiver.events.GAMESTATE, function(packetDa
         } else {
             $('#join-right').attr('disabled', 'disabled');
         }
-    }
+    //}
 });

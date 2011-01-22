@@ -29,7 +29,7 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
     
-    receiver.subscribe(Pong.RemoteEventsReceiver.events.GAMESTATE, function(packetData) {
+    receiver.subscribe(Pong.Packets.GameState.id, function(packetData) {
         if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (packetData.leftPlayerState == Pong.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
