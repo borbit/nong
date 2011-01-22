@@ -48,7 +48,7 @@ Pong.ClientWSAdapter = function() {
     }
 
     function processMessage(message) {
-        observer.message(JSON.parse(message.data));
+        observer.message(message.data);
     }
 
     function sendMessage(message) {

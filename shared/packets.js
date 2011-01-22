@@ -2,22 +2,21 @@
     var hasRequire = (typeof require !== 'undefined'),
         constants = hasRequire ? require('constants') : window.Pong.Constants,
         functions = hasRequire ? require('./functions') : window.Pong.Functions;
-
-    ns.Names = {
-        GAME_STATE: 'GameState',
-        JOIN_RIGHT: 'JoinRight',
-        JOIN_LEFT: 'JoinLeft'
+    
+    var packets = {};
+    packets.add = function(packet) {
+        packets[packet.id] = packet;
     };
-
-    ns.Packet = function(packetName) {
+    
+    ns.Packet = function(packetId) {
         var packetData = {};
 
         return {
-            name: function(name) {
-                if(!functions.isUndefined(name))  {
-                    packetName = _name;
+            id: function(id) {
+                if(!functions.isUndefined(id))  {
+                    packetId = id;
                 } else {
-                    return packetName;
+                    return packetId;
                 }
             },
             data: function(data) {
@@ -31,7 +30,7 @@
     };
     
     ns.GameState = function() {
-        var packet = ns.Packet(ns.Names.GAME_STATE);
+        var packet = ns.Packet(ns.GameState.id);
 
         packet.data({
             gameState: constants.GAME_STATE_IN_PROGRESS,
@@ -69,21 +68,55 @@
             rightPlayerState: rightPlayerState
         });
     };
+    ns.GameState.id = 'GameState';
+    packets.add(ns.GameState);
     
-    ns.JoinLeft = function() {
-        return ns.Packet(ns.Names.JOIN_LEFT);
-    };
-    
-    ns.JoinRight = function() {
-        return ns.Packet(ns.Names.JOIN_RIGHT);
-    };
-    
-    ns.factory = function(packetName) {
-        if (typeof ns[packetName] === 'undefined') {
-            return false;
+    ns.JoinGame = function() {
+        var packet = ns.Packet(ns.JoinGame.id);
+        
+        function name(name) {
+            if(!functions.isUndefined(name))  {
+                packet.data({name: name});
+            } else {
+                return packet.data().name;
+            }
         }
         
-        return ns[packetName].call(null);
+        return functions.extend(packet, {
+            name: name
+        });
     };
+    ns.JoinGame.id = 'JoinGame';
+    packets.add(ns.JoinGame);
+    
+    ns.JoinLeft = function() {
+        return ns.Packet(ns.JoinLeft.id);
+    };
+    ns.JoinLeft.id = 'JoinLeft';
+    packets.add(ns.JoinLeft);
+    
+    ns.JoinRight = function() {
+        return ns.Packet(ns.JoinRight.id);
+    };
+    ns.JoinRight.id = 'JoinRight';
+    packets.add(ns.JoinRight);
+    
+    ns.serialize = function(packet) {
+        return JSON.stringify({
+            id: packet.id(),
+            data: packet.data()
+        });
+    };
+    
+    ns.unserialize = function(payload) {
+        payload = JSON.parse(payload);
+        if (functions.isUndefined(packets[payload.id])) {
+            throw 'Unknown packet ID: ' + payload.id; 
+        }
+        var packet = packets[payload.id].call(null);
+        packet.data(payload.data);
+        return packet;
+    };
+    
     
 }((typeof exports === 'undefined') ? window.Pong.Packets = {} : exports));

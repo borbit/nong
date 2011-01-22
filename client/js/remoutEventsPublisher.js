@@ -1,4 +1,10 @@
 Pong.RemoutEventsPublisher = function(ws) {
+    
+    function joinGame(name) {
+        var packet = Pong.Packets.JoinGame();
+        packet.name(name);
+        sendPacket(packet);
+    }
 
     function joinLeft() {
         sendPacket(Pong.Packets.JoinLeft());
@@ -17,15 +23,13 @@ Pong.RemoutEventsPublisher = function(ws) {
     }
 
     function sendPacket(packet) {
-        var payload = JSON.stringify({
-            name: packet.name(),
-            data: packet.data()
-        });
+        var payload = Pong.Packets.serialize(packet);
         console.log('Sending packet: ' + payload);
         ws.sendMessage(payload);
     }
 
     return {
+        joinGame: joinGame,
         joinLeft: joinLeft,
         joinRight: joinRight
     };
