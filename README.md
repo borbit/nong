@@ -27,7 +27,7 @@ Steps:
 Running Backend
 ---------------
 
-    node server/server.js &
+    node server/app.js &
     sudo ant restart
 
 Stopping Backend
