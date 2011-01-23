@@ -1,9 +1,9 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('functions') : ns.Functions,
-    Element = hasRequire ? require('element') : ns.Element,
-    Region = hasRequire ? require('region') : ns.Region;
+    Functions = (hasRequire) ? require('./functions') : ns.Functions,
+    Element = hasRequire ? require('./element').Element : ns.Element,
+    Region = hasRequire ? require('./region').Region : ns.Region;
 
 function StageWall(x, y, length, orientation) {
     this.region = Region({

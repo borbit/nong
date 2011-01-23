@@ -19,12 +19,8 @@ ns.Region = function(options) {
     function bottom() {
         return this.y + this.height
     }
-<<<<<<< HEAD
 
-    return ns.Functions.extend({
-=======
     return Functions.extend({
->>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
         x: 0, y: 0,
         width: 0,
         height: 0,

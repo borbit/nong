@@ -76,9 +76,9 @@ exports.createGame = function() {
     }
     
     function start() {
-        var shieldLeft = Shield(40, 250);
-        var shieldRight = Shield(750, 250);
-        var ball = Ball(100, 100);
+        var shieldLeft = new Shield(40, 250);
+        var shieldRight = new Shield(750, 250);
+        var ball = new Ball(100, 100);
 
         stage = Stage();
         stage.addShield(shieldLeft, leftPlayer)

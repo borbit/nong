@@ -22,28 +22,20 @@ ns.GameLoop = function() {
 
     function tick() {
         Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
-<<<<<<< HEAD
 
         if (Globals.RFPS) {
-            for(var i = 0, len = elements.length; i < len; i++) {
-                if(updaters[elements[i]] != null) {
+            var count = elements.length;
+
+            if(count > 0) {
+                var updated = [];
+
+                for(var i = 0; i < count; i++) {
                     updaters[elements[i]].update();
-                    observer.tickWithUpdates();
+                    updated.push(updaters[elements[i]].element);
                 }
-=======
-        
-        var count = elements.length;
-        
-        if(count > 0) {
-            var updated = [];
-            
-            for(var i = 0; i < count; i++) {
-                updaters[elements[i]].update();
-                updated.push(updaters[elements[i]].element);
->>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
+
+                observer.fire(events.tickWithUpdates, updated);
             }
-            
-            observer.fire(events.tickWithUpdates, updated);
         }
 
         prevTick = +(new Date());

@@ -1,16 +1,11 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-<<<<<<< HEAD
-    Functions = (hasRequire) ? require('functions') : ns.Functions,
-    Element = hasRequire ? require('element') : ns.Element,
-    Region = hasRequire ? require('region') : ns.Region,
-    StageWall = hasRequire ? require('stageWall') : ns.StageWall,
-    Globals = hasRequire ? require('globals') : ns.Globals;
-=======
+    Functions = (hasRequire) ? require('./functions') : ns.Functions,
     Element = hasRequire ? require('./element').Element : ns.Element,
-    Region = hasRequire ? require('./region').Region : ns.Region;
->>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
+    Region = hasRequire ? require('./region').Region : ns.Region,
+    StageWall = hasRequire ? require('./stageWall').StageWall : ns.StageWall,
+    Globals = hasRequire ? require('./globals') : ns.Globals;
 
 Ball = function(x, y) {
     this.id = Functions.getUniqId();

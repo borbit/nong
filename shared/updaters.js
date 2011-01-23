@@ -15,6 +15,7 @@ ns.Updaters.Shield = function(shield) {
     function update() {
         if (shield.isMoving()) {
             shield.updatePosition();
+            observer.fire(ns.Updaters.events.changed);
         }
     }
 
