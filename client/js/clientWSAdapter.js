@@ -7,17 +7,13 @@ Pong.ClientWSAdapter = function() {
     var state = STATE_DISCONNECTED;
     var observer = Pong.Observer();
 
-    observer.register(Pong.WSAdapter.events.CONNECTED);
-    observer.register(Pong.WSAdapter.events.DISCONNECTED);
-    observer.register(Pong.WSAdapter.events.MESSAGE);
-
     function connect() {
         ws = new WebSocket(Pong.Config.WS_BACKEND);
         
         ws.onopen = function() {
             console.log('WebSocket connected');
             state = STATE_CONNECTED;
-            observer.connected();
+            observer.fire(Pong.WSAdapter.events.CONNECTED);
         };
         ws.onmessage = function(message) {
             console.log('Received: ' + message.data);
@@ -26,12 +22,12 @@ Pong.ClientWSAdapter = function() {
         ws.onerror = function(error) {
             console.log('WebSocket error: ' + error);
             state = STATE_DISCONNECTED;
-            observer.disconnected();
+            observer.fire(Pong.WSAdapter.events.DISCONNECTED);
         };
         ws.onclose = function() {
             console.log('WebSocket disconnected');
             state = STATE_DISCONNECTED;
-            observer.disconnected();
+            observer.fire(Pong.WSAdapter.events.DISCONNECTED);
         };
 
         state = STATE_CONNECTING
@@ -48,7 +44,7 @@ Pong.ClientWSAdapter = function() {
     }
 
     function processMessage(message) {
-        observer.message(JSON.parse(message.data));
+        observer.fire(Pong.WSAdapter.events.MESSAGE, message.data);
     }
 
     function sendMessage(message) {

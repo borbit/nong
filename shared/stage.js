@@ -1,6 +1,7 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
+<<<<<<< HEAD
     StageWall = hasRequire ? require('stageWall') : ns.StageWall,
     GameLoop = hasRequire ? require('gameLoop') : ns.GameLoop,
     Collisions = hasRequire ? require('collisions') : ns.Collisions,
@@ -46,26 +47,79 @@ ns.Stage = function() {
         updater.subscribe(ns.Updaters.events.changed, function() {
             collisions.detect();
             observer.changed(shield);
+=======
+    Region = hasRequire ? require('./region').Region : ns.Region,
+    GameLoop = hasRequire ? require('./gameLoop').GameLoop : ns.GameLoop,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
+    Collisions = hasRequire ? require('./collisions').Collisions : ns.Collisions,
+    Updaters = hasRequire ? require('./updaters').Updaters : ns.Updaters;
+
+ns.Stage = function Stage() {
+    var balls = [], shields = [],
+        region = Region({width: 800, height: 600}),
+        gameLoop = GameLoop(),
+        observer = Observer(),
+        collisions = Collisions(region);
+
+    subscribeForCollisionEvents();
+
+    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function(elements) {
+        observer.fire(Stage.events.changed, elements);
+        collisions.detect();
+    });
+
+    function addShield(shield, receiver) {
+        var updater = Updaters.Shield(shield, region);
+
+        receiver.subscribe(receiver.events.MOVEUP, function() {
+            if(shield.region.y > region.y) {
+                updater.moveUp();
+                gameLoop.addElement(shield.id);
+            }
+        });
+
+        receiver.subscribe(receiver.events.MOVEDOWN, function() {
+            if(shield.region.y + shield.region.height < region.y + region.height) {
+                updater.moveDown();
+                gameLoop.addElement(shield.id);
+            }
+        });
+
+        receiver.subscribe(receiver.events.STOP, function() {
+            updater.stop();
+            gameLoop.removeElement(shield.id);
+        });
+
+        updater.subscribe(Updaters.events.stopped, function() {
+            updater.stop();
+            gameLoop.removeElement(shield.id);
+>>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
         });
 
         gameLoop.addUpdater(updater);
         collisions.addShield(shield);
         shields.push(shield);
+        return this;
     }
 
     function addBall(ball, publisher) {
+<<<<<<< HEAD
         var updater = Pong.Updaters.Ball(ball);
 
         updater.subscribe(ns.Updaters.events.changed, function() {
             collisions.detect();
             observer.changed(ball);
         });
+=======
+        var updater = Updaters.Ball(ball);
+>>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
 
         gameLoop.addUpdater(updater);
         gameLoop.addElement(ball.id);
 
         collisions.addBall(ball);
         balls.push(ball);
+        return this;
     }
 
     function subscribeForCollisionEvents() {
@@ -84,6 +138,7 @@ ns.Stage = function() {
     }
 
     return {
+        stop: stop,
         start: start,
         addBall: addBall,
         addShield: addShield,

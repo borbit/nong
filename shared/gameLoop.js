@@ -1,18 +1,14 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined');
-var Globals = (hasRequire) ? require('globals') : ns.Globals;
-var Observer = hasRequire ? require('observer') : ns.Observer;
+var hasRequire = (typeof require !== 'undefined'),
+    Globals = (hasRequire) ? require('./globals').Globals : ns.Globals,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
 ns.GameLoop = function() {
-    var observer = Observer();
-
-    var timerId = null;
-    var elements = [];
-    var updaters = {};
-    var prevTick = 0;
-
-    observer.register(ns.GameLoop.events.tickWithUpdates);
+    var observer = Observer(),
+        events = ns.GameLoop.events,
+        timerId = null, prevTick = 0,
+        elements = [], updaters = {};
 
     function start() {
         timerId = setInterval(tick, parseInt(1000 / Globals.FPS));
@@ -26,6 +22,7 @@ ns.GameLoop = function() {
 
     function tick() {
         Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
+<<<<<<< HEAD
 
         if (Globals.RFPS) {
             for(var i = 0, len = elements.length; i < len; i++) {
@@ -33,7 +30,20 @@ ns.GameLoop = function() {
                     updaters[elements[i]].update();
                     observer.tickWithUpdates();
                 }
+=======
+        
+        var count = elements.length;
+        
+        if(count > 0) {
+            var updated = [];
+            
+            for(var i = 0; i < count; i++) {
+                updaters[elements[i]].update();
+                updated.push(updaters[elements[i]].element);
+>>>>>>> 14a4861baa64af29c7f5a25f028634e8f6dfb7fd
             }
+            
+            observer.fire(events.tickWithUpdates, updated);
         }
 
         prevTick = +(new Date());
@@ -41,7 +51,11 @@ ns.GameLoop = function() {
 
     function addElement(elementId) {
         if(elements.indexOf(elementId) < 0) {
-            elements.push(elementId);
+            if(updaters[elementId] != null) {
+                elements.push(elementId);
+            } else {
+                throw 'Adding element without updater';
+            }
         }
     }
 

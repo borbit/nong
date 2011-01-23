@@ -1,7 +1,8 @@
 $(function() {
     var ws = Pong.ClientWSAdapter(),
-        publisher = Pong.RemoutEventsPublisher(ws),
-        receiver = Pong.RemoutEventsReceiver(ws),
+        publisher = Pong.RemoteEventsPublisher(ws),
+        receiver = Pong.RemoteEventsReceiver(ws),
+
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
         waitingMessage = $('#menu .waiting'),
@@ -13,6 +14,7 @@ $(function() {
     joinButtonRight.click(publisher.joinRight);
     
     ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
+        publisher.joinGame('only');
         statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
@@ -27,7 +29,7 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
     
-    receiver.subscribe(Pong.RemoutEventsReceiver.events.GAMESTATE, function(packetData) {
+    receiver.subscribe(Pong.Packets.GameState.id, function(packetData) {
         if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (packetData.leftPlayerState == Pong.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
@@ -45,8 +47,6 @@ $(function() {
     
     statusMessage.text('CONNECTING').show();
     ws.connect();
-    menu.hide();
-    createGame();
     
     function createGame() {
         var shield1 = new Pong.Shield(40, 250);

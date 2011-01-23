@@ -1,54 +1,28 @@
 (function(ns) {
 
 ns.Observer = function() {
-    var triggers = {};
+    var subscribers = {};
 
-    function register(eventName) {
-        if(triggers[eventName] == null) {
-           triggers[eventName] = [];
-           self[eventName] = function() {
-               var args = Array.prototype.slice.call(arguments);
-               fire(eventName, args);
-           };
-        }
-    }
-
-    function isRegistered(eventName) {
-        if(triggers[eventName] == null) {
-           return false;
-        }
-
-        return true;
-    }
-
-    function fire(eventName, args) {
-        if(triggers[eventName] != null) {
-            var count = triggers[eventName].length;
+    function fire() {
+        var eventName = Array.prototype.shift.call(arguments);
+        if(subscribers[eventName] != null) {
+            var count = subscribers[eventName].length;
             for(var j = 0; j < count; j++) {
-                triggers[eventName][j].apply(null, args);
+                subscribers[eventName][j].apply(null, arguments);
             }
         }
     }
 
     function subscribe(eventName, trigger) {
-        if(triggers[eventName] != null) {
-            triggers[eventName].push(trigger);
+        if(subscribers[eventName] == null) {
+            subscribers[eventName] = [];
         }
-    }
-
-    function unsubscribe(eventName) {
-        if(isSet(triggers[eventName])) {
-            delete triggers[eventName];
-            delete self[eventName];
-        }
+        subscribers[eventName].push(trigger);
     }
 
     var self = {
         fire: fire,
-        register: register,
-        subscribe: subscribe,
-        unsubscribe: unsubscribe,
-        isRegistered: isRegistered
+        subscribe: subscribe
     };
 
     return self;

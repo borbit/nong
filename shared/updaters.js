@@ -1,7 +1,8 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Observer = hasRequire ? require('observer') : ns.Observer;
+    Globals = hasRequire ? require('./globals') : ns.Globals,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
 ns.Updaters = {};
 ns.Updaters.events = {
@@ -10,13 +11,11 @@ ns.Updaters.events = {
 
 ns.Updaters.Shield = function(shield) {
     var observer = Observer();
-    observer.register(ns.Updaters.events.changed);
 
     function update() {
         if (shield.isMoving()) {
             shield.updatePosition();
         }
-        observer.changed();
     }
 
     return {
@@ -28,11 +27,10 @@ ns.Updaters.Shield = function(shield) {
 
 ns.Updaters.Ball = function(ball) {
     var observer = Observer();
-    observer.register(ns.Updaters.events.changed);
 
     function update() {
         ball.updatePosition();
-        observer.changed();
+        observer.fire(ns.Updaters.events.changed);
     }
 
     return {
