@@ -3,71 +3,40 @@
 var hasRequire = (typeof require !== 'undefined'),
     Observer = hasRequire ? require('observer') : ns.Observer;
 
-ns.Collisions = function(stageRegion) {
+ns.Collisions = function() {
     var observer = Observer();
 
-    var balls = [];
-    var shields = [];
+    var dynamicElements = [];
+    var staticElements = [];
 
-    observer.register(ns.Collisions.events.stage.leftEdge);
-    observer.register(ns.Collisions.events.stage.topEdge);
-    observer.register(ns.Collisions.events.stage.rightEdge);
-    observer.register(ns.Collisions.events.stage.bottomEdge);
+    observer.register(ns.Collisions.events.collisionDetected);
 
-    observer.register(ns.Collisions.events.shield.leftEdge);
-    observer.register(ns.Collisions.events.shield.rightEdge);
+    function addWall(wall) {
+        staticElements.push(wall);
+    }
 
     function addBall(ball) {
-        balls.push(ball);
+        dynamicElements.push(ball);
     }
 
     function addShield(shield) {
-        shields.push(shield);
+        dynamicElements.push(shield);
     }
 
     function detectCollisions() {
-        for (var i = 0, ballsCount = balls.length; i < ballsCount; ++i) {
-            detectCollisionsForBall(balls[i]);
-        }
-    }
-
-    function detectCollisionsForBall(ball) {
-        for (var i = 0, shieldsCount = shields.length; i < shieldsCount; ++i) {
-            detectCollisionWithShield(ball, shields[i]);
-        }
-
-        detectCollisionWithStage(ball);
-    }
-
-    function detectCollisionWithStage(ball) {
-        if (ball.region.right() > stageRegion.right()) {
-            observer.stageRightEdgeHitted(ball);
-        } else if (ball.region.left() < stageRegion.left()) {
-            observer.stageLeftEdgeHitted(ball);
-        }
-
-        if (ball.region.bottom() > stageRegion.bottom()) {
-            observer.stageBottomEdgeHitted(ball);
-        } else if (ball.region.top() < stageRegion.top()) {
-            observer.stageTopEdgeHitted(ball);
-        }
-    }
-
-    function detectCollisionWithShield(ball, shield) {
-        if (ball.region.right() > shield.region.left() && 
-            ball.region.left() < shield.region.right() &&
-            ball.region.bottom() > shield.region.top() && 
-            ball.region.top() < shield.region.bottom()) {
-
-            if(ball.region.right() > shield.region.right()) {
-                observer.shieldRightEdgeHitted(ball, shield);
-            } else if (ball.region.left() < shield.region.left()) {
-                observer.shieldLeftEdgeHitted(ball, shield);
+        var targets = staticElements.concat(dynamicElements);
+        while (targets.length > staticElements.length) { // we don't wan't to detect a collision of 2 static objects
+            var target = targets.pop();
+            for (var j = 0, targetsCount = targets.length; j < targetsCount; ++j) {
+                if (target.collidesWith(targets[j])) {
+                    observer.collisionDetected(target, targets[j]);
+                }
             }
         }
     }
 
     return {
+        addWall: addWall,
         addBall: addBall,
         addShield: addShield,
         subscribe: observer.subscribe,
@@ -76,16 +45,7 @@ ns.Collisions = function(stageRegion) {
 };
 
 ns.Collisions.events = {
-    stage: {
-        leftEdge: 'stageLeftEdgeHitted',
-        topEdge: 'stageTopEdgeHitted',
-        rightEdge: 'stageRightEdgeHitted',
-        bottomEdge: 'stageBottomEdgeHitted'
-    },
-    shield: {
-        leftEdge: 'shieldLeftEdgeHitted',
-        rightEdge: 'shieldRightEdgeHitted'
-    }
+    collisionDetected: 'collisionDetected'
 };
 
 }((typeof exports === 'undefined') ? window.Pong : exports));

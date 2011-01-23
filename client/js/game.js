@@ -49,9 +49,9 @@ $(function() {
     createGame();
     
     function createGame() {
-        var shield1 = Pong.Shield(40, 250);
-        var shield2 = Pong.Shield(750, 250);
-        var ball = Pong.Ball(100, 100);
+        var shield1 = new Pong.Shield(40, 250);
+        var shield2 = new Pong.Shield(750, 250);
+        var ball = new Pong.Ball(100, 100);
 
         var stage = Pong.Stage();
         stage.addShield(shield1, Pong.ClientEvents);

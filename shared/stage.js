@@ -1,7 +1,7 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Region = hasRequire ? require('region') : ns.Region,
+    StageWall = hasRequire ? require('stageWall') : ns.StageWall,
     GameLoop = hasRequire ? require('gameLoop') : ns.GameLoop,
     Collisions = hasRequire ? require('collisions') : ns.Collisions,
     Observer = hasRequire ? require('observer') : ns.Observer;
@@ -10,46 +10,42 @@ ns.Stage = function() {
     var balls = [];
     var shields = [];
     var gameLoop = GameLoop();
-    var region = Region({width: 800, height: 600});
+    var walls = {
+        'left': new StageWall(-50, 0, 600, StageWall.orientation.VERTICAL),
+        'right': new StageWall(800, 0, 600, StageWall.orientation.VERTICAL),
+        'top': new StageWall(0, -50, 800, StageWall.orientation.HORIZONTAL),
+        'bottom': new StageWall(0, 600, 800, StageWall.orientation.HORIZONTAL)
+    };
     var observer = Observer();
-    var collisions = Collisions(region);
+    var collisions = Collisions();
+    for (var key in walls) {
+        collisions.addWall(walls[key]);
+    }
 
     observer.register(ns.Stage.events.changed);
     subscribeForCollisionEvents();
 
-    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function() {
-        collisions.detect();
-    });
-
     function addShield(shield, receiver) {
-        var updater = ns.Updaters.Shield(shield, region);
+        var updater = ns.Updaters.Shield(shield);
 
         receiver.subscribe(receiver.events.moveUp, function() {
-            if(shield.region.y > region.y) {
-                updater.moveUp();
-                gameLoop.addElement(shield.id);
-            }
+            shield.moveUp();
+            gameLoop.addElement(shield.id);
         });
 
         receiver.subscribe(receiver.events.moveDown, function() {
-            if(shield.region.y + shield.region.height < region.y + region.height) {
-                updater.moveDown();
-                gameLoop.addElement(shield.id);
-            }
+            shield.moveDown();
+            gameLoop.addElement(shield.id);
         });
 
         receiver.subscribe(receiver.events.stop, function() {
-            updater.stop();
+            shield.stop();
             gameLoop.removeElement(shield.id);
         });
 
         updater.subscribe(ns.Updaters.events.changed, function() {
+            collisions.detect();
             observer.changed(shield);
-        });
-
-        updater.subscribe(ns.Updaters.events.stopped, function() {
-            updater.stop();
-            gameLoop.removeElement(shield.id);
         });
 
         gameLoop.addUpdater(updater);
@@ -61,6 +57,7 @@ ns.Stage = function() {
         var updater = Pong.Updaters.Ball(ball);
 
         updater.subscribe(ns.Updaters.events.changed, function() {
+            collisions.detect();
             observer.changed(ball);
         });
 
@@ -72,50 +69,10 @@ ns.Stage = function() {
     }
 
     function subscribeForCollisionEvents() {
-        collisions.subscribe(Collisions.events.stage.leftEdge, function(ball) {
-            ball.region.x = region.x;
-            ball.vx = ball.vx * -1;
+        collisions.subscribe(Collisions.events.collisionDetected, function(obj1, obj2) {
+            obj1.hit(obj2);
+            obj2.hit(obj1);
         });
-
-        collisions.subscribe(Collisions.events.stage.topEdge, function(ball) {
-            ball.region.y = region.y;
-            ball.vy = ball.vy * -1;
-        });
-
-        collisions.subscribe(Collisions.events.stage.rightEdge, function(ball) {
-            ball.region.x = region.x + region.width - ball.region.width;
-            ball.vx = ball.vx * -1;
-        });
-
-        collisions.subscribe(Collisions.events.stage.bottomEdge, function(ball) {
-            ball.region.y = region.y + region.height - ball.region.height;
-            ball.vy = ball.vy * -1;
-        });
-
-        collisions.subscribe(Collisions.events.shield.leftEdge, function(ball, shield) {
-            var offset = calcCollisionOffset(ball, shield);
-            ball.region.x = shield.region.x - ball.region.width;
-            ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
-            ball.vx = ball.vx * -1;
-        });
-
-        collisions.subscribe(Collisions.events.shield.rightEdge, function(ball, shield) {
-            var offset = calcCollisionOffset(ball, shield);
-            ball.region.x = shield.region.x + shield.region.width;
-            ball.vy = ball.vy >= 0 ? offset / 100 : offset / 100 * -1;
-            ball.vx = ball.vx * -1;
-        });
-    }
-
-    function calcCollisionOffset(ball, shield) {
-        var ballCenter = parseInt(ball.region.y + ball.region.height / 2 - shield.region.y, 10);
-        var collOffset = parseInt(ballCenter / (shield.region.height / 100), 10) - 50;
-
-        if(collOffset < 0) {
-            collOffset *= -1;
-        }
-
-        return collOffset;
     }
 
     function start() {

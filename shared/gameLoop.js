@@ -27,10 +27,12 @@ ns.GameLoop = function() {
     function tick() {
         Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
 
-        for(var i = 0, len = elements.length; i < len; i++) {
-            if(updaters[elements[i]] != null) {
-                updaters[elements[i]].update();
-                observer.tickWithUpdates();
+        if (Globals.RFPS) {
+            for(var i = 0, len = elements.length; i < len; i++) {
+                if(updaters[elements[i]] != null) {
+                    updaters[elements[i]].update();
+                    observer.tickWithUpdates();
+                }
             }
         }
 
