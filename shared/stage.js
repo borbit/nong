@@ -3,7 +3,7 @@
 var hasRequire = (typeof require !== 'undefined'),
     StageWall = hasRequire ? require('./stageWall').StageWall : ns.StageWall,
     GameLoop = hasRequire ? require('./gameLoop').GameLoop : ns.GameLoop,
-    Collisions = hasRequire ? require('./collisions').Collisions : ns.Collisions,
+    CollisionsDetector = hasRequire ? require('./collisionsDetector').CollisionsDetector : ns.CollisionsDetector,
     Updaters = hasRequire ? require('./updaters').Updaters : ns.Updaters,
     Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
@@ -18,9 +18,9 @@ ns.Stage = function Stage() {
         'bottom': new StageWall(0, 600, 800, StageWall.orientation.HORIZONTAL)
     };
     var observer = Observer();
-    var collisions = Collisions();
+    var collisionsDetector = CollisionsDetector();
     for (var key in walls) {
-        collisions.addWall(walls[key]);
+        collisionsDetector.addStaticElement(walls[key]);
     }
 
     gameLoop.subscribe(GameLoop.events.tickWithUpdates, function(elements) {
@@ -48,11 +48,11 @@ ns.Stage = function Stage() {
         });
 
         updater.subscribe(Updaters.events.changed, function() {
-            collisions.detect();
+            collisionsDetector.detect();
         });
 
         gameLoop.addUpdater(updater);
-        collisions.addShield(shield);
+        collisionsDetector.addDynamicElement(shield);
         shields.push(shield);
         return this;
     }
@@ -61,19 +61,19 @@ ns.Stage = function Stage() {
         var updater = Updaters.Ball(ball);
 
         updater.subscribe(Updaters.events.changed, function() {
-            collisions.detect();
+            collisionsDetector.detect();
         });
 
         gameLoop.addUpdater(updater);
         gameLoop.addElement(ball.id);
 
-        collisions.addBall(ball);
+        collisionsDetector.addDynamicElement(ball);
         balls.push(ball);
         return this;
     }
 
     function subscribeForCollisionEvents() {
-        collisions.subscribe(Collisions.events.collisionDetected, function(obj1, obj2) {
+        collisionsDetector.subscribe(CollisionsDetector.events.collisionDetected, function(obj1, obj2) {
             obj1.hit(obj2);
             obj2.hit(obj1);
         });
