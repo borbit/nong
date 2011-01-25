@@ -17,10 +17,7 @@ Element.prototype = {
     },
 
     collidesWith: function(targetElement) {
-        var tr = targetElement.region;
-        var r = this.region;
-        return r.right() > tr.left() && r.left() < tr.right() &&
-            r.bottom() > tr.top() && r.top() < tr.bottom();
+        return this.region.intersectsWith(targetElement.region);
     },
 
     hit: function(targetElement) {
