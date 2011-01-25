@@ -108,14 +108,15 @@ exports.createGame = function() {
     }
     
     function start() {
-        var shieldLeft = new Shield(40, 250);
-        var shieldRight = new Shield(750, 250);
+        var shieldLeft = new Shield(40, 250, leftPlayer);
+        var shieldRight = new Shield(750, 250, leftPlayer);
         var ball = new Ball(100, 100);
 
         stage = NongStage();
-        stage.addShield(shieldLeft, leftPlayer)
-             .addShield(shieldRight, rightPlayer)
-             .addBall(ball).start();
+        stage.addDynamicElement(shieldLeft)
+            .addDynamicElement(shieldRight)
+            .addDynamicElement(ball)
+            .start();
         
         stage.subscribe(Stage.events.changed, function(elements) {
             emitter.emit(events.ELEMENTS_CHANGED, elements);

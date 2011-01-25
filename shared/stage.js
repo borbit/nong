@@ -11,6 +11,7 @@ ns.Stage = function Stage() {
     var collisionsDetector = CollisionsDetector();
 
     gameLoop.subscribe(GameLoop.events.tickWithUpdates, function(elements) {
+        collisionsDetector.detect();
         observer.fire(Stage.events.changed, elements);
     });
 
@@ -18,6 +19,17 @@ ns.Stage = function Stage() {
         element1.hit(element2);
         element2.hit(element1);
     });
+
+    function addStaticElement(element) {
+        collisionsDetector.addStaticElement(element);
+        return this;
+    }
+
+    function addDynamicElement(element) {
+        gameLoop.addElement(element);
+        collisionsDetector.addDynamicElement(element);
+        return this;
+    }
 
     function start() {
         gameLoop.start();
@@ -31,8 +43,11 @@ ns.Stage = function Stage() {
         gameLoop: gameLoop,
         observer: observer,
         collisionsDetector: collisionsDetector,
+        addStaticElement: addStaticElement,
+        addDynamicElement: addDynamicElement,
         start: start,
-        stop: stop
+        stop: stop,
+        subscribe: observer.subscribe
     };
 };
 

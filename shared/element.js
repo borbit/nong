@@ -1,10 +1,12 @@
 (function(ns) {
 
 var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('./functions') : ns.Functions;
+    Functions = (hasRequire) ? require('./functions') : ns.Functions,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
 
 function Element() {
     this.id = Functions.getUniqId();
+    this.observer = Observer();
 }
 
 Element.prototype = {
@@ -28,10 +30,17 @@ Element.prototype = {
                 this[methodName](targetElement);
             }
         }
+    },
+    
+    subscribe: function(eventName, trigger) {
+        this.observer.subscribe(eventName, trigger);
     }
 }
 
 
 ns.Element = Element;
+ns.Element.events = {
+    changed: 'changed'
+};
 
 }((typeof exports === 'undefined') ? window.Pong : exports));

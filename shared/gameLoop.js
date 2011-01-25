@@ -8,7 +8,7 @@ ns.GameLoop = function() {
     var observer = Observer(),
         events = ns.GameLoop.events,
         timerId = null, prevTick = 0,
-        elements = [], updaters = {};
+        elements = [];
 
     function start() {
         timerId = setInterval(tick, parseInt(1000 / Globals.FPS));
@@ -30,8 +30,8 @@ ns.GameLoop = function() {
                 var updated = [];
 
                 for(var i = 0; i < count; i++) {
-                    updaters[elements[i]].update();
-                    updated.push(updaters[elements[i]].element);
+                    elements[i].update();
+                    updated.push(elements[i]);
                 }
 
                 observer.fire(events.tickWithUpdates, updated);
@@ -41,30 +41,21 @@ ns.GameLoop = function() {
         prevTick = +(new Date());
     }
 
-    function addElement(elementId) {
-        if(elements.indexOf(elementId) < 0) {
-            if(updaters[elementId] != null) {
-                elements.push(elementId);
-            } else {
-                throw 'Adding element without updater';
-            }
+    function addElement(element) {
+        if(elements.indexOf(element) < 0) {
+            elements.push(element);
         }
     }
 
-    function removeElement(elementId) {
-        if (elements.indexOf(elementId) != -1) {
-            elements.splice(elements.indexOf(elementId), 1);
+    function removeElement(element) {
+        if (elements.indexOf(element) != -1) {
+            elements.splice(elements.indexOf(element), 1);
         }
-    }
-
-    function addUpdater(updater) {
-        updaters[updater.element.id] = updater;
     }
 
     return {
         start: start,
         stop: stop,
-        addUpdater: addUpdater,
         addElement: addElement,
         removeElement: removeElement,
         subscribe: observer.subscribe
