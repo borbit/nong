@@ -49,11 +49,27 @@ $(function() {
     ws.connect();
     
     function createGame() {
+
+        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEUP, function() {
+            publisher.shieldMoveUp('left');
+            publisher.shieldMoveUp('right');
+        });
+
+        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEDOWN, function() {
+            publisher.shieldMoveDown('left');
+            publisher.shieldMoveDown('right');
+        });
+
+        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.STOP, function() {
+            publisher.shieldStop('left');
+            publisher.shieldStop('right');
+        });
+
         var shield1 = new Pong.Shield(40, 250);
         var shield2 = new Pong.Shield(750, 250);
         var ball = new Pong.Ball(100, 100);
 
-        var stage = Pong.Stage();
+        var stage = Pong.NongStage();
         stage.addShield(shield1, Pong.ClientEvents);
         stage.addShield(shield2, Pong.ClientEvents);
         stage.addBall(ball);

@@ -15,7 +15,7 @@ ns.inherit = function(child, parent) {
     child.prototype.constructor = child;
     child.superproto = parent.prototype;
     return child;
-}
+};
 
 ns.extend = function(first, second) {
     for(var i in second) {

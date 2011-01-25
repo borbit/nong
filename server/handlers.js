@@ -9,8 +9,44 @@ exports.createHandlers = function(game) {
         broadcast(createGameStatePacket());
     });
     
-    game.on(Game.events.ELEMENTS_CHANGED, function(elements) {
+    /*game.on(Game.events.ELEMENTS_CHANGED, function(elements) {
         broadcast(createGameSnapshotPacket(elements));
+    });*/
+
+    game.on(Game.events.LEFT_SHIELD_MOVEUP, function() {
+        var packet = Packets.ShieldMoveUp();
+        packet.data({position: 'left'});
+        broadcast(packet);
+    });
+
+    game.on(Game.events.LEFT_SHIELD_MOVEDOWN, function() {
+        var packet = Packets.ShieldMoveDown();
+        packet.data({position: 'left'});
+        broadcast(packet);
+    });
+
+    game.on(Game.events.LEFT_SHIELD_STOP, function() {
+        var packet = Packets.ShieldStop();
+        packet.data({position: 'left'});
+        broadcast(packet);
+    });
+
+    game.on(Game.events.RIGHT_SHIELD_MOVEUP, function() {
+        var packet = Packets.ShieldMoveUp();
+        packet.data({position: 'right'});
+        broadcast(packet);
+    });
+
+    game.on(Game.events.RIGHT_SHIELD_MOVEDOWN, function() {
+        var packet = Packets.ShieldMoveDown();
+        packet.data({position: 'right'});
+        broadcast(packet);
+    });
+
+    game.on(Game.events.RIGHT_SHIELD_STOP, function() {
+        var packet = Packets.ShieldStop();
+        packet.data({position: 'right'});
+        broadcast(packet);
     });
     
     function handle(client) {

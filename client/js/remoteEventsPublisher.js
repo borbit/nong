@@ -13,12 +13,22 @@ Pong.RemoteEventsPublisher = function(ws) {
     function joinRight() {
         sendPacket(Pong.Packets.JoinRight());
     }
-    
-    function sendGameState(gameState, leftPlayerState, rightPlayerState) {
-        var packet = Pong.Packets.GameState();
-        packet.gameState(gameState);
-        packet.leftPlayerState(leftPlayerState);
-        packet.rightPlayerState(rightPlayerState);
+
+    function shieldMoveUp(position) {
+        var packet = Pong.Packets.ShieldMoveUp();
+        packet.data({position: position});
+        sendPacket(packet);
+    }
+
+    function shieldMoveDown(position) {
+        var packet = Pong.Packets.ShieldMoveDown();
+        packet.data({position: position});
+        sendPacket(packet);
+    }
+
+    function shieldStop(position) {
+        var packet = Pong.Packets.ShieldStop();
+        packet.data({position: position});
         sendPacket(packet);
     }
 
@@ -31,7 +41,10 @@ Pong.RemoteEventsPublisher = function(ws) {
     return {
         joinGame: joinGame,
         joinLeft: joinLeft,
-        joinRight: joinRight
+        joinRight: joinRight,
+        shieldMoveUp: shieldMoveUp,
+        shieldMoveDown: shieldMoveDown,
+        shieldStop: shieldStop
     };
 
 };

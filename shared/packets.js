@@ -87,6 +87,20 @@
             name: name
         });
     });
+
+    ns.GameSnapshot = createPacket('GameSnapshot', function() {
+        var packet = ns.Packet(ns.GameSnapshot.id);
+
+        function addElementData(elementId, data) {
+            var tmp = {};
+            tmp[elementId] = data;
+            packet.data(tmp);
+        }
+
+        return functions.extend(packet, {
+            addElementData: addElementData
+        });
+    });
     
     ns.JoinLeft = createPacket('JoinLeft', function() {
         return ns.Packet(ns.JoinLeft.id);
@@ -106,20 +120,6 @@
     
     ns.ShieldStop = createPacket('ShieldStop', function() {
         return ns.Packet(ns.ShieldStop.id);
-    });
-    
-    ns.GameSnapshot = createPacket('GameSnapshot', function() {
-        var packet = ns.Packet(ns.GameSnapshot.id);
-        
-        function addElementData(elementId, data) {
-            var tmp = {};
-            tmp[elementId] = data;
-            packet.data(tmp);
-        }
-        
-        return functions.extend(packet, {
-            addElementData: addElementData
-        });
     });
     
     ns.serialize = function(packet) {

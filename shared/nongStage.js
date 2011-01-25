@@ -9,10 +9,10 @@ ns.NongStage = function NongStage() {
     var base = Stage();
     var balls = [], shields = [];
 
-    base.collisions.addWall(new StageWall(-50, 0, 600, StageWall.orientation.VERTICAL));
-    base.collisions.addWall(new StageWall(800, 0, 600, StageWall.orientation.VERTICAL));
-    base.collisions.addWall(new StageWall(0, -50, 800, StageWall.orientation.HORIZONTAL));
-    base.collisions.addWall(new StageWall(0, 600, 800, StageWall.orientation.HORIZONTAL));
+    base.collisionsDetector.addStaticElement(new StageWall(-50, 0, 600, StageWall.orientation.VERTICAL));
+    base.collisionsDetector.addStaticElement(new StageWall(800, 0, 600, StageWall.orientation.VERTICAL));
+    base.collisionsDetector.addStaticElement(new StageWall(0, -50, 800, StageWall.orientation.HORIZONTAL));
+    base.collisionsDetector.addStaticElement(new StageWall(0, 600, 800, StageWall.orientation.HORIZONTAL));
 
     function addShield(shield, receiver) {
         var updater = Updaters.Shield(shield);
@@ -33,11 +33,11 @@ ns.NongStage = function NongStage() {
         });
 
         updater.subscribe(Updaters.events.changed, function() {
-            base.collisions.detect();
+            base.collisionsDetector.detect();
         });
 
         base.gameLoop.addUpdater(updater);
-        base.collisions.addShield(shield);
+        base.collisionsDetector.addDynamicElement(shield);
         shields.push(shield);
         return this;
     }
@@ -46,13 +46,13 @@ ns.NongStage = function NongStage() {
         var updater = Updaters.Ball(ball);
 
         updater.subscribe(Updaters.events.changed, function() {
-            base.collisions.detect();
+            base.collisionsDetector.detect();
         });
 
         base.gameLoop.addUpdater(updater);
         base.gameLoop.addElement(ball.id);
 
-        base.collisions.addBall(ball);
+        base.collisionsDetector.addDynamicElement(ball);
         balls.push(ball);
         return this;
     }
