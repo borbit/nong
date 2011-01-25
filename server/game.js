@@ -1,6 +1,7 @@
 var Constants = require('../shared/constants'),
     Ball = require('../shared/ball').Ball,
     Stage = require('../shared/stage').Stage,
+    NongStage = require('../shared/nongStage').NongStage,
     Shield = require('../shared/shield').Shield,
     Emitter = require('events').EventEmitter,
     Client = require('./client'),
@@ -111,7 +112,7 @@ exports.createGame = function() {
         var shieldRight = new Shield(750, 250);
         var ball = new Ball(100, 100);
 
-        stage = Stage();
+        stage = NongStage();
         stage.addShield(shieldLeft, leftPlayer)
              .addShield(shieldRight, rightPlayer)
              .addBall(ball).start();
