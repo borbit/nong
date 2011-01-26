@@ -1,6 +1,7 @@
 var Constants = require('../shared/constants'),
+    Functions = require('../shared/functions'),
+    Stage = require('../shared/stage').Stage,
     Emitter = require('events').EventEmitter,
-    Functions = require('./functions'),
     Client = require('./client');
 
 var events = exports.events = {
@@ -8,7 +9,7 @@ var events = exports.events = {
     STATE_CHANGED: 'stateChanged'
 };
 
-exports.createGame = function(settings) {
+exports.createGame = function(stage, settings) {
     var emitter = new Emitter(),
         gameState = Constants.GAME_STATE_WAITING_FOR_PLAYERS;
 
@@ -19,6 +20,10 @@ exports.createGame = function(settings) {
         minPlayersCount: 2,
         maxPlayersCount: 2
     }, settings);
+
+    stage.subscribe(Stage.events.changed, function(elements) {
+        emitter.emit(events.ELEMENTS_CHANGED, elements);
+    });
 
     function joinPlayer(id, client) {
         if (!Functions.isUndefined(players[id])) {
@@ -34,7 +39,7 @@ exports.createGame = function(settings) {
         client.on(Client.events.DISCONNECTED, function() {
             freePlayer(id);
         });
-        
+
         if (joined == settings.minPlayersCount) {
             gameState = Constants.GAME_STATE_IN_PROGRESS;
         }
@@ -53,8 +58,6 @@ exports.createGame = function(settings) {
         if(joined < settings.minPlayersCount) {
             gameState = Constants.GAME_STATE_WAITING_FOR_PLAYERS;
         }
-
-        emitter.emit(events.STATE_CHANGED);
     }
 
     function getPlayer(id) {
@@ -65,11 +68,18 @@ exports.createGame = function(settings) {
     }
         
     return {
-        emitter: emitter,
-        players: players,
-        gameState: gameState,
         joinPlayer: joinPlayer,
         freePlayer: freePlayer,
-        getPlayer: getPlayer
+        getPlayer: getPlayer,
+        
+        get gameState() {
+            return gameState;
+        },
+        get players() {
+            return players;
+        },
+        get emitter() {
+            return emitter;
+        }
     };
 };

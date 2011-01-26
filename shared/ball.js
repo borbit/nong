@@ -5,10 +5,12 @@ var hasRequire = (typeof require !== 'undefined'),
     Element = hasRequire ? require('./element').Element : ns.Element,
     Region = hasRequire ? require('./region').Region : ns.Region,
     StageWall = hasRequire ? require('./stageWall').StageWall : ns.StageWall,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
     Globals = hasRequire ? require('./globals') : ns.Globals;
 
 Ball = function(x, y) {
     this.id = Functions.getUniqId();
+    this.observer = Observer();
     
     this.region = Region({
         x: x, y: y,
@@ -25,6 +27,11 @@ Ball = function(x, y) {
 Functions.inherit(Ball, Element);
 
 Functions.extend(Ball.prototype, {
+    update: function() {
+        this.updatePosition();
+        this.observer.fire(Element.events.changed);
+    },
+
     updatePosition: function() {
         this.region.x += this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / Globals.RFPS;
         this.region.y += this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / Globals.RFPS;

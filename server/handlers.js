@@ -1,6 +1,7 @@
 var Game = require('./game');
 var Packets = require('../shared/packets');
 var Client = require('./client');
+var Player = require('./player');
 
 exports.createHandlers = function(game) {
     var clients = [];
@@ -11,7 +12,7 @@ exports.createHandlers = function(game) {
     
     /*game.on(Game.events.ELEMENTS_CHANGED, function(elements) {
         broadcast(createGameSnapshotPacket(elements));
-    });*/
+    });
 
     game.on(Game.events.LEFT_SHIELD_MOVEUP, function() {
         var packet = Packets.ShieldMoveUp();
@@ -47,7 +48,7 @@ exports.createHandlers = function(game) {
         var packet = Packets.ShieldStop();
         packet.data({position: 'right'});
         broadcast(packet);
-    });
+    });*/
     
     function handle(client) {
         clients.push(client);
@@ -57,11 +58,11 @@ exports.createHandlers = function(game) {
         });
 
         client.on(Packets.JoinLeft.id, function() {
-            game.joinLeftPlayer(client);
+            game.joinLeftPlayer(Player.createPlayer(client));
         });
 
         client.on(Packets.JoinRight.id, function() {
-            game.joinRightPlayer(client);
+            game.joinRightPlayer(Player.createPlayer(client));
         });
 
         client.send(createGameStatePacket());

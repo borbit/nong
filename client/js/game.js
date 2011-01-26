@@ -65,15 +65,15 @@ $(function() {
             publisher.shieldStop('right');
         });
 
-        var shield1 = new Pong.Shield(40, 250);
-        var shield2 = new Pong.Shield(750, 250);
+        var shield1 = new Pong.Shield(40, 250, Pong.ClientEvents);
+        var shield2 = new Pong.Shield(750, 250, Pong.ClientEvents);
         var ball = new Pong.Ball(100, 100);
 
         var stage = Pong.NongStage();
-        stage.addShield(shield1, Pong.ClientEvents);
-        stage.addShield(shield2, Pong.ClientEvents);
-        stage.addBall(ball);
-        stage.start();
+        stage.addDynamicElement(shield1)
+            .addDynamicElement(shield2)
+            .addDynamicElement(ball)
+            .start();
 
         var view = Pong.View(stage);
         var ballsRenderer = Pong.Renderers.Ball();

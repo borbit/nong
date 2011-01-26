@@ -4,10 +4,12 @@ var hasRequire = (typeof require !== 'undefined'),
     Functions = (hasRequire) ? require('./functions') : ns.Functions,
     Element = hasRequire ? require('./element').Element : ns.Element,
     Region = hasRequire ? require('./region').Region : ns.Region,
+    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
     Globals = hasRequire ? require('./globals') : ns.Globals;
 
-function Shield(x, y) {
+function Shield(x, y, receiver) {
     this.id = Functions.getUniqId();
+    this.observer = Observer();
     
     this.region = Region({
         x: x, y: y,
@@ -17,11 +19,31 @@ function Shield(x, y) {
 
     this.speed = 500;
     this.vy = 0;
+
+    var shield = this; //XXX: omg wtf???
+    receiver.subscribe(receiver.events.MOVEUP, function() {
+        shield.moveUp();
+    });
+
+    receiver.subscribe(receiver.events.MOVEDOWN, function() {
+        shield.moveDown();
+    });
+
+    receiver.subscribe(receiver.events.STOP, function() {
+        shield.stop();
+    });
 }
 
 Functions.inherit(Shield, Element);
 
 Functions.extend(Shield.prototype, {
+    update: function() {
+        if (this.isMoving()) {
+            this.updatePosition();
+            this.observer.fire(Element.events.changed);
+        }
+    },
+
     updatePosition: function() {
         this.region.y += this.vy * this.speed / Globals.RFPS;
     },
