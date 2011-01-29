@@ -1,16 +1,21 @@
 var ws = require('websocket-server');
+var comps = require('../shared/components');
+var pong = require('../shared/pong');
 var Client = require('./client');
-var Handlers = require('./handlers');
+var Player = require('./player');
 var Game = require('./game');
 
 exports.createServer = function() {
     var game = Game.createGame();
-    var handlers = Handlers.createHandlers(game);
     var server = ws.createServer();
     
     server.addListener('connection', function(connection) {
         var client = Client.createClient(connection);
-        handlers.handle(client);
+        var player = Player.createPlayer(client);
+        
+        player.on(Player.events.JOINGAME, function(gameId) {
+            game.joinPlayer(player);
+        });
     });
     
     return {

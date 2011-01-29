@@ -4,16 +4,24 @@ var pong = require('../shared/pong'),
     Client = require('./client');
 
 var events = exports.events = {
-    GONE: 'gone',
     STOP: 'stop',
     MOVEUP: 'moveUp',
-    MOVEDOWN: 'moveDown'
+    MOVEDOWN: 'moveDown',
+    JOINGAME: 'joinGame',
+    JOINLEFT: 'joinLeft',
+    JOINRIGHT: 'joinRight',
+    GONE: 'gone'
 };
     
 exports.createPlayer = function(client) {
     var emitter = new Emitter();
     var score = 0;
-    
+    var id = utils.Functions.getUniqId();
+
+    client.on(pong.Packets.JoinGame.id, function(data) {
+        emitter.emit(events.JOINGAME, data.gameId);
+    });
+
     client.on(Client.events.DISCONNECTED, function() {
         emitter.emit(events.GONE);
     });
@@ -30,6 +38,35 @@ exports.createPlayer = function(client) {
         emitter.emit(events.STOP);
     });
 
+    client.on(pong.Packets.JoinLeft.id, function() {
+        emitter.emit(events.JOINLEFT);
+    });
+
+    client.on(pong.Packets.JoinRight.id, function() {
+        emitter.emit(events.JOINRIGHT);
+    });
+
+    function updateGameState(gameState) {
+        var packet = pong.Packets.GameState();
+        packet.gameState(gameState.game);
+        packet.leftPlayerState(gameState.leftPlayer);
+        packet.rightPlayerState(gameState.rightPlayer);
+        client.send(packet);
+    }
+
+    function updateElements(elements) {
+        var packet = pong.Packets.GameSnapshot();
+
+        elements.forEach(function(element) {
+            packet.addEntityData(element.id, {
+                x: element.region.x,
+                y: element.region.y
+            });
+        });
+
+        client.send(packet);
+    }
+
     function on(event, callback) {
         emitter.on(event, callback);
     }
@@ -38,6 +75,9 @@ exports.createPlayer = function(client) {
         on: on,
         subscribe: on,
         events: events,
+        updateGameState: updateGameState,
+        updateElements: updateElements,
+        get id() { return id; },
         get score() { return score; }
     };
 };

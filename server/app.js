@@ -25,6 +25,7 @@ process.on('exit', function() {
 // gracefully exit on uncaught exception
 process.on('uncaughtException', function(err) {
     console.log(err.stack);
+    console.dir(err);
     process.exit(1);
 });
 

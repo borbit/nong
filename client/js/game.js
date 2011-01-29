@@ -11,14 +11,10 @@ $(function() {
         menu = $('#menu');
     
     joinButtonLeft.click(function() {
-        shieldLeft = new Pong.Shield(40, 250, Pong.ClientEvents);
-        shieldRight = new Pong.Shield(750, 250, receiver);
         publisher.joinLeft();
     });
 
     joinButtonRight.click(function() {
-        shieldLeft = new Pong.Shield(40, 250, receiver);
-        shieldRight = new Pong.Shield(750, 250, Pong.ClientEvents);
         publisher.joinRight();
     });
     
@@ -55,12 +51,12 @@ $(function() {
     });
 
     receiver.subscribe(receiver.events.GAMESNAPSHOT, function(packetData) {
-        shieldLeft.region.x = packetData[0].x;
-        shieldLeft.region.y = packetData[0].y;
-        shieldRight.region.x = packetData[1].x;
-        shieldRight.region.y = packetData[1].y;
-        ball.region.x = packetData[2].x;
-        ball.region.y = packetData[2].y;
+        shieldLeft.region.x = packetData['left'].x;
+        shieldLeft.region.y = packetData['left'].y;
+        shieldRight.region.x = packetData['right'].x;
+        shieldRight.region.y = packetData['right'].y;
+        ball.region.x = packetData['ball'].x;
+        ball.region.y = packetData['ball'].y;
     });
     
     statusMessage.text('CONNECTING').show();
@@ -85,9 +81,13 @@ $(function() {
             publisher.shieldStop('right');
         });
 
-        ball = new Pong.Ball(100, 100);
+        ball = new Pong.Ball(100, 100, 'ball');
 
         var stage = Pong.NongStage();
+
+        shieldLeft = new Pong.Shield(40, 250, 'left');
+        shieldRight = new Pong.Shield(750, 250, 'right');
+        
         stage.addDynamicElement(shieldLeft)
             .addDynamicElement(shieldRight)
             .addDynamicElement(ball)

@@ -4,8 +4,8 @@ var pong = require('./pong'),
     utils = require('./utils'),
     comps = require('./components');
 
-Ball = function(x, y) {
-    this.id = utils.Functions.getUniqId();
+Ball = function(x, y, id) {
+    this.id = id;
     this.observer = utils.Observer();
     
     this.region = comps.Region({

@@ -24,7 +24,9 @@ exports.Game.createGame = function(stage, settings) {
         emitter.emit(events.ELEMENTS_CHANGED, elements);
     });
 
-    function joinPlayer(id, player) {
+    function joinPlayer(player) {
+        var id = player.id;
+        
         if (!utils.Functions.isUndefined(players[id])) {
             throw 'Tring to connect already connected player: ' + id;
         }
@@ -33,32 +35,28 @@ exports.Game.createGame = function(stage, settings) {
         }
         
         players[id] = player;
-
+        
         player.on(Player.events.GONE, function() {
             freePlayer(id);
         });
 
-        if (utils.Functions.size(players) == settings.minPlayersCount) {
-            gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
-        }
-        
         emitter.emit(events.STATE_CHANGED);
     }
     
     function freePlayer(id) {
-        if(utils.Functions.isUndefined(players[id])) {
+        console.log(1);
+        console.dir(players);
+        if (utils.Functions.isUndefined(players[id])) {
             throw 'Tring to free not connected player: ' + id;
         }
 
         delete players[id];
 
-        if(utils.Functions.size(players) < settings.minPlayersCount) {
-            gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-        }
+        emitter.emit(events.STATE_CHANGED);
     }
 
     function getPlayer(id) {
-        if(utils.Functions.isUndefined(players[id])) {
+        if (utils.Functions.isUndefined(players[id])) {
             return false;
         }
         return players[id];
@@ -80,6 +78,7 @@ exports.Game.createGame = function(stage, settings) {
         fire: fireEvent,
         
         get gameState() { return gameState; },
+        set gameState(state) { gameState = state; },
         get players() { return players; },
         get emitter() { return emitter; }
     };
