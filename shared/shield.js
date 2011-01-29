@@ -4,7 +4,7 @@ var pong = require('./pong'),
     utils = require('./utils'),
     comps = require('./components');
 
-function Shield(x, y, receiver) {
+function Shield(x, y) {
     this.id = utils.Functions.getUniqId();
     this.observer = utils.Observer();
     
@@ -16,19 +16,6 @@ function Shield(x, y, receiver) {
 
     this.speed = 500;
     this.vy = 0;
-
-    var shield = this; //XXX: omg wtf???
-    receiver.subscribe(receiver.events.MOVEUP, function() {
-        shield.moveUp();
-    });
-
-    receiver.subscribe(receiver.events.MOVEDOWN, function() {
-        shield.moveDown();
-    });
-
-    receiver.subscribe(receiver.events.STOP, function() {
-        shield.stop();
-    });
 }
 
 utils.Functions.inherit(Shield, comps.Element);

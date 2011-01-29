@@ -38,10 +38,22 @@ exports.createGame = function() {
     }
 
     function start() {
-        stage.addDynamicElement(new pong.Shield(40, 250, base.getPlayer('left')))
-             .addDynamicElement(new pong.Shield(750, 250, base.getPlayer('right')))
+        var shieldLeft = new pong.Shield(40, 250);
+        var shieldRight = new pong.Shield(750, 250);
+
+        bindPlayerToShield(base.getPlayer('left'), shieldLeft);
+        bindPlayerToShield(base.getPlayer('right'), shieldRight);
+
+        stage.addDynamicElement(shieldLeft)
+             .addDynamicElement(shieldRight)
              .addDynamicElement(new pong.Ball(100, 100))
              .start();
+    }
+
+    function bindPlayerToShield(player, shield) {
+        player.subscribe(player.events.STOP, function() { shield.stop(); });
+        player.subscribe(player.events.MOVEUP, function() { shield.moveUp(); });
+        player.subscribe(player.events.MOVEDOWN, function() { shield.moveDown(); });
     }
 
     function stop() {

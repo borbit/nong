@@ -1,10 +1,10 @@
 var ws = require('websocket-server');
 var Client = require('./client');
 var Handlers = require('./handlers');
-var NongGame = require('./nongGame');
+var Game = require('./game');
 
 exports.createServer = function() {
-    var game = NongGame.createGame();
+    var game = Game.createGame();
     var handlers = Handlers.createHandlers(game);
     var server = ws.createServer();
     
