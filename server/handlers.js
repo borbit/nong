@@ -1,13 +1,30 @@
-var Game = require('./game');
-var Packets = require('../shared/packets');
+var comps = require('../shared/components');
+var pong = require('../shared/pong');
 var Client = require('./client');
 var Player = require('./player');
 
 exports.createHandlers = function(game) {
     var clients = [];
     
-    game.on(Game.events.STATE_CHANGED, function() {
+    game.on(comps.Game.events.STATE_CHANGED, function() {
         broadcast(createGameStatePacket());
+
+        if (game.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
+            var leftPlayer = game.getPlayer('left');
+            var rightPlayer = game.getPlayer('right');
+
+            leftPlayer.on(Player.events.MOVEUP, function() {
+                broadcast(pong.Packets.ShieldMoveUp());
+            });
+
+            leftPlayer.on(Player.events.MOVEDOWN, function() {
+                broadcast(pong.Packets.ShieldMoveDown());
+            });
+
+            leftPlayer.on(Player.events.STOP, function() {
+                broadcast(pong.Packets.ShieldStop());
+            });
+        }
     });
     
     /*game.on(Game.events.ELEMENTS_CHANGED, function(elements) {
@@ -57,11 +74,11 @@ exports.createHandlers = function(game) {
             removeClient(client);
         });
 
-        client.on(Packets.JoinLeft.id, function() {
+        client.on(pong.Packets.JoinLeft.id, function() {
             game.joinLeftPlayer(Player.createPlayer(client));
         });
 
-        client.on(Packets.JoinRight.id, function() {
+        client.on(pong.Packets.JoinRight.id, function() {
             game.joinRightPlayer(Player.createPlayer(client));
         });
 
@@ -83,14 +100,14 @@ exports.createHandlers = function(game) {
     
     function createGameStatePacket() {
         var gameState = game.getState();
-        var packet = Packets.GameState();
+        var packet = pong.Packets.GameState();
         packet.gameState(gameState.game);
         packet.leftPlayerState(gameState.leftPlayer);
         packet.rightPlayerState(gameState.rightPlayer);
         return packet;
     }
     
-    function createGameSnapshotPacket(elements) {
+    /*function createGameSnapshotPacket(elements) {
         var packet = Packets.GameSnapshot();
         
         elements.forEach(function(element, index) {
@@ -98,7 +115,7 @@ exports.createHandlers = function(game) {
         });
         
         return packet;
-    }
+    }*/
     
     return {
         handle: handle

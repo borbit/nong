@@ -5,7 +5,7 @@ Pong.ClientEvents = (function() {
         MOVEDOWN: 'moveDown'
     };
 
-    var observer = Pong.Observer();
+    var observer = Utils.Observer();
 
     $(window).keydown(function(event) {
         if(event.which == 38) {

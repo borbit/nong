@@ -1,4 +1,4 @@
-var Packets = require('../shared/packets');
+var Packets = require('../shared/components/packets').Packets;
 var Emitter = require('events').EventEmitter;
 
 var events = exports.events = {
@@ -27,9 +27,15 @@ exports.createClient = function(connection) {
     function addEventsListener(event, callback) {
         emitter.on(event, callback);
     }
+
+    function fireEvent(event) {
+        emitter.emit(event);
+    }
     
     return {
         send: send,
-        on: addEventsListener
+        on: addEventsListener,
+        subscribe: addEventsListener,
+        fire: fireEvent
     };
 };

@@ -2,5 +2,7 @@ config/config.local
 config/nginx.conf
 config/config.js
 client/js/config.js
+client/jquery.js
+server.pid
 node_modules
 

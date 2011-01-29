@@ -1,17 +1,16 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Globals = (hasRequire) ? require('./globals').Globals : ns.Globals,
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
+var pong = require('../pong'),
+    utils = require('../utils');
 
 ns.GameLoop = function() {
-    var observer = Observer(),
+    var observer = utils.Observer(),
         events = ns.GameLoop.events,
         timerId = null, prevTick = 0,
         elements = [];
 
     function start() {
-        timerId = setInterval(tick, parseInt(1000 / Globals.FPS));
+        timerId = setInterval(tick, parseInt(1000 / pong.Globals.FPS));
     }
 
     function stop() {
@@ -21,9 +20,9 @@ ns.GameLoop = function() {
     }
 
     function tick() {
-        Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
+        pong.Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
 
-        if (Globals.RFPS) {
+        if (pong.Globals.RFPS) {
             var count = elements.length;
 
             if(count > 0) {
@@ -66,4 +65,4 @@ ns.GameLoop.events = {
     tickWithUpdates: 'tickWithUpdates'
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Components : exports));

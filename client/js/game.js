@@ -30,16 +30,16 @@ $(function() {
     });
     
     receiver.subscribe(Pong.Packets.GameState.id, function(packetData) {
-        if (packetData.gameState == Pong.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
-            if (packetData.leftPlayerState == Pong.Constants.PLAYER_STATE_CONNECTED) {
+        if (packetData.gameState == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
+            if (packetData.leftPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
                 joinedMessage.addClass('left').show();
             }
-            if (packetData.rightPlayerState == Pong.Constants.PLAYER_STATE_CONNECTED) {
+            if (packetData.rightPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonRight.hide();
                 joinedMessage.addClass('right').show();
             }
-        } else if(packetData.gameState == Pong.Constants.GAME_STATE_IN_PROGRESS) {
+        } else if(packetData.gameState == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
             createGame();
         }

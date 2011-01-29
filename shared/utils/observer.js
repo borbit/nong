@@ -28,4 +28,4 @@ ns.Observer = function() {
     return self;
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Utils : exports));

@@ -4,10 +4,12 @@
     if(typeof exports === 'undefined') {
         if(typeof window.Pong === 'undefined') {
             window.Pong = {};
+            window.Components = {};
+            window.Utils = {};
         }
         ns = window.Pong;
     } else {
-        ns = exports;
+        ns = exports.Globals = {};
     }
 
     ns.Globals= {};

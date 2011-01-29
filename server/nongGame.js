@@ -1,15 +1,10 @@
-var Constants = require('../shared/constants'),
-    NongStage = require('../shared/nongStage').NongStage,
-    Emitter = require('events').EventEmitter,
-    Stage = require('../shared/stage').Stage,
-    Shield = require('../shared/shield').Shield,
-    Ball = require('../shared/ball').Ball,
-    Player = require('./player'),
-    Game = require('./game');
+var pong = require('../shared/pong'),
+    comps = require('../shared/components'),
+    utils = require('../shared/utils');
 
 exports.createGame = function() {
-    var stage = NongStage();
-    var base = Game.createGame(stage);
+    var stage = pong.NongStage();
+    var base = comps.Game.createGame(stage);
 
     function joinLeftPlayer(player) {
         if (!base.getPlayer('left')) {
@@ -24,15 +19,15 @@ exports.createGame = function() {
     }
 
     function getState() {
-        var leftPlayerState = Constants.PLAYER_STATE_FREE;
-        var rightPlayerState = Constants.PLAYER_STATE_FREE;
+        var leftPlayerState = comps.Constants.PLAYER_STATE_FREE;
+        var rightPlayerState = comps.Constants.PLAYER_STATE_FREE;
 
         if(base.getPlayer('left')) {
-            leftPlayerState = Constants.PLAYER_STATE_CONNECTED;
+            leftPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
         }
 
         if(base.getPlayer('right')) {
-            rightPlayerState = Constants.PLAYER_STATE_CONNECTED;
+            rightPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
         }
 
         return {
@@ -43,9 +38,9 @@ exports.createGame = function() {
     }
 
     function start() {
-        stage.addDynamicElement(new Shield(40, 250, base.getPlayer('left')))
-             .addDynamicElement(new Shield(750, 250, base.getPlayer('right')))
-             .addDynamicElement(new Ball(100, 100))
+        stage.addDynamicElement(new pong.Shield(40, 250, base.getPlayer('left')))
+             .addDynamicElement(new pong.Shield(750, 250, base.getPlayer('right')))
+             .addDynamicElement(new pong.Ball(100, 100))
              .start();
     }
 
@@ -53,14 +48,9 @@ exports.createGame = function() {
         stage.stop();
     }
 
-    function addEventsListener(event, callback) {
-        base.emitter.on(event, callback);
-    }
-
-    return {
-        on: addEventsListener,
+    return utils.Functions.extend(base, {
         getState: getState,
         joinLeftPlayer: joinLeftPlayer,
         joinRightPlayer: joinRightPlayer
-    };
+    });
 };

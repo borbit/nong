@@ -33,7 +33,7 @@ Pong.RemoteEventsPublisher = function(ws) {
     }
 
     function sendPacket(packet) {
-        var payload = Pong.Packets.serialize(packet);
+        var payload = Components.Packets.serialize(packet);
         console.log('Sending packet: ' + payload);
         ws.sendMessage(payload);
     }

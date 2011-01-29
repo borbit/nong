@@ -1,21 +1,21 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    GameLoop = hasRequire ? require('./gameLoop').GameLoop : ns.GameLoop,
-    CollisionsDetector = hasRequire ? require('./collisionsDetector').CollisionsDetector : ns.CollisionsDetector,
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
+var utils = require('../utils'),
+    components = require('../components')
 
 ns.Stage = function Stage() {
-    var gameLoop = GameLoop();
-    var observer = Observer();
-    var collisionsDetector = CollisionsDetector();
+    var observer = utils.Observer();
+    var gameLoop = components.GameLoop();
+    var collisionsDetector = components.CollisionsDetector();
+    var gameLoopEvents = components.GameLoop.events;
+    var collisionsEvents = components.CollisionsDetector.events;
 
-    gameLoop.subscribe(GameLoop.events.tickWithUpdates, function(elements) {
+    gameLoop.subscribe(gameLoopEvents.tickWithUpdates, function(elements) {
         collisionsDetector.detect();
         observer.fire(Stage.events.changed, elements);
     });
 
-    collisionsDetector.subscribe(CollisionsDetector.events.collisionDetected, function(element1, element2) {
+    collisionsDetector.subscribe(collisionsEvents.collisionDetected, function(element1, element2) {
         element1.hit(element2);
         element2.hit(element1);
     });
@@ -55,4 +55,4 @@ ns.Stage.events = {
     changed: 'changed'
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Components : exports));

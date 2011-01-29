@@ -1,12 +1,10 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('./functions') : ns.Functions,
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
+var utils = require('../utils');
 
 function Element() {
-    this.id = Functions.getUniqId();
-    this.observer = Observer();
+    this.id = utils.Functions.getUniqId();
+    this.observer = utils.Observer();
 }
 
 Element.prototype = {
@@ -23,7 +21,7 @@ Element.prototype = {
     },
 
     hit: function(targetElement) {
-        var targetElementType = Functions.getTypeName(targetElement);
+        var targetElementType = utils.Functions.getTypeName(targetElement);
         if (targetElementType) {
             var methodName = 'hit' + targetElementType;
             if (this[methodName] !== undefined) {
@@ -43,4 +41,4 @@ ns.Element.events = {
     changed: 'changed'
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Components : exports));

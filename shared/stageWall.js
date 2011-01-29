@@ -1,12 +1,10 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('./functions') : ns.Functions,
-    Element = hasRequire ? require('./element').Element : ns.Element,
-    Region = hasRequire ? require('./region').Region : ns.Region;
+var comts = require('./components'),
+    utils = require('./utils');
 
 function StageWall(x, y, length, orientation) {
-    this.region = Region({
+    this.region = comts.Region({
         x: x, y: y,
         width: orientation == ns.StageWall.orientation.HORIZONTAL ? length : 50,
         height: orientation == ns.StageWall.orientation.VERTICAL ? length : 50
@@ -15,7 +13,7 @@ function StageWall(x, y, length, orientation) {
     this.orientation = orientation;
 }
 
-Functions.inherit(StageWall, Element);
+utils.Functions.inherit(StageWall, comts.Element);
 
 ns.StageWall = StageWall;
 

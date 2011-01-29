@@ -1,10 +1,9 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Functions = hasRequire ? require('./functions') : ns.Functions;
+var utils = require('../utils');
         
 ns.Region = function(options) {
-    return Functions.extend({
+    return utils.Functions.extend({
         x: 0,
         y: 0,
         width: 0,
@@ -33,4 +32,4 @@ ns.Region = function(options) {
     }, options);
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Components : exports));

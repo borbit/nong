@@ -1,17 +1,14 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('./functions') : ns.Functions,
-    Element = hasRequire ? require('./element').Element : ns.Element,
-    Region = hasRequire ? require('./region').Region : ns.Region,
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
-    Globals = hasRequire ? require('./globals') : ns.Globals;
+var pong = require('./pong'),
+    utils = require('./utils'),
+    comps = require('./components');
 
 function Shield(x, y, receiver) {
-    this.id = Functions.getUniqId();
-    this.observer = Observer();
+    this.id = utils.Functions.getUniqId();
+    this.observer = utils.Observer();
     
-    this.region = Region({
+    this.region = comps.Region({
         x: x, y: y,
         width: 10,
         height: 80
@@ -34,18 +31,18 @@ function Shield(x, y, receiver) {
     });
 }
 
-Functions.inherit(Shield, Element);
+utils.Functions.inherit(Shield, comps.Element);
 
-Functions.extend(Shield.prototype, {
+utils.Functions.extend(Shield.prototype, {
     update: function() {
         if (this.isMoving()) {
             this.updatePosition();
-            this.observer.fire(Element.events.changed);
+            this.observer.fire(comps.Element.events.changed);
         }
     },
 
     updatePosition: function() {
-        this.region.y += this.vy * this.speed / Globals.RFPS;
+        this.region.y += this.vy * this.speed / pong.Globals.RFPS;
     },
 
     moveUp: function() {

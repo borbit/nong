@@ -1,10 +1,9 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer;
+var utils = require('../utils');
 
 ns.CollisionsDetector = function() {
-    var observer = Observer();
+    var observer = utils.Observer();
 
     var dynamicElements = [];
     var staticElements = [];
@@ -41,4 +40,4 @@ ns.CollisionsDetector.events = {
     collisionDetected: 'collisionDetected'
 };
 
-}((typeof exports === 'undefined') ? window.Pong : exports));
+}((typeof exports === 'undefined') ? window.Components : exports));

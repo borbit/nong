@@ -1,18 +1,14 @@
 (function(ns) {
 
-var hasRequire = (typeof require !== 'undefined'),
-    Functions = (hasRequire) ? require('./functions') : ns.Functions,
-    Element = hasRequire ? require('./element').Element : ns.Element,
-    Region = hasRequire ? require('./region').Region : ns.Region,
-    StageWall = hasRequire ? require('./stageWall').StageWall : ns.StageWall,
-    Observer = hasRequire ? require('./observer').Observer : ns.Observer,
-    Globals = hasRequire ? require('./globals') : ns.Globals;
+var pong = require('./pong'),
+    utils = require('./utils'),
+    comps = require('./components');
 
 Ball = function(x, y) {
-    this.id = Functions.getUniqId();
-    this.observer = Observer();
+    this.id = utils.Functions.getUniqId();
+    this.observer = utils.Observer();
     
-    this.region = Region({
+    this.region = comps.Region({
         x: x, y: y,
         width: 10,
         height: 10
@@ -24,21 +20,21 @@ Ball = function(x, y) {
     this.speed = 500;
 }
 
-Functions.inherit(Ball, Element);
+utils.Functions.inherit(Ball, comps.Element);
 
-Functions.extend(Ball.prototype, {
+utils.Functions.extend(Ball.prototype, {
     update: function() {
         this.updatePosition();
-        this.observer.fire(Element.events.changed);
+        this.observer.fire(comps.Element.events.changed);
     },
 
     updatePosition: function() {
-        this.region.x += this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / Globals.RFPS;
-        this.region.y += this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / Globals.RFPS;
+        this.region.x += this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS;
+        this.region.y += this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS;
     },
 
     hitStageWall: function(wall) {
-        if (wall.orientation == StageWall.orientation.VERTICAL) {
+        if (wall.orientation == pong.StageWall.orientation.VERTICAL) {
             //to prevent ball from stucking in the wall
             this.region.x = this.kx > 0 ? wall.region.left() - this.region.width: wall.region.right()
             this.kx = - this.kx;

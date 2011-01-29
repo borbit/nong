@@ -1,6 +1,7 @@
-var Packets = require('../shared/packets');
-var Client = require('./client');
-var Emitter = require('events').EventEmitter;
+var pong = require('../shared/pong'),
+    utils = require('../shared/utils'),
+    Emitter = require('events').EventEmitter,
+    Client = require('./client');
 
 var events = exports.events = {
     STOP: 'stop',
@@ -9,27 +10,19 @@ var events = exports.events = {
 };
     
 exports.createPlayer = function(client) {
-    var emitter = new Emitter();
-    
-    client.on(Packets.ShieldMoveUp.id, function() {
-        emitter.emit(events.MOVEUP);
+    client.on(pong.Packets.ShieldMoveUp.id, function() {
+        client.fire(events.MOVEUP);
     });
     
-    client.on(Packets.ShieldMoveDown.id, function() {
-        emitter.emit(events.MOVEDOWN);
+    client.on(pong.Packets.ShieldMoveDown.id, function() {
+        client.fire(events.MOVEDOWN);
     });
     
-    client.on(Packets.ShieldStop.id, function() {
-        emitter.emit(events.STOP);
+    client.on(pong.Packets.ShieldStop.id, function() {
+        client.fire(events.STOP);
     });
-    
-    function addEventListener(event, callback) {
-        emitter.on(event, callback);
-    }
-    
-    return {
-        events: events,
-        on: addEventListener,
-        subscribe: addEventListener
-    };
+
+    return utils.Functions.extend(client, {
+        events: events
+    });
 };

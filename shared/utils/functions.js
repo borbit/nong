@@ -21,8 +21,15 @@ ns.extend = function(first, second) {
     for(var i in second) {
         first[i] = second[i];
     }
-
     return first;
+};
+
+ns.size = function(object) {
+    var length = 0;
+    for(var i in object) {
+        length++;
+    }
+    return length;
 };
 
 ns.isUndefined = function(value) {
@@ -35,4 +42,4 @@ ns.getTypeName = function(value) {
    return (results && results.length > 1) ? results[1] : "";
 };
 
-}((typeof exports === 'undefined') ? window.Pong.Functions = {} : exports));
+}((typeof exports === 'undefined') ? window.Utils.Functions = {} : exports.Functions = {}));

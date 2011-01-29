@@ -7,4 +7,4 @@
     ns.GAME_STATE_WAITING_FOR_PLAYERS = 'waiting-for-players';
     ns.GAME_STATE_IN_PROGRESS = 'in-progress';
     
-}((typeof exports === 'undefined') ? window.Pong.Constants = {} : exports));
+}((typeof exports === 'undefined') ? window.Components.Constants = {} : exports.Constants = {}));

@@ -5,7 +5,7 @@ Pong.ClientWSAdapter = function() {
 
     var ws = null;
     var state = STATE_DISCONNECTED;
-    var observer = Pong.Observer();
+    var observer = Utils.Observer();
 
     function connect() {
         ws = new WebSocket(Pong.Config.WS_BACKEND);
