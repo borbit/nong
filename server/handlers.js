@@ -10,28 +10,18 @@ exports.createHandlers = function(game) {
         broadcast(createGameStatePacket());
 
         if (game.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
+            game.start();
+
             var leftPlayer = game.getPlayer('left');
             var rightPlayer = game.getPlayer('right');
-
-            leftPlayer.on(Player.events.MOVEUP, function() {
-                broadcast(pong.Packets.ShieldMoveUp());
-            });
-
-            leftPlayer.on(Player.events.MOVEDOWN, function() {
-                broadcast(pong.Packets.ShieldMoveDown());
-            });
-
-            leftPlayer.on(Player.events.STOP, function() {
-                broadcast(pong.Packets.ShieldStop());
-            });
         }
     });
-    
-    /*game.on(Game.events.ELEMENTS_CHANGED, function(elements) {
+
+    game.on(comps.Game.events.ELEMENTS_CHANGED, function(elements) {
         broadcast(createGameSnapshotPacket(elements));
     });
 
-    game.on(Game.events.LEFT_SHIELD_MOVEUP, function() {
+    /*game.on(Game.events.LEFT_SHIELD_MOVEUP, function() {
         var packet = Packets.ShieldMoveUp();
         packet.data({position: 'left'});
         broadcast(packet);
@@ -72,6 +62,7 @@ exports.createHandlers = function(game) {
         
         client.on(Client.events.DISCONNECTED, function() {
             removeClient(client);
+            game.stop();
         });
 
         client.on(pong.Packets.JoinLeft.id, function() {
@@ -107,15 +98,18 @@ exports.createHandlers = function(game) {
         return packet;
     }
     
-    /*function createGameSnapshotPacket(elements) {
-        var packet = Packets.GameSnapshot();
+    function createGameSnapshotPacket(elements) {
+        var packet = pong.Packets.GameSnapshot();
         
         elements.forEach(function(element, index) {
-            packet.addElementData(element.id, element.region);
+            packet.addEntityData(element.id, {
+                x: element.region.x,
+                y: element.region.y
+            });
         });
         
         return packet;
-    }*/
+    }
     
     return {
         handle: handle

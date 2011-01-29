@@ -49,6 +49,8 @@ exports.createGame = function() {
     }
 
     return utils.Functions.extend(base, {
+        start: start,
+        stop: stop,
         getState: getState,
         joinLeftPlayer: joinLeftPlayer,
         joinRightPlayer: joinRightPlayer

@@ -10,8 +10,17 @@ $(function() {
         statusMessage = $('#menu .status'),
         menu = $('#menu');
     
-    joinButtonLeft.click(publisher.joinLeft);
-    joinButtonRight.click(publisher.joinRight);
+    joinButtonLeft.click(function() {
+        shieldLeft = new Pong.Shield(40, 250, Pong.ClientEvents);
+        shieldRight = new Pong.Shield(750, 250, receiver);
+        publisher.joinLeft();
+    });
+
+    joinButtonRight.click(function() {
+        shieldLeft = new Pong.Shield(40, 250, receiver);
+        shieldRight = new Pong.Shield(750, 250, Pong.ClientEvents);
+        publisher.joinRight();
+    });
     
     ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
         publisher.joinGame('only');
@@ -29,7 +38,7 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
     
-    receiver.subscribe(Pong.Packets.GameState.id, function(packetData) {
+    receiver.subscribe(receiver.events.GAMESTATE, function(packetData) {
         if (packetData.gameState == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (packetData.leftPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
@@ -44,9 +53,20 @@ $(function() {
             createGame();
         }
     });
+
+    receiver.subscribe(receiver.events.GAMESNAPSHOT, function(packetData) {
+        shieldLeft.region.x = packetData[0].x;
+        shieldLeft.region.y = packetData[0].y;
+        shieldRight.region.x = packetData[1].x;
+        shieldRight.region.y = packetData[1].y;
+        ball.region.x = packetData[2].x;
+        ball.region.y = packetData[2].y;
+    });
     
     statusMessage.text('CONNECTING').show();
     ws.connect();
+
+    var shieldLeft, shieldRight, ball;
     
     function createGame() {
 
@@ -65,21 +85,19 @@ $(function() {
             publisher.shieldStop('right');
         });
 
-        var shield1 = new Pong.Shield(40, 250, Pong.ClientEvents);
-        var shield2 = new Pong.Shield(750, 250, Pong.ClientEvents);
-        var ball = new Pong.Ball(100, 100);
+        ball = new Pong.Ball(100, 100);
 
         var stage = Pong.NongStage();
-        stage.addDynamicElement(shield1)
-            .addDynamicElement(shield2)
+        stage.addDynamicElement(shieldLeft)
+            .addDynamicElement(shieldRight)
             .addDynamicElement(ball)
             .start();
 
         var view = Pong.View(stage);
         var ballsRenderer = Pong.Renderers.Ball();
         var shieldsRenderer = Pong.Renderers.Shield();
-        view.addRenderer(shield1.id, $('#shield1'), shieldsRenderer);
-        view.addRenderer(shield2.id, $('#shield2'), shieldsRenderer);
+        view.addRenderer(shieldLeft.id, $('#shield1'), shieldsRenderer);
+        view.addRenderer(shieldRight.id, $('#shield2'), shieldsRenderer);
         view.addRenderer(ball.id, $('#ball'), ballsRenderer);
     }
 });

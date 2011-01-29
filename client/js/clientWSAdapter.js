@@ -1,3 +1,5 @@
+var Packets = require('../shared/components/packets').Packets;
+
 Pong.ClientWSAdapter = function() {
     var STATE_DISCONNECTED = 'disconnected';
     var STATE_CONNECTING = 'connecting';
@@ -44,7 +46,8 @@ Pong.ClientWSAdapter = function() {
     }
 
     function processMessage(message) {
-        observer.fire(Pong.WSAdapter.events.MESSAGE, message.data);
+        var packet = Components.Packets.unserialize(message.data);
+        observer.fire(packet.id(), packet.data());
     }
 
     function sendMessage(message) {
@@ -64,5 +67,5 @@ Pong.WSAdapter = {};
 Pong.WSAdapter.events = {
     DISCONNECTED: 'disconnected',
     CONNECTED: 'connected',
-    MESSAGE: 'message'
+    PACKET: 'packet'
 };

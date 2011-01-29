@@ -36,8 +36,10 @@ ns.JoinGame = comps.Packets.createPacket('JoinGame', {
 });
 
 ns.GameSnapshot = comps.Packets.createPacket('GameSnapshot', {
-    addElementData: function(elementId, data) {
-
+    addEntityData: function(entityId, data) {
+        var temp = {};
+        temp[entityId] = data;
+        this.data(temp);
     }
 });
 

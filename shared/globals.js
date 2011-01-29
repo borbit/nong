@@ -9,10 +9,10 @@
         }
         ns = window.Pong;
     } else {
-        ns = exports.Globals = {};
+        ns = exports;
     }
 
     ns.Globals= {};
-    ns.Globals.FPS = 50;
-    ns.Globals.RFPS = 50;
+    ns.Globals.FPS = 30;
+    ns.Globals.RFPS = 30;
 })();
