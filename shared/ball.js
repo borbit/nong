@@ -29,8 +29,8 @@ utils.Functions.extend(Ball.prototype, {
     },
 
     updatePosition: function() {
-        this.region.x += this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS;
-        this.region.y += this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS;
+        this.region.x += Math.floor(this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS);
+        this.region.y += Math.floor(this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS);
     },
 
     hitStageWall: function(wall) {
