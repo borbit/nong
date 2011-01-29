@@ -1,6 +1,4 @@
 var ws = require('websocket-server');
-var comps = require('../shared/components');
-var pong = require('../shared/pong');
 var Client = require('./client');
 var Player = require('./player');
 var Game = require('./game');

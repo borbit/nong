@@ -3,22 +3,33 @@ var pong = require('../shared/pong'),
     utils = require('../shared/utils'),
     Player = require('./player');
 
-var events = exports.events = comps.Game.events;
 exports.createGame = function() {
-    var stage = pong.NongStage();
-    var base = comps.Game.createGame(stage);
-    var activePlayers = {
-        left: null,
-        right: null
-    };
+    var spectators = {};
+    var players = {left: null, right: null};
+    var gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
 
-    base.on(events.ELEMENTS_CHANGED, function(elements) {
+    var stage = pong.NongStage();
+    var ball = new pong.Ball(100, 100, 'ball');
+    var shieldLeft = new pong.Shield(40, 250, 'left');
+    var shieldRight = new pong.Shield(750, 250, 'right');
+
+    stage.subscribe(comps.Stage.events.changed, function(elements) {
         notifyElementsChanged(elements);
     });
 
     function joinPlayer(player) {
-        base.joinPlayer(player);
-        
+        var id = player.id;
+
+        if (!utils.Functions.isUndefined(spectators[id])) {
+            throw 'Tring to connect already connected player: ' + id;
+        }
+
+        spectators[id] = player;
+
+        player.on(Player.events.GONE, function() {
+            freePlayer(id);
+        });
+
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
         });
@@ -30,39 +41,46 @@ exports.createGame = function() {
         player.updateGameState(getState());
     }
 
+    function freePlayer(id) {
+        if (utils.Functions.isUndefined(spectators[id])) {
+            throw 'Tring to free not connected player: ' + id;
+        }
+
+        delete spectators[id];
+    }
+
     function assignShield(side, player) {
-        if (activePlayers[side]) {
+        if (players[side]) {
             return;
         }
 
-        activePlayers[side] = player;
+        players[side] = player;
 
         player.on(Player.events.GONE, function() {
-            activePlayers[side] = null;
+            players[side] = null;
             updateGameState();
         });
 
         updateGameState();
     }
 
-    // TODO: Anton, refucktor this please
     function updateGameState() {
-        if (activePlayers.left && activePlayers.right) {
-            base.gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
+        if (players.left && players.right) {
+            gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
             start();
-        } else if (base.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
-            base.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+        } else if (gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
+            gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
             stop();
         }
 
-        for (var k in base.players) {
-            base.players[k].updateGameState(getState());
+        for (var i in spectators) {
+            spectators[i].updateGameState(getState());
         }
     }
 
     function notifyElementsChanged(elements) {
-        for (var k in base.players) {
-            base.players[k].updateElements(elements);
+        for (var i in spectators) {
+            spectators[i].updateElements(elements);
         }
     }
 
@@ -70,31 +88,27 @@ exports.createGame = function() {
         var leftPlayerState = comps.Constants.PLAYER_STATE_FREE;
         var rightPlayerState = comps.Constants.PLAYER_STATE_FREE;
 
-        if (activePlayers.left) {
+        if (players.left) {
             leftPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
         }
-
-        if (activePlayers.right) {
+        if (players.right) {
             rightPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
         }
 
         return {
-            game: base.gameState,
+            game: gameState,
             leftPlayer: leftPlayerState,
             rightPlayer: rightPlayerState
         };
     }
 
     function start() {
-        var shieldLeft = new pong.Shield(40, 250, 'left');
-        var shieldRight = new pong.Shield(750, 250, 'right');
-
-        bindPlayerToShield(activePlayers.left, shieldLeft);
-        bindPlayerToShield(activePlayers.right, shieldRight);
+        bindPlayerToShield(players.left, shieldLeft);
+        bindPlayerToShield(players.right, shieldRight);
 
         stage.addDynamicElement(shieldLeft)
              .addDynamicElement(shieldRight)
-             .addDynamicElement(new pong.Ball(100, 100, 'ball'))
+             .addDynamicElement(ball)
              .start();
     }
 
@@ -111,7 +125,6 @@ exports.createGame = function() {
     return {
         start: start,
         stop: stop,
-        on: base.on,
         getState: getState,
         joinPlayer: joinPlayer
     };
