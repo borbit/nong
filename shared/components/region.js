@@ -3,7 +3,7 @@
 var utils = require('../utils');
         
 ns.Region = function(options) {
-    return utils.Functions.extend({
+    return utils._.extend({
         x: 0,
         y: 0,
         width: 0,

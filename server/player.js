@@ -14,7 +14,7 @@ var events = exports.events = {
 };
     
 exports.createPlayer = function(client) {
-    var id = utils.Functions.getUniqId();
+    var id = utils.getUniqId();
     var emitter = new Emitter();
     var score = 0;
 

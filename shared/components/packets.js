@@ -7,15 +7,15 @@ ns.Packet = function(packetId) {
 
     return {
         id: function(id) {
-            if(!utils.Functions.isUndefined(id))  {
+            if(!utils._.isUndefined(id))  {
                 packetId = id;
             } else {
                 return packetId;
             }
         },
         data: function(data) {
-            if(!utils.Functions.isUndefined(data))  {
-                packetData = utils.Functions.extend(packetData, data);
+            if(!utils._.isUndefined(data))  {
+                packetData = utils._.extend(packetData, data);
             } else {
                 return packetData;
             }
@@ -28,7 +28,7 @@ var packets = {};
 ns.createPacket = function(id, addons) {
     function constructor() {
         var packet = ns.Packet(id);
-        return utils.Functions.extend(packet, addons);
+        return utils._.extend(packet, addons);
     }
     constructor.id = id;
     packets[id] = constructor;
@@ -44,7 +44,7 @@ ns.serialize = function(packet) {
 
 ns.unserialize = function(payload) {
     payload = JSON.parse(payload);
-    if (utils.Functions.isUndefined(packets[payload.id])) {
+    if (utils._.isUndefined(packets[payload.id])) {
         throw 'Unknown packet ID: ' + payload.id;
     }
     var packet = packets[payload.id].call(null);

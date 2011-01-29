@@ -3,7 +3,7 @@
 var utils = require('../utils');
 
 function Element() {
-    this.id = utils.Functions.getUniqId();
+    this.id = utils.getUniqId();
     this.observer = utils.Observer();
 }
 
@@ -21,7 +21,7 @@ Element.prototype = {
     },
 
     hit: function(targetElement) {
-        var targetElementType = utils.Functions.getTypeName(targetElement);
+        var targetElementType = utils.getTypeName(targetElement);
         if (targetElementType) {
             var methodName = 'hit' + targetElementType;
             if (this[methodName] !== undefined) {

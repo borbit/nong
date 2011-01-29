@@ -5,21 +5,21 @@ var utils = require('./utils'),
 
 ns.GameState = comps.Packets.createPacket('GameState', {
     gameState: function(state) {
-        if(utils.Functions.isUndefined(state))  {
+        if(utils._.isUndefined(state))  {
             return this.data().gameState;
         }
         this.data({gameState: state});
     },
 
     leftPlayerState: function(state) {
-        if(utils.Functions.isUndefined(state))  {
+        if(utils._.isUndefined(state))  {
             return this.data().leftPlayerState;
         }
         this.data({leftPlayerState: state});
     },
 
     rightPlayerState: function(state) {
-        if(utils.Functions.isUndefined(state))  {
+        if(utils._.isUndefined(state))  {
             return this.data().rightPlayerState;
         }
         this.data({rightPlayerState: state});
@@ -28,7 +28,7 @@ ns.GameState = comps.Packets.createPacket('GameState', {
 
 ns.JoinGame = comps.Packets.createPacket('JoinGame', {
     name: function(name) {
-        if (utils.Functions.isUndefined(name))  {
+        if (utils._.isUndefined(name))  {
             return this.data().name;
         }
         this.data({name: name});

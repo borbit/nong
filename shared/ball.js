@@ -20,9 +20,9 @@ Ball = function(x, y, id) {
     this.speed = 500;
 }
 
-utils.Functions.inherit(Ball, comps.Element);
+utils.inherit(Ball, comps.Element);
 
-utils.Functions.extend(Ball.prototype, {
+utils._.extend(Ball.prototype, {
     update: function() {
         this.updatePosition();
         this.observer.fire(comps.Element.events.changed);

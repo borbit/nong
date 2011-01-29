@@ -13,7 +13,7 @@ function StageWall(x, y, length, orientation) {
     this.orientation = orientation;
 }
 
-utils.Functions.inherit(StageWall, comts.Element);
+utils.inherit(StageWall, comts.Element);
 
 ns.StageWall = StageWall;
 

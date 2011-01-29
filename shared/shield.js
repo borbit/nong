@@ -18,9 +18,9 @@ function Shield(x, y, id) {
     this.vy = 0;
 }
 
-utils.Functions.inherit(Shield, comps.Element);
+utils.inherit(Shield, comps.Element);
 
-utils.Functions.extend(Shield.prototype, {
+utils._.extend(Shield.prototype, {
     update: function() {
         if (this.isMoving()) {
             this.updatePosition();

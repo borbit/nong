@@ -1,3 +1,3 @@
-exports.Functions = require('./functions').Functions;
+exports._ = require('./underscore')._;
 exports.Observer = require('./observer').Observer;
-exports._ = require('./underscore');
+exports._.extend(exports, require('./functions'));

@@ -20,7 +20,7 @@ exports.createGame = function() {
     function joinPlayer(player) {
         var id = player.id;
 
-        if (!utils.Functions.isUndefined(spectators[id])) {
+        if (!utils._.isUndefined(spectators[id])) {
             throw 'Tring to connect already connected player: ' + id;
         }
 
@@ -42,7 +42,7 @@ exports.createGame = function() {
     }
 
     function freePlayer(id) {
-        if (utils.Functions.isUndefined(spectators[id])) {
+        if (utils._.isUndefined(spectators[id])) {
             throw 'Tring to free not connected player: ' + id;
         }
 
