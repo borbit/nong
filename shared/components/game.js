@@ -1,7 +1,7 @@
 var comps = require('../components'),
     utils = require('../utils'),
     Emitter = require('events').EventEmitter,
-    Client = require('../../server/client');
+    Player = require('../../server/player');
 
 exports.Game = {};
 
@@ -34,7 +34,7 @@ exports.Game.createGame = function(stage, settings) {
         
         players[id] = player;
 
-        player.on(Client.events.DISCONNECTED, function() {
+        player.on(Player.events.GONE, function() {
             freePlayer(id);
         });
 
