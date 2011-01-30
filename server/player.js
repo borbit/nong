@@ -57,13 +57,13 @@ exports.createPlayer = function(client) {
     function updateElements(elements) {
         var packet = pong.Packets.GameSnapshot();
 
-        elements.forEach(function(element) {
-            packet.addEntityData(element.id, {
-                x: element.region.x,
-                y: element.region.y
+        for (var i in elements) {
+            packet.addEntityData(elements[i].id, {
+                x: elements[i].x,
+                y: elements[i].y
             });
-        });
-
+        }
+        
         client.send(packet);
     }
 

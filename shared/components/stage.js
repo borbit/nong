@@ -4,11 +4,12 @@ var utils = require('../utils'),
     components = require('../components')
 
 ns.Stage = function Stage() {
-    var observer = utils.Observer();
-    var gameLoop = components.GameLoop();
-    var collisionsDetector = components.CollisionsDetector();
-    var gameLoopEvents = components.GameLoop.events;
-    var collisionsEvents = components.CollisionsDetector.events;
+    var observer = utils.Observer(),
+        gameLoop = components.GameLoop(),
+        elementsDynamic = {}, elementsStatic = {},
+        collisionsDetector = components.CollisionsDetector(),
+        gameLoopEvents = components.GameLoop.events,
+        collisionsEvents = components.CollisionsDetector.events;
 
     gameLoop.subscribe(gameLoopEvents.tickWithUpdates, function(elements) {
         collisionsDetector.detect();
@@ -21,14 +22,28 @@ ns.Stage = function Stage() {
     });
 
     function addStaticElement(element) {
+        elementsStatic[element.id] = element;
         collisionsDetector.addStaticElement(element);
         return this;
     }
 
     function addDynamicElement(element) {
+        elementsDynamic[element.id] = element;
         gameLoop.addElement(element);
         collisionsDetector.addDynamicElement(element);
         return this;
+    }
+
+    function getState() {
+        var result = {};
+        for(var i in elementsDynamic) {
+            result[i] = {
+                id: elementsDynamic[i].id,
+                x: elementsDynamic[i].region.x,
+                y: elementsDynamic[i].region.y
+            };
+        }
+        return result;
     }
 
     function start() {
@@ -45,6 +60,7 @@ ns.Stage = function Stage() {
         collisionsDetector: collisionsDetector,
         addStaticElement: addStaticElement,
         addDynamicElement: addDynamicElement,
+        getState: getState,
         start: start,
         stop: stop,
         subscribe: observer.subscribe

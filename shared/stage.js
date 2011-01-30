@@ -1,6 +1,7 @@
 (function(ns) {
 
 var pong = require('./pong'),
+    utils = require('./utils'),
     comps = require('./components');
 
 ns.Stage = function Stage() {
@@ -15,13 +16,7 @@ ns.Stage = function Stage() {
     addWall(0, -50, 800, pong.StageWall.orientation.HORIZONTAL);
     addWall(0, 600, 800, pong.StageWall.orientation.HORIZONTAL);
 
-    return {
-        stop: base.stop,
-        start: base.start,
-        addStaticElement: base.addStaticElement,
-        addDynamicElement: base.addDynamicElement,
-        subscribe: base.observer.subscribe
-    };
+    return base;
 };
 
 ns.Stage.events = {

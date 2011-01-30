@@ -87,11 +87,9 @@ $(function() {
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEUP, function() {
             publisher.shieldMoveUp(chosenSide);
         });
-
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEDOWN, function() {
             publisher.shieldMoveDown(chosenSide);
         });
-
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.STOP, function() {
             publisher.shieldStop(chosenSide);
         });

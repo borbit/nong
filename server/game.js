@@ -7,6 +7,7 @@ exports.createGame = function() {
     var spectators = {};
     var players = {left: null, right: null};
     var gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+    var snapshotter = null;
 
     var stage = pong.Stage();
     var ball = new pong.Ball(100, 100, 'ball');
@@ -14,10 +15,6 @@ exports.createGame = function() {
         left: new pong.Shield(40, 250, 'left'),
         right: new pong.Shield(750, 250, 'right')
     };
-
-    stage.subscribe(comps.Stage.events.changed, function(elements) {
-        notifyElementsChanged(elements);
-    });
 
     function joinPlayer(player) {
         var id = player.id;
@@ -139,6 +136,10 @@ exports.createGame = function() {
              .addDynamicElement(shields.right)
              .addDynamicElement(ball)
              .start();
+
+        snapshotter = setInterval(function(elements) {
+            notifyElementsChanged(stage.getState());
+        }, 1000 / pong.Globals.SPS);
     }
 
     function bindPlayerToShield(player, shield) {
@@ -149,6 +150,8 @@ exports.createGame = function() {
 
     function stop() {
         stage.stop();
+
+        clearInterval(snapshotter);
     }
 
     return {
