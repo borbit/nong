@@ -98,7 +98,7 @@ $(function() {
 
         ball = new Pong.Ball(100, 100, 'ball');
 
-        var stage = Pong.NongStage();
+        var stage = Pong.Stage();
 
         shields.left = new Pong.Shield(40, 250, 'left');
         shields.right = new Pong.Shield(750, 250, 'right');

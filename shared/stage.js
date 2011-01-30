@@ -3,7 +3,7 @@
 var pong = require('./pong'),
     comps = require('./components');
 
-ns.NongStage = function NongStage() {
+ns.Stage = function Stage() {
     var base = comps.Stage();
 
     function addWall(x, y, length, orientation) {
@@ -24,7 +24,7 @@ ns.NongStage = function NongStage() {
     };
 };
 
-ns.NongStage.events = {
+ns.Stage.events = {
     //changed: 'changed'
 };
 

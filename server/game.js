@@ -8,7 +8,7 @@ exports.createGame = function() {
     var players = {left: null, right: null};
     var gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
 
-    var stage = pong.NongStage();
+    var stage = pong.Stage();
     var ball = new pong.Ball(100, 100, 'ball');
     var shields = {
         left: new pong.Shield(40, 250, 'left'),
@@ -35,7 +35,6 @@ exports.createGame = function() {
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
         });
-
         player.on(Player.events.JOINRIGHT, function() {
             assignShield('right', player);
         });
@@ -64,13 +63,13 @@ exports.createGame = function() {
         });
 
         player.on(Player.events.MOVEUP, function() {
-            player.shieldMoveUp(side, shields[side].region.x, shields[side].region.y);
+            notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y);
         });
         player.on(Player.events.MOVEDOWN, function() {
-            player.shieldMoveDown(side, shields[side].region.x, shields[side].region.y);
+            notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y);
         });
         player.on(Player.events.STOP, function() {
-            player.shieldStop(side, shields[side].region.x, shields[side].region.y);
+            notifyShieldStop(side, shields[side].region.x, shields[side].region.y);
         });
 
         updateGameState();
@@ -93,6 +92,24 @@ exports.createGame = function() {
     function notifyElementsChanged(elements) {
         for (var i in spectators) {
             spectators[i].updateElements(elements);
+        }
+    }
+
+    function notifyShieldMoveUp(side, x, y) {
+        for (var i in spectators) {
+            spectators[i].shieldMoveUp(side, x, y);
+        }
+    }
+
+    function notifyShieldMoveDown(side, x, y) {
+        for (var i in spectators) {
+            spectators[i].shieldMoveDown(side, x, y);
+        }
+    }
+
+    function notifyShieldStop(side, x, y) {
+        for (var i in spectators) {
+            spectators[i].shieldStop(side, x, y);
         }
     }
 
@@ -135,9 +152,6 @@ exports.createGame = function() {
     }
 
     return {
-        start: start,
-        stop: stop,
-        getState: getState,
         joinPlayer: joinPlayer
     };
 };
