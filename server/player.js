@@ -67,6 +67,24 @@ exports.createPlayer = function(client) {
         client.send(packet);
     }
 
+    function shieldMoveUp(side, x, y) {
+        var packet = pong.Packets.ShieldMoveUp();
+        packet.data({side: side, x: x, y: y});
+        client.send(packet);
+    }
+
+    function shieldMoveDown(side, x, y) {
+        var packet = pong.Packets.ShieldMoveDown();
+        packet.data({side: side, x: x, y: y});
+        client.send(packet);
+    }
+
+    function shieldStop(side, x, y) {
+        var packet = pong.Packets.ShieldStop();
+        packet.data({side: side, x: x, y: y});
+        client.send(packet);
+    }
+
     function on(event, callback) {
         emitter.on(event, callback);
     }
@@ -75,9 +93,13 @@ exports.createPlayer = function(client) {
         on: on,
         subscribe: on,
         events: events,
+        get id() { return id; },
+        get score() { return score; },
+
         updateGameState: updateGameState,
         updateElements: updateElements,
-        get id() { return id; },
-        get score() { return score; }
+        shieldMoveUp: shieldMoveUp,
+        shieldMoveDown: shieldMoveDown,
+        shieldStop: shieldStop
     };
 };

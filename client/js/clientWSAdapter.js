@@ -18,7 +18,7 @@ Pong.ClientWSAdapter = function() {
             observer.fire(Pong.WSAdapter.events.CONNECTED);
         };
         ws.onmessage = function(message) {
-            console.log('Received: ' + message.data);
+            //console.log('Received: ' + message.data);
             processMessage(message);
         };
         ws.onerror = function(error) {

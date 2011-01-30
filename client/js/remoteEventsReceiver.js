@@ -17,16 +17,16 @@ Pong.RemoteEventsReceiver = function(ws) {
         observer.fire(events.GAMESNAPSHOT, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldMoveUp.id, function() {
-        observer.fire(events.MOVEUP);
+    ws.subscribe(Pong.Packets.ShieldMoveUp.id, function(data) {
+        observer.fire(events.MOVEUP, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldMoveDown.id, function() {
-        observer.fire(events.MOVEDOWN);
+    ws.subscribe(Pong.Packets.ShieldMoveDown.id, function(data) {
+        observer.fire(events.MOVEDOWN, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldStop.id, function() {
-        observer.fire(events.STOP);
+    ws.subscribe(Pong.Packets.ShieldStop.id, function(data) {
+        observer.fire(events.STOP, data);
     });
 
     return {

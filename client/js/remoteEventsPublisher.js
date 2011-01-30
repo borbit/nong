@@ -14,21 +14,21 @@ Pong.RemoteEventsPublisher = function(ws) {
         sendPacket(Pong.Packets.JoinRight());
     }
 
-    function shieldMoveUp(position) {
+    function shieldMoveUp(side) {
         var packet = Pong.Packets.ShieldMoveUp();
-        packet.data({position: position});
+        packet.data({side: side});
         sendPacket(packet);
     }
 
-    function shieldMoveDown(position) {
+    function shieldMoveDown(side) {
         var packet = Pong.Packets.ShieldMoveDown();
-        packet.data({position: position});
+        packet.data({side: side});
         sendPacket(packet);
     }
 
-    function shieldStop(position) {
+    function shieldStop(side) {
         var packet = Pong.Packets.ShieldStop();
-        packet.data({position: position});
+        packet.data({side: side});
         sendPacket(packet);
     }
 

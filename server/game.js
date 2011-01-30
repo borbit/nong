@@ -10,8 +10,10 @@ exports.createGame = function() {
 
     var stage = pong.NongStage();
     var ball = new pong.Ball(100, 100, 'ball');
-    var shieldLeft = new pong.Shield(40, 250, 'left');
-    var shieldRight = new pong.Shield(750, 250, 'right');
+    var shields = {
+        left: new pong.Shield(40, 250, 'left'),
+        right: new pong.Shield(750, 250, 'right')
+    };
 
     stage.subscribe(comps.Stage.events.changed, function(elements) {
         notifyElementsChanged(elements);
@@ -61,6 +63,16 @@ exports.createGame = function() {
             updateGameState();
         });
 
+        player.on(Player.events.MOVEUP, function() {
+            player.shieldMoveUp(side, shields[side].region.x, shields[side].region.y);
+        });
+        player.on(Player.events.MOVEDOWN, function() {
+            player.shieldMoveDown(side, shields[side].region.x, shields[side].region.y);
+        });
+        player.on(Player.events.STOP, function() {
+            player.shieldStop(side, shields[side].region.x, shields[side].region.y);
+        });
+
         updateGameState();
     }
 
@@ -103,11 +115,11 @@ exports.createGame = function() {
     }
 
     function start() {
-        bindPlayerToShield(players.left, shieldLeft);
-        bindPlayerToShield(players.right, shieldRight);
+        bindPlayerToShield(players.left, shields.left);
+        bindPlayerToShield(players.right, shields.right);
 
-        stage.addDynamicElement(shieldLeft)
-             .addDynamicElement(shieldRight)
+        stage.addDynamicElement(shields.left)
+             .addDynamicElement(shields.right)
              .addDynamicElement(ball)
              .start();
     }

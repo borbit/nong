@@ -12,10 +12,12 @@ $(function() {
     
     joinButtonLeft.click(function() {
         publisher.joinLeft();
+        chosenSide = 'left';
     });
 
     joinButtonRight.click(function() {
         publisher.joinRight();
+        chosenSide = 'right';
     });
     
     ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
@@ -50,54 +52,67 @@ $(function() {
         }
     });
 
-    receiver.subscribe(receiver.events.GAMESNAPSHOT, function(packetData) {
-        shieldLeft.region.x = packetData['left'].x;
-        shieldLeft.region.y = packetData['left'].y;
-        shieldRight.region.x = packetData['right'].x;
-        shieldRight.region.y = packetData['right'].y;
-        ball.region.x = packetData['ball'].x;
-        ball.region.y = packetData['ball'].y;
+    receiver.subscribe(receiver.events.GAMESNAPSHOT, function(data) {
+        shields.left.region.x = data['left'].x;
+        shields.left.region.y = data['left'].y;
+        shields.right.region.x = data['right'].x;
+        shields.right.region.y = data['right'].y;
+        ball.region.x = data['ball'].x;
+        ball.region.y = data['ball'].y;
+    });
+
+    receiver.subscribe(receiver.events.MOVEUP, function(data) {
+        shields[data.side].region.x = data.x;
+        shields[data.side].region.y = data.y;
+        shields[data.side].moveUp();
+    });
+    receiver.subscribe(receiver.events.MOVEDOWN, function(data) {
+        shields[data.side].region.x = data.x;
+        shields[data.side].region.y = data.y;
+        shields[data.side].moveDown();
+    });
+    receiver.subscribe(receiver.events.STOP, function(data) {
+        shields[data.side].region.x = data.x;
+        shields[data.side].region.y = data.y;
+        shields[data.side].stop();
     });
     
     statusMessage.text('CONNECTING').show();
     ws.connect();
 
-    var shieldLeft, shieldRight, ball;
+    var shields = {left: null, right: null} , ball, chosenSide;
     
     function createGame() {
 
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEUP, function() {
-            publisher.shieldMoveUp('left');
-            publisher.shieldMoveUp('right');
+            publisher.shieldMoveUp(chosenSide);
         });
 
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEDOWN, function() {
-            publisher.shieldMoveDown('left');
-            publisher.shieldMoveDown('right');
+            publisher.shieldMoveDown(chosenSide);
         });
 
         Pong.ClientEvents.subscribe(Pong.ClientEvents.events.STOP, function() {
-            publisher.shieldStop('left');
-            publisher.shieldStop('right');
+            publisher.shieldStop(chosenSide);
         });
 
         ball = new Pong.Ball(100, 100, 'ball');
 
         var stage = Pong.NongStage();
 
-        shieldLeft = new Pong.Shield(40, 250, 'left');
-        shieldRight = new Pong.Shield(750, 250, 'right');
+        shields.left = new Pong.Shield(40, 250, 'left');
+        shields.right = new Pong.Shield(750, 250, 'right');
         
-        stage.addDynamicElement(shieldLeft)
-            .addDynamicElement(shieldRight)
+        stage.addDynamicElement(shields.left)
+            .addDynamicElement(shields.right)
             .addDynamicElement(ball)
             .start();
 
         var view = Pong.View(stage);
         var ballsRenderer = Pong.Renderers.Ball();
         var shieldsRenderer = Pong.Renderers.Shield();
-        view.addRenderer(shieldLeft.id, $('#shield1'), shieldsRenderer);
-        view.addRenderer(shieldRight.id, $('#shield2'), shieldsRenderer);
+        view.addRenderer(shields.left.id, $('#shield1'), shieldsRenderer);
+        view.addRenderer(shields.right.id, $('#shield2'), shieldsRenderer);
         view.addRenderer(ball.id, $('#ball'), ballsRenderer);
     }
 });
