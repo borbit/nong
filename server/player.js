@@ -58,10 +58,7 @@ exports.createPlayer = function(client) {
         var packet = pong.Packets.GameSnapshot();
 
         for (var i in elements) {
-            packet.addEntityData(elements[i].id, {
-                x: elements[i].x,
-                y: elements[i].y
-            });
+            packet.addEntityData(elements[i].id, elements[i]);
         }
         
         client.send(packet);

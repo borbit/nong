@@ -59,6 +59,9 @@ $(function() {
         shields.right.region.y = data['right'].y;
         ball.region.x = data['ball'].x;
         ball.region.y = data['ball'].y;
+        ball.kx = data['ball'].kx;
+        ball.ky = data['ball'].ky;
+        ball.angle = data['ball'].angle;
     });
 
     receiver.subscribe(receiver.events.MOVEUP, function(data) {

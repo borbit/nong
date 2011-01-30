@@ -37,11 +37,7 @@ ns.Stage = function Stage() {
     function getState() {
         var result = {};
         for(var i in elementsDynamic) {
-            result[i] = {
-                id: elementsDynamic[i].id,
-                x: elementsDynamic[i].region.x,
-                y: elementsDynamic[i].region.y
-            };
+            result[i] = elementsDynamic[i].serialize();
         }
         return result;
     }

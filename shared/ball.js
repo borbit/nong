@@ -58,6 +58,15 @@ utils._.extend(Ball.prototype, {
         var maxAngleDelta = ns.Ball.angleLimits.MAX - ns.Ball.angleLimits.MIN;
         this.angle = ns.Ball.angleLimits.MIN + maxAngleDelta * offset / (shield.region.height / 2);
         this.kx = - this.kx;
+    },
+
+    serialize: function() {
+        return {
+            id: this.id,
+            kx: this.kx, ky: this.ky,
+            x: this.region.x, y: this.region.y,
+            angle: this.angle
+        };
     }
 });
 

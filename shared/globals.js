@@ -13,7 +13,7 @@
     }
 
     ns.Globals= {};
-    ns.Globals.SPS = 5; // snapshots per second
+    ns.Globals.SPS = 20; // snapshots per second
     ns.Globals.FPS = 30;
     ns.Globals.RFPS = 30;
 })();

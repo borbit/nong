@@ -56,6 +56,14 @@ utils._.extend(Shield.prototype, {
             this.region.y = wall.region.top() - this.region.height;
         }
         this.stop();
+    },
+
+    serialize: function() {
+        return {
+            id: this.id,
+            x: this.region.x,
+            y: this.region.y
+        };
     }
 });
 

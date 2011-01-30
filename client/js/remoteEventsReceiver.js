@@ -14,7 +14,6 @@ Pong.RemoteEventsReceiver = function(ws) {
     });
 
     ws.subscribe(Pong.Packets.GameSnapshot.id, function(data) {
-        console.dir(data);
         observer.fire(events.GAMESNAPSHOT, data);
     });
 
