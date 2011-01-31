@@ -1,5 +1,4 @@
 (function(ns) {
-
 var pong = require('./pong'),
     utils = require('./utils'),
     comps = require('./components');
@@ -7,29 +6,42 @@ var pong = require('./pong'),
 function Shield(x, y, id) {
     this.id = id;
     this.observer = utils.Observer();
-    
+
     this.region = comps.Region({
         x: x, y: y,
         width: 10,
         height: 80
     });
 
-    this.speed = 500;
+    this.speed = 800;
     this.vy = 0;
+
+    this.energy = 0;
 }
 
 utils.inherit(Shield, comps.Element);
 
 utils._.extend(Shield.prototype, {
+    updateEnergy: function() {
+        if (this.vy == 0 && this.energy != 0) {
+            this.energy += - Math.round(this.energy / Math.abs(this.energy));
+        } else if (this.vy) {
+            if (Math.abs(this.energy + this.vy) <= 5) {
+                this.energy += this.vy;
+            }
+        }
+    },
+
     update: function() {
         if (this.isMoving()) {
+            this.updateEnergy();
             this.updatePosition();
             this.observer.fire(comps.Element.events.changed);
         }
     },
 
     updatePosition: function() {
-        this.region.y += this.vy * this.speed / pong.Globals.RFPS;
+        this.region.y += this.energy * this.speed / (pong.Globals.RFPS * 7);
     },
 
     moveUp: function() {
@@ -45,16 +57,17 @@ utils._.extend(Shield.prototype, {
     },
 
     isMoving: function() {
-        return this.vy != 0;
+        return this.energy != 0 || this.vy != 0;
     },
 
     hitStageWall: function(wall) {
-        if (this.vy < 0) {
+        if (this.energy < 0) {
             this.region.y = wall.region.bottom();
         }
-        else if (this.vy > 0) {
+        else if (this.energy > 0) {
             this.region.y = wall.region.top() - this.region.height;
         }
+        this.energy = 0;
         this.stop();
     },
 

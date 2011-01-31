@@ -60,10 +60,10 @@ exports.createGame = function() {
         });
 
         player.on(Player.events.MOVEUP, function() {
-            notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y);
+            notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
         });
         player.on(Player.events.MOVEDOWN, function() {
-            notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y);
+            notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
         });
         player.on(Player.events.STOP, function() {
             notifyShieldStop(side, shields[side].region.x, shields[side].region.y);
@@ -92,15 +92,15 @@ exports.createGame = function() {
         }
     }
 
-    function notifyShieldMoveUp(side, x, y) {
+    function notifyShieldMoveUp(side, x, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveUp(side, x, y);
+            spectators[i].shieldMoveUp(side, x, y, energy);
         }
     }
 
-    function notifyShieldMoveDown(side, x, y) {
+    function notifyShieldMoveDown(side, x, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveDown(side, x, y);
+            spectators[i].shieldMoveDown(side, x, y, energy);
         }
     }
 
