@@ -13,7 +13,7 @@ function Shield(x, y, id) {
         height: 80
     });
 
-    this.speed = 800;
+    this.speed = 100;
     this.vy = 0;
 
     this.energy = 0;
@@ -26,7 +26,7 @@ utils._.extend(Shield.prototype, {
         if (this.vy == 0 && this.energy != 0) {
             this.energy += - Math.round(this.energy / Math.abs(this.energy));
         } else if (this.vy) {
-            if (Math.abs(this.energy + this.vy) <= 5) {
+            if (Math.abs(this.energy + this.vy) <= 8) {
                 this.energy += this.vy;
             }
         }
@@ -41,7 +41,7 @@ utils._.extend(Shield.prototype, {
     },
 
     updatePosition: function() {
-        this.region.y += this.energy * this.speed / (pong.Globals.RFPS * 7);
+        this.region.y += this.energy * this.speed / pong.Globals.RFPS;
     },
 
     moveUp: function() {
@@ -63,12 +63,11 @@ utils._.extend(Shield.prototype, {
     hitStageWall: function(wall) {
         if (this.energy < 0) {
             this.region.y = wall.region.bottom();
-        }
-        else if (this.energy > 0) {
+        } else if (this.energy > 0) {
             this.region.y = wall.region.top() - this.region.height;
         }
-        this.energy = 0;
-        this.stop();
+
+        this.energy *= -1;
     },
 
     serialize: function() {
