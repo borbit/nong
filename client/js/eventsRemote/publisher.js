@@ -1,4 +1,4 @@
-Pong.RemoteEventsPublisher = function(ws) {
+Pong.EventsRemote.Publisher = function(transport) {
     
     function joinGame(name) {
         var packet = Pong.Packets.JoinGame();
@@ -35,7 +35,7 @@ Pong.RemoteEventsPublisher = function(ws) {
     function sendPacket(packet) {
         var payload = Components.Packets.serialize(packet);
         console.log('Sending packet: ' + payload);
-        ws.sendMessage(payload);
+        transport.sendMessage(payload);
     }
 
     return {

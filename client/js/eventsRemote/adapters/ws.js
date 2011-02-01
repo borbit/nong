@@ -1,6 +1,6 @@
 var Packets = require('../shared/components/packets').Packets;
 
-Pong.ClientWSAdapter = function() {
+Pong.EventsRemote.Adapters.WS = function() {
     var STATE_DISCONNECTED = 'disconnected';
     var STATE_CONNECTING = 'connecting';
     var STATE_CONNECTED = 'connected';

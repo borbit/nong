@@ -1,4 +1,4 @@
-Pong.RemoteEventsReceiver = function(ws) {
+Pong.EventsRemote.Receiver = function(transport) {
     var events = {
         STOP: 'stop',
         MOVEUP: 'moveUp',
@@ -9,23 +9,23 @@ Pong.RemoteEventsReceiver = function(ws) {
     
     var observer = Utils.Observer();
 
-    ws.subscribe(Pong.Packets.GameState.id, function(data) {
+    transport.subscribe(Pong.Packets.GameState.id, function(data) {
         observer.fire(events.GAMESTATE, data);
     });
 
-    ws.subscribe(Pong.Packets.GameSnapshot.id, function(data) {
+    transport.subscribe(Pong.Packets.GameSnapshot.id, function(data) {
         observer.fire(events.GAMESNAPSHOT, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldMoveUp.id, function(data) {
+    transport.subscribe(Pong.Packets.ShieldMoveUp.id, function(data) {
         observer.fire(events.MOVEUP, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldMoveDown.id, function(data) {
+    transport.subscribe(Pong.Packets.ShieldMoveDown.id, function(data) {
         observer.fire(events.MOVEDOWN, data);
     });
 
-    ws.subscribe(Pong.Packets.ShieldStop.id, function(data) {
+    transport.subscribe(Pong.Packets.ShieldStop.id, function(data) {
         observer.fire(events.STOP, data);
     });
 

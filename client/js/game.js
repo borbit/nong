@@ -1,7 +1,7 @@
 $(function() {
-    var ws = Pong.ClientWSAdapter(),
-        publisher = Pong.RemoteEventsPublisher(ws),
-        receiver = Pong.RemoteEventsReceiver(ws),
+    var transport = Pong.EventsRemote.Adapters.WS(),
+        publisher = Pong.EventsRemote.Publisher(transport),
+        receiver = Pong.EventsRemote.Receiver(transport),
 
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
@@ -20,14 +20,14 @@ $(function() {
         chosenSide = 'right';
     });
     
-    ws.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
+    transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
         publisher.joinGame('only');
         statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
     });
 
-    ws.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
+    transport.subscribe(Pong.WSAdapter.events.DISCONNECTED, function() {
         menu.show();
         joinButtonLeft.hide();
         joinButtonRight.hide();
@@ -53,10 +53,10 @@ $(function() {
     });
 
     receiver.subscribe(receiver.events.GAMESNAPSHOT, function(data) {
-        shields.left.region.x = data['left'].x;
+        /*shields.left.region.x = data['left'].x;
         shields.left.region.y = data['left'].y;
         shields.right.region.x = data['right'].x;
-        shields.right.region.y = data['right'].y;
+        shields.right.region.y = data['right'].y;*/
         ball.region.x = data['ball'].x;
         ball.region.y = data['ball'].y;
         ball.kx = data['ball'].kx;
@@ -81,19 +81,19 @@ $(function() {
     });
     
     statusMessage.text('CONNECTING').show();
-    ws.connect();
+    transport.connect();
 
     var shields = {left: null, right: null} , ball, chosenSide;
-    
-    function createGame() {
+    var keyboard = Pong.EventsClient.KeyboardReceiver;
 
-        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEUP, function() {
+    function createGame() {
+        keyboard.subscribe(keyboard.events.MOVEUP, function() {
             publisher.shieldMoveUp(chosenSide);
         });
-        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.MOVEDOWN, function() {
+        keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
             publisher.shieldMoveDown(chosenSide);
         });
-        Pong.ClientEvents.subscribe(Pong.ClientEvents.events.STOP, function() {
+        keyboard.subscribe(keyboard.events.STOP, function() {
             publisher.shieldStop(chosenSide);
         });
 
@@ -105,9 +105,9 @@ $(function() {
         shields.right = new Pong.Shield(750, 250, 'right');
         
         stage.addDynamicElement(shields.left)
-            .addDynamicElement(shields.right)
-            .addDynamicElement(ball)
-            .start();
+             .addDynamicElement(shields.right)
+             .addDynamicElement(ball)
+             .start();
 
         var view = Pong.View(stage);
         var ballsRenderer = Pong.Renderers.Ball();

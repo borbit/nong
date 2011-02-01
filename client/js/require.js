@@ -1,3 +1,10 @@
+window.Pong = {};
+window.Components = {};
+window.Utils = {};
+window.Pong.EventsClient = {};
+window.Pong.EventsRemote = {};
+window.Pong.EventsRemote.Adapters = {};
+
 function require(path) {
     path = path.replace('../', '');
     path = path.replace('./', '');
