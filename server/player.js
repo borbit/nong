@@ -12,7 +12,7 @@ var events = exports.events = {
     JOINRIGHT: 'joinRight',
     GONE: 'gone'
 };
-    
+
 exports.createPlayer = function(client) {
     var id = utils.getUniqId();
     var emitter = new Emitter();
@@ -29,11 +29,11 @@ exports.createPlayer = function(client) {
     client.on(pong.Packets.ShieldMoveUp.id, function() {
         emitter.emit(events.MOVEUP);
     });
-    
+
     client.on(pong.Packets.ShieldMoveDown.id, function() {
         emitter.emit(events.MOVEDOWN);
     });
-    
+
     client.on(pong.Packets.ShieldStop.id, function() {
         emitter.emit(events.STOP);
     });
@@ -60,19 +60,19 @@ exports.createPlayer = function(client) {
         for (var i in elements) {
             packet.addEntityData(elements[i].id, elements[i]);
         }
-        
+
         client.send(packet);
     }
 
-    function shieldMoveUp(side, x, y) {
+    function shieldMoveUp(side, x, y, energy) {
         var packet = pong.Packets.ShieldMoveUp();
-        packet.data({side: side, x: x, y: y});
+        packet.data({side: side, x: x, y: y, energy: energy});
         client.send(packet);
     }
 
-    function shieldMoveDown(side, x, y) {
+    function shieldMoveDown(side, x, y, energy) {
         var packet = pong.Packets.ShieldMoveDown();
-        packet.data({side: side, x: x, y: y});
+        packet.data({side: side, x: x, y: y, energy: energy});
         client.send(packet);
     }
 

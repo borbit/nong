@@ -9,7 +9,7 @@ $(function() {
         joinedMessage = $('#menu .joined'),
         statusMessage = $('#menu .status'),
         menu = $('#menu');
-    
+
     joinButtonLeft.click(function() {
         publisher.joinLeft();
         chosenSide = 'left';
@@ -32,10 +32,10 @@ $(function() {
         joinButtonLeft.hide();
         joinButtonRight.hide();
         waitingMessage.hide();
-        joinedMessage.hide(); 
+        joinedMessage.hide();
         statusMessage.text('DISCONNECTED').show();
     });
-    
+
     receiver.subscribe(receiver.events.GAMESTATE, function(packetData) {
         if (packetData.gameState == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (packetData.leftPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
@@ -67,11 +67,13 @@ $(function() {
     receiver.subscribe(receiver.events.MOVEUP, function(data) {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
+        shields[data.side].energy = data.energy;
         shields[data.side].moveUp();
     });
     receiver.subscribe(receiver.events.MOVEDOWN, function(data) {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
+        shields[data.side].energy = data.energy;
         shields[data.side].moveDown();
     });
     receiver.subscribe(receiver.events.STOP, function(data) {
@@ -79,7 +81,7 @@ $(function() {
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
     });
-    
+
     statusMessage.text('CONNECTING').show();
     transport.connect();
 
@@ -103,7 +105,7 @@ $(function() {
 
         shields.left = new Pong.Shield(40, 250, 'left');
         shields.right = new Pong.Shield(750, 250, 'right');
-        
+
         stage.addDynamicElement(shields.left)
              .addDynamicElement(shields.right)
              .addDynamicElement(ball)
