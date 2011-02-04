@@ -44,6 +44,11 @@ utils._.extend(Shield.prototype, {
         this.region.y += this.energy * this.speed / pong.Globals.RFPS;
     },
 
+    moveTo: function(y) {
+        this.region.y = y;
+        this.observer.fire(comps.Element.events.changed);
+    },
+
     moveUp: function() {
         this.vy = -1;
     },

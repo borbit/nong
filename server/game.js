@@ -10,7 +10,7 @@ exports.createGame = function() {
     var snapshotter = null;
 
     var stage = pong.Stage();
-    var ball = new pong.Ball(100, 100, 'ball');
+    var ball = new pong.Ball('ball');
     var shields = {
         left: new pong.Shield(40, 250, 'left'),
         right: new pong.Shield(750, 250, 'right')
@@ -132,10 +132,26 @@ exports.createGame = function() {
         bindPlayerToShield(players.left, shields.left);
         bindPlayerToShield(players.right, shields.right);
 
-        stage.addDynamicElement(shields.left)
-             .addDynamicElement(shields.right)
+        stage.addStaticElement(new pong.StageWall(0, -50, 800))
+             .addStaticElement(new pong.StageWall(0, 600, 800))
+             .addStaticElement(new pong.Goal(-50, 0, 600))
+             .addStaticElement(new pong.Goal(800, 0, 600))
+             .addShield(shields.left)
+             .addShield(shields.right)
              .addDynamicElement(ball)
              .start();
+
+        //TODO: this should be a method of a shared Game object
+        function startRound() {
+            //TODO: implement pause and countdown
+            ball.pitch();
+        }
+
+        startRound();
+        
+        stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+            startRound();
+        });
 
         snapshotter = setInterval(function(elements) {
             notifyElementsChanged(stage.getState());

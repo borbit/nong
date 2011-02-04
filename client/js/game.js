@@ -62,6 +62,7 @@ $(function() {
         ball.kx = data['ball'].kx;
         ball.ky = data['ball'].ky;
         ball.angle = data['ball'].angle;
+        ball.isMoving = data['ball'].isMoving;
     });
 
     receiver.subscribe(receiver.events.MOVEUP, function(data) {
@@ -80,12 +81,14 @@ $(function() {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
+        console.log("STOP");
     });
 
     statusMessage.text('CONNECTING').show();
     transport.connect();
 
     var shields = {left: null, right: null} , ball, chosenSide;
+    var goals = {left: null, right: null};
     var keyboard = Pong.EventsClient.KeyboardReceiver;
 
     function createGame() {
@@ -99,17 +102,36 @@ $(function() {
             publisher.shieldStop(chosenSide);
         });
 
-        ball = new Pong.Ball(100, 100, 'ball');
+        ball = new Pong.Ball('ball');
 
         var stage = Pong.Stage();
 
         shields.left = new Pong.Shield(40, 250, 'left');
         shields.right = new Pong.Shield(750, 250, 'right');
 
-        stage.addDynamicElement(shields.left)
-             .addDynamicElement(shields.right)
+        goals.left = new Pong.Goal(-50, 0, 600);
+        goals.right = new Pong.Goal(800, 0, 600);
+
+        stage.addStaticElement(new Pong.StageWall(0, -50, 800))
+             .addStaticElement(new Pong.StageWall(0, 600, 800))
+             .addStaticElement(goals.left)
+             .addStaticElement(goals.right)
+             .addShield(shields.left)
+             .addShield(shields.right)
              .addDynamicElement(ball)
              .start();
+
+        //TODO: this should be a method of a shared Game object
+        function startRound() {
+            //TODO: implement pause and countdown
+            ball.pitch();
+        }
+
+        startRound();
+        
+        stage.subscribe(Pong.Stage.events.goalHit, function(goal) {
+            startRound();
+        });
 
         var view = Pong.View(stage);
         var ballsRenderer = Pong.Renderers.Ball();

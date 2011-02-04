@@ -6,21 +6,29 @@ var pong = require('./pong'),
 
 ns.Stage = function Stage() {
     var base = comps.Stage();
+    var shields = [];
 
-    function addWall(x, y, length, orientation) {
-        base.addStaticElement(new pong.StageWall(x, y, length, orientation));
+    base.addShield = function(shield) {
+        shields.push(shield);
+        base.addDynamicElement(shield);
+        return base;
     }
 
-    addWall(-50, 0, 600, pong.StageWall.orientation.VERTICAL);
-    addWall(800, 0, 600, pong.StageWall.orientation.VERTICAL);
-    addWall(0, -50, 800, pong.StageWall.orientation.HORIZONTAL);
-    addWall(0, 600, 800, pong.StageWall.orientation.HORIZONTAL);
+    base.onBallHitsGoal = function(ball, goal) {
+        ball.moveHome();
+        for (var key in shields) {
+            shields[key].moveTo(300 - shields[key].region.height / 2);
+            shields[key].stop();
+        }
+        ball.stop();
+        base.observer.fire(Stage.events.goalHit, goal);
+    }
 
     return base;
 };
 
 ns.Stage.events = {
-    //changed: 'changed'
+    goalHit: 'goalHit'
 };
 
 }((typeof exports === 'undefined') ? window.Pong : exports));
