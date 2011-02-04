@@ -144,7 +144,9 @@ exports.createGame = function() {
         //TODO: this should be a method of a shared Game object
         function startRound() {
             //TODO: implement pause and countdown
-            ball.pitch();
+            setTimeout(function() {
+                ball.pitch();
+            }, 2000);
         }
 
         startRound();
