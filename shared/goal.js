@@ -3,16 +3,16 @@
 var comts = require('./components'),
     utils = require('./utils');
 
-function StageWall(x, y, length) {
+function Goal(x, y, height) {
     this.region = comts.Region({
         x: x, y: y,
-        width: length,
-        height: 50
+        width: 50,
+        height: height
     });
 }
 
-utils.inherit(StageWall, comts.Element);
+utils.inherit(Goal, comts.Element);
 
-ns.StageWall = StageWall;
+ns.Goal = Goal;
 
 }((typeof exports === 'undefined') ? window.Pong : exports));

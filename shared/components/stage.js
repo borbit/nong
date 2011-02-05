@@ -19,7 +19,20 @@ ns.Stage = function Stage() {
     collisionsDetector.subscribe(collisionsEvents.collisionDetected, function(element1, element2) {
         element1.hit(element2);
         element2.hit(element1);
+        executeCollisionHandler(element1, element2);
+        executeCollisionHandler(element2, element1);
     });
+
+    function executeCollisionHandler(element1, element2) {
+        var type1 = utils.getTypeName(element1);
+        var type2 = utils.getTypeName(element2);
+        if (type1 && type2) {
+            var handlerName = 'on' + type1 + 'Hits' + type2;
+            if (stage[handlerName] != undefined) {
+                stage[handlerName](element1, element2);
+            }
+        }
+    }
 
     function addStaticElement(element) {
         elementsStatic[element.id] = element;
@@ -50,7 +63,7 @@ ns.Stage = function Stage() {
         gameLoop.stop();
     }
 
-    return {
+    var stage = {
         gameLoop: gameLoop,
         observer: observer,
         collisionsDetector: collisionsDetector,
@@ -60,7 +73,8 @@ ns.Stage = function Stage() {
         start: start,
         stop: stop,
         subscribe: observer.subscribe
-    };
+    }
+    return stage;
 };
 
 ns.Stage.events = {

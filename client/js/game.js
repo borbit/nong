@@ -53,15 +53,16 @@ $(function() {
     });
 
     remoteReceiver.subscribe(remoteReceiver.events.GAMESNAPSHOT, function(data) {
-        shields.left.region.x = data[shields.left.id].x;
+        /*shields.left.region.x = data[shields.left.id].x;
         shields.left.region.y = data[shields.left.id].y;
         shields.right.region.x = data[shields.right.id].x;
-        shields.right.region.y = data[shields.right.id].y;
+        shields.right.region.y = data[shields.right.id].y;*/
         ball.region.x = data[ball.id].x;
         ball.region.y = data[ball.id].y;
         ball.kx = data[ball.id].kx;
         ball.ky = data[ball.id].ky;
         ball.angle = data[ball.id].angle;
+        ball.isMoving = data[ball.id].isMoving;
     });
 
     remoteReceiver.subscribe(remoteReceiver.events.MOVEUP, function(data) {
@@ -80,6 +81,7 @@ $(function() {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
+        console.log("STOP");
     });
 
     statusMessage.text('CONNECTING').show();
@@ -106,11 +108,19 @@ $(function() {
         left: new Pong.Shield(40, 250, 'left'),
         right: new Pong.Shield(750, 250, 'right')
     };
+    var goals = {
+        left: new Pong.Goal(-50, 0, 600),
+        right: new Pong.Goal(800, 0, 600)
+    };
     var ball = new Pong.Ball(100, 100, 'ball');
     var stage = Pong.Stage();
 
-    stage.addDynamicElement(shields.left)
-         .addDynamicElement(shields.right)
+    stage.addStaticElement(new Pong.StageWall(0, -50, 800))
+         .addStaticElement(new Pong.StageWall(0, 600, 800))
+         .addStaticElement(goals.left)
+         .addStaticElement(goals.right)
+         .addShield(shields.left)
+         .addShield(shields.right)
          .addDynamicElement(ball);
 
     var view = Pong.View(stage);
@@ -119,4 +129,18 @@ $(function() {
     view.addRenderer(shields.left.id, $('#shield1'), shieldRenderer);
     view.addRenderer(shields.right.id, $('#shield2'), shieldRenderer);
     view.addRenderer(ball.id, $('#ball'), ballRenderer);
+
+    //TODO: this should be a method of a shared Game object
+    function startRound() {
+        //TODO: implement pause and countdown
+        setTimeout(function() {
+            ball.pitch();
+        }, 2000);
+    }
+
+    startRound();
+        
+    stage.subscribe(Pong.Stage.events.goalHit, function(goal) {
+        startRound();
+    });
 });
