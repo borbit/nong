@@ -53,10 +53,10 @@ $(function() {
     });
 
     remoteReceiver.subscribe(remoteReceiver.events.GAMESNAPSHOT, function(data) {
-        /*shields.left.region.x = data[shields.left.id].x;
+        shields.left.region.x = data[shields.left.id].x;
         shields.left.region.y = data[shields.left.id].y;
         shields.right.region.x = data[shields.right.id].x;
-        shields.right.region.y = data[shields.right.id].y;*/
+        shields.right.region.y = data[shields.right.id].y;
         ball.region.x = data[ball.id].x;
         ball.region.y = data[ball.id].y;
         ball.kx = data[ball.id].kx;

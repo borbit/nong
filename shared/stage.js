@@ -16,10 +16,10 @@ ns.Stage = function Stage() {
 
     base.onBallHitsGoal = function(ball, goal) {
         ball.moveHome();
-        for (var key in shields) {
+        /*for (var key in shields) {
             shields[key].moveTo(300 - shields[key].region.height / 2);
             shields[key].stop();
-        }
+        }*/
         ball.stop();
         base.observer.fire(Stage.events.goalHit, goal);
     }
