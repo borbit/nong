@@ -1,5 +1,5 @@
 var Packets = require('../shared/components/packets').Packets;
-var Globals = require('../shared/globals');
+var Globals = require('../shared/globals').Globals;
 var Emitter = require('events').EventEmitter;
 
 var events = exports.events = {

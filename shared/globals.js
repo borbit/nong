@@ -12,5 +12,5 @@
     ns.Globals.FPS = 30;
     ns.Globals.RFPS = 30;
     ns.Globals.COUNTDOWN = 3;
-    ns.Globals.SIMULATED_LAG = 100;
+    ns.Globals.SIMULATED_LAG = 0;
 })();
