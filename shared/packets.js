@@ -43,8 +43,11 @@ ns.GameSnapshot = comps.Packets.createPacket('GameSnapshot', {
     }
 });
 
+ns.Pong = comps.Packets.createPacket('Pong');
+ns.Ping = comps.Packets.createPacket('Ping');
 ns.JoinLeft = comps.Packets.createPacket('JoinLeft');
 ns.JoinRight = comps.Packets.createPacket('JoinRight');
+ns.RoundStarted = comps.Packets.createPacket('RoundStarted');
 ns.ShieldMoveUp = comps.Packets.createPacket('ShieldMoveUp');
 ns.ShieldMoveDown = comps.Packets.createPacket('ShieldMoveDown');
 ns.ShieldStop = comps.Packets.createPacket('ShieldStop');

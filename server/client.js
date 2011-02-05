@@ -1,4 +1,5 @@
 var Packets = require('../shared/components/packets').Packets;
+var Globals = require('../shared/globals');
 var Emitter = require('events').EventEmitter;
 
 var events = exports.events = {
@@ -10,9 +11,11 @@ exports.createClient = function(connection) {
     var emitter = new Emitter();
     
     connection.addListener('message', function(message) {
-        var packet = Packets.unserialize(message);
-        emitter.emit(events.PACKET, packet);
-        emitter.emit(packet.id(), packet);
+        setTimeout(function() {
+            var packet = Packets.unserialize(message);
+            emitter.emit(events.PACKET, packet);
+            emitter.emit(packet.id(), packet);
+        }, Globals.SIMULATED_LAG);
     });
     
     connection.addListener('close', function() {
@@ -20,8 +23,10 @@ exports.createClient = function(connection) {
     });
     
     function send(packet) {
-        var payload = Packets.serialize(packet);
-        connection.send(payload);
+        setTimeout(function() {
+            var payload = Packets.serialize(packet);
+            connection.send(payload);
+        }, Globals.SIMULATED_LAG);
     }
     
     function addEventsListener(event, callback) {

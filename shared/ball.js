@@ -17,24 +17,26 @@ function Ball(id) {
     this.angle = 45;
     this.kx = 1;
     this.ky = 1;
-    this.speed = 0;
-    this.isMoving = true;
+    this.speed = 500;
+    this.isMoving = false;
     this.moveHome();
 }
 
 utils.inherit(Ball, comps.Element);
 
 utils._.extend(Ball.prototype, {
-    update: function() {
+    update: function(delay) {
         if (this.isMoving) {
-            this.updatePosition();
+            this.updatePosition(delay);
             this.observer.fire(comps.Element.events.changed);
         }
     },
 
-    updatePosition: function() {
-        this.region.x += Math.floor(this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS);
-        this.region.y += Math.floor(this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed / pong.Globals.RFPS);
+    updatePosition: function(delay) {
+        var deltaT = delay / 1000;
+
+        this.region.x += Math.floor(this.kx * Math.abs(Math.cos(this.angle / 180 * Math.PI)) * this.speed * deltaT);
+        this.region.y += Math.floor(this.ky * Math.abs(Math.sin(this.angle / 180 * Math.PI)) * this.speed * deltaT);
     },
 
     moveHome: function() {
@@ -47,11 +49,15 @@ utils._.extend(Ball.prototype, {
         this.isMoving = false;
     },
 
-    pitch: function() {
+    preparePitch: function() {
+        this.stop();
+        this.moveHome();
         this.kx = Math.round(Math.random()) ? 1 : -1;
         this.ky = Math.round(Math.random()) ? 1 : -1;
         this.angle = ns.Ball.angleLimits.MIN;
-        this.speed = 500;
+    },
+
+    pitch: function() {
         this.isMoving = true;
     },
 

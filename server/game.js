@@ -28,7 +28,9 @@ exports.createGame = function() {
         player.on(Player.events.GONE, function() {
             freePlayer(id);
         });
-
+        player.on(Player.events.PING, function(key) {
+            player.pong(key);
+        });
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
         });
@@ -43,7 +45,6 @@ exports.createGame = function() {
         if (utils._.isUndefined(spectators[id])) {
             throw 'Tring to free not connected player: ' + id;
         }
-
         delete spectators[id];
     }
 
@@ -110,6 +111,12 @@ exports.createGame = function() {
         }
     }
 
+    function notifyRoundStarted(ballData) {
+        for (var i in spectators) {
+            spectators[i].roundStarted(ballData);
+        }
+    }
+
     function getState() {
         var leftPlayerState = comps.Constants.PLAYER_STATE_FREE;
         var rightPlayerState = comps.Constants.PLAYER_STATE_FREE;
@@ -141,23 +148,30 @@ exports.createGame = function() {
              .addDynamicElement(ball)
              .start();
 
-        //TODO: this should be a method of a shared Game object
-        function startRound() {
-            //TODO: implement pause and countdown
-            setTimeout(function() {
-                ball.pitch();
-            }, 2000);
-        }
-
         startRound();
         
         stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+            clearInterval(snapshotter);
             startRound();
         });
+    }
 
-        snapshotter = setInterval(function(elements) {
-            notifyElementsChanged(stage.getState());
-        }, 1000 / pong.Globals.SPS);
+    function startRound() {
+        ball.preparePitch();
+
+        notifyRoundStarted({
+            ball: ball.serialize(),
+            countdown: pong.Globals.COUNTDOWN
+        });
+
+        setTimeout(function() {
+            ball.pitch();
+
+            snapshotter = setInterval(function(elements) {
+                notifyElementsChanged(stage.getState());
+            }, 1000 / pong.Globals.SPS);
+            
+        }, pong.Globals.COUNTDOWN * 1000);
     }
 
     function bindPlayerToShield(player, shield) {
@@ -168,7 +182,6 @@ exports.createGame = function() {
 
     function stop() {
         stage.stop();
-
         clearInterval(snapshotter);
     }
 

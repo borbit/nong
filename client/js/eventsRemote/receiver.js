@@ -4,6 +4,7 @@ Pong.EventsRemote.Receiver = function(transport) {
         MOVEUP: 'moveUp',
         MOVEDOWN: 'moveDown',
         GAMESTATE: 'gameState',
+        ROUNDSTARTED: 'roundStarted',
         GAMESNAPSHOT: 'gameSnapshot'
     };
     
@@ -11,6 +12,10 @@ Pong.EventsRemote.Receiver = function(transport) {
 
     transport.subscribe(Pong.Packets.GameState.id, function(data) {
         observer.fire(events.GAMESTATE, data);
+    });
+
+    transport.subscribe(Pong.Packets.RoundStarted.id, function(data) {
+        observer.fire(events.ROUNDSTARTED, data);
     });
 
     transport.subscribe(Pong.Packets.GameSnapshot.id, function(data) {

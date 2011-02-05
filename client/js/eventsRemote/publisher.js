@@ -1,4 +1,6 @@
 Pong.EventsRemote.Publisher = function(transport) {
+    var lastPingTime = null;
+    var latency = null;
     
     function joinGame(name) {
         var packet = Pong.Packets.JoinGame();
@@ -12,6 +14,13 @@ Pong.EventsRemote.Publisher = function(transport) {
 
     function joinRight() {
         sendPacket(Pong.Packets.JoinRight());
+    }
+
+    function ping() {
+        var packet = Pong.Packets.Ping();
+        packet.data({key: Utils.getUniqId()});
+        sendPacket(packet);
+        lastPingTime = (new Date()).getTime();
     }
 
     function shieldMoveUp(side) {
@@ -38,13 +47,25 @@ Pong.EventsRemote.Publisher = function(transport) {
         transport.sendMessage(payload);
     }
 
+    transport.subscribe(Pong.Packets.Pong.id, function(data) {
+        latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
+        console.log('latency ' + latency);
+    });
+
     return {
+        ping: ping,
         joinGame: joinGame,
         joinLeft: joinLeft,
         joinRight: joinRight,
         shieldMoveUp: shieldMoveUp,
         shieldMoveDown: shieldMoveDown,
-        shieldStop: shieldStop
+        shieldStop: shieldStop,
+        get lastPingTime() {
+            return lastPingTime;
+        },
+        get latency() {
+            return latency;
+        }
     };
 
 };

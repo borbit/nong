@@ -29,7 +29,7 @@ ns.GameLoop = function() {
                 var updated = [];
 
                 for(var i = 0; i < count; i++) {
-                    elements[i].update();
+                    elements[i].update(1000 / pong.Globals.RFPS);
                     updated.push(elements[i]);
                 }
 

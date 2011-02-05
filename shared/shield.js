@@ -13,7 +13,7 @@ function Shield(x, y, id) {
         height: 80
     });
 
-    this.speed = 100;
+    this.speed = 500;
     this.vy = 0;
 
     this.energy = 0;
@@ -32,16 +32,17 @@ utils._.extend(Shield.prototype, {
         }
     },
 
-    update: function() {
+    update: function(delay) {
         if (this.isMoving()) {
-            this.updateEnergy();
-            this.updatePosition();
+            //this.updateEnergy();
+            this.updatePosition(delay);
             this.observer.fire(comps.Element.events.changed);
         }
     },
 
-    updatePosition: function() {
-        this.region.y += this.energy * this.speed / pong.Globals.RFPS;
+    updatePosition: function(delay) {
+        var deltaT = delay / 1000;
+        this.region.y += /*this.energy * */ this.vy * this.speed * deltaT;
     },
 
     moveTo: function(y) {
@@ -62,17 +63,17 @@ utils._.extend(Shield.prototype, {
     },
 
     isMoving: function() {
-        return this.energy != 0 || this.vy != 0;
+        return /*this.energy != 0 ||*/ this.vy != 0;
     },
 
     hitStageWall: function(wall) {
-        if (this.energy < 0) {
+        if (this.vy < 0) {
             this.region.y = wall.region.bottom();
-        } else if (this.energy > 0) {
+        } else if (this.vy > 0) {
             this.region.y = wall.region.top() - this.region.height;
         }
 
-        this.energy *= -1;
+        //this.energy *= -1;
     },
 
     serialize: function() {

@@ -1,5 +1,5 @@
-var pong = require('../shared/pong'),
-    utils = require('../shared/utils'),
+var utils = require('../shared/utils'),
+    packets = require('../shared/pong').Packets,
     Emitter = require('events').EventEmitter,
     Client = require('./client');
 
@@ -10,7 +10,8 @@ var events = exports.events = {
     JOINGAME: 'joinGame',
     JOINLEFT: 'joinLeft',
     JOINRIGHT: 'joinRight',
-    GONE: 'gone'
+    GONE: 'gone',
+    PING: 'ping'
 };
 
 exports.createPlayer = function(client) {
@@ -22,32 +23,36 @@ exports.createPlayer = function(client) {
         emitter.emit(events.GONE);
     });
 
-    client.on(pong.Packets.JoinGame.id, function(data) {
+    client.on(packets.JoinGame.id, function(data) {
         emitter.emit(events.JOINGAME, data.gameId);
     });
 
-    client.on(pong.Packets.ShieldMoveUp.id, function() {
+    client.on(packets.ShieldMoveUp.id, function() {
         emitter.emit(events.MOVEUP);
     });
 
-    client.on(pong.Packets.ShieldMoveDown.id, function() {
+    client.on(packets.ShieldMoveDown.id, function() {
         emitter.emit(events.MOVEDOWN);
     });
 
-    client.on(pong.Packets.ShieldStop.id, function() {
+    client.on(packets.ShieldStop.id, function() {
         emitter.emit(events.STOP);
     });
 
-    client.on(pong.Packets.JoinLeft.id, function() {
+    client.on(packets.JoinLeft.id, function() {
         emitter.emit(events.JOINLEFT);
     });
 
-    client.on(pong.Packets.JoinRight.id, function() {
+    client.on(packets.JoinRight.id, function() {
         emitter.emit(events.JOINRIGHT);
     });
 
+    client.on(packets.Ping.id, function(data) {
+        emitter.emit(events.PING, data.key);
+    });
+
     function updateGameState(gameState) {
-        var packet = pong.Packets.GameState();
+        var packet = packets.GameState();
         packet.gameState(gameState.game);
         packet.leftPlayerState(gameState.leftPlayer);
         packet.rightPlayerState(gameState.rightPlayer);
@@ -55,7 +60,7 @@ exports.createPlayer = function(client) {
     }
 
     function updateElements(elements) {
-        var packet = pong.Packets.GameSnapshot();
+        var packet = packets.GameSnapshot();
 
         for (var i in elements) {
             packet.addEntityData(elements[i].id, elements[i]);
@@ -65,20 +70,32 @@ exports.createPlayer = function(client) {
     }
 
     function shieldMoveUp(side, x, y, energy) {
-        var packet = pong.Packets.ShieldMoveUp();
+        var packet = packets.ShieldMoveUp();
         packet.data({side: side, x: x, y: y, energy: energy});
         client.send(packet);
     }
 
     function shieldMoveDown(side, x, y, energy) {
-        var packet = pong.Packets.ShieldMoveDown();
+        var packet = packets.ShieldMoveDown();
         packet.data({side: side, x: x, y: y, energy: energy});
         client.send(packet);
     }
 
     function shieldStop(side, x, y) {
-        var packet = pong.Packets.ShieldStop();
+        var packet = packets.ShieldStop();
         packet.data({side: side, x: x, y: y});
+        client.send(packet);
+    }
+
+    function pong(key) {
+        var packet = packets.Pong();
+        packet.data({key: key});
+        client.send(packet);
+    }
+
+    function roundStarted(ballData) {
+        var packet = packets.RoundStarted();
+        packet.data(ballData);
         client.send(packet);
     }
 
@@ -88,6 +105,7 @@ exports.createPlayer = function(client) {
 
     return {
         on: on,
+        pong: pong,
         subscribe: on,
         events: events,
         get id() { return id; },
@@ -97,6 +115,7 @@ exports.createPlayer = function(client) {
         updateElements: updateElements,
         shieldMoveUp: shieldMoveUp,
         shieldMoveDown: shieldMoveDown,
-        shieldStop: shieldStop
+        shieldStop: shieldStop,
+        roundStarted: roundStarted
     };
 };

@@ -12,11 +12,13 @@ $(function() {
 
     joinButtonLeft.click(function() {
         remotePublisher.joinLeft();
+        remotePublisher.ping();
         assignShield('left');
     });
 
     joinButtonRight.click(function() {
         remotePublisher.joinRight();
+        remotePublisher.ping();
         assignShield('right');
     });
     
@@ -52,36 +54,46 @@ $(function() {
         }
     });
 
+    remoteReceiver.subscribe(remoteReceiver.events.ROUNDSTARTED, function(data) {
+        ball.isMoving = data.ball.isMoving;
+        ball.region.x = data.ball.x;
+        ball.region.y = data.ball.y;
+        ball.angle = data.ball.angle;
+        ball.kx = data.ball.kx;
+        ball.ky = data.ball.ky;
+        
+        setTimeout(function() {
+            ball.pitch();
+        }, data.countdown * 1000 - remotePublisher.latency);
+    });
+
     remoteReceiver.subscribe(remoteReceiver.events.GAMESNAPSHOT, function(data) {
-        shields.left.region.x = data[shields.left.id].x;
-        shields.left.region.y = data[shields.left.id].y;
-        shields.right.region.x = data[shields.right.id].x;
-        shields.right.region.y = data[shields.right.id].y;
         ball.region.x = data[ball.id].x;
         ball.region.y = data[ball.id].y;
         ball.kx = data[ball.id].kx;
         ball.ky = data[ball.id].ky;
         ball.angle = data[ball.id].angle;
         ball.isMoving = data[ball.id].isMoving;
+        ball.updatePosition(remotePublisher.latency);
     });
 
     remoteReceiver.subscribe(remoteReceiver.events.MOVEUP, function(data) {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
-        shields[data.side].energy = data.energy;
         shields[data.side].moveUp();
+        //shields[data.side].updatePosition(remotePublisher.latency);
     });
     remoteReceiver.subscribe(remoteReceiver.events.MOVEDOWN, function(data) {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
-        shields[data.side].energy = data.energy;
         shields[data.side].moveDown();
+        //shields[data.side].updatePosition(remotePublisher.latency);
     });
     remoteReceiver.subscribe(remoteReceiver.events.STOP, function(data) {
         shields[data.side].region.x = data.x;
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
-        console.log("STOP");
+        //shields[data.side].updatePosition(remotePublisher.latency);
     });
 
     statusMessage.text('CONNECTING').show();
@@ -92,15 +104,15 @@ $(function() {
 
         keyboard.subscribe(keyboard.events.MOVEUP, function() {
             remotePublisher.shieldMoveUp(side);
-            shields[side].moveUp();
+            //shields[side].moveUp();
         });
         keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
             remotePublisher.shieldMoveDown(side);
-            shields[side].moveDown();
+            //shields[side].moveDown();
         });
         keyboard.subscribe(keyboard.events.STOP, function() {
             remotePublisher.shieldStop(side);
-            shields[side].stop();
+            //shields[side].stop();
         });
     }
 
@@ -112,7 +124,7 @@ $(function() {
         left: new Pong.Goal(-50, 0, 600),
         right: new Pong.Goal(800, 0, 600)
     };
-    var ball = new Pong.Ball(100, 100, 'ball');
+    var ball = new Pong.Ball('ball');
     var stage = Pong.Stage();
 
     stage.addStaticElement(new Pong.StageWall(0, -50, 800))
@@ -129,18 +141,4 @@ $(function() {
     view.addRenderer(shields.left.id, $('#shield1'), shieldRenderer);
     view.addRenderer(shields.right.id, $('#shield2'), shieldRenderer);
     view.addRenderer(ball.id, $('#ball'), ballRenderer);
-
-    //TODO: this should be a method of a shared Game object
-    function startRound() {
-        //TODO: implement pause and countdown
-        setTimeout(function() {
-            ball.pitch();
-        }, 2000);
-    }
-
-    startRound();
-        
-    stage.subscribe(Pong.Stage.events.goalHit, function(goal) {
-        startRound();
-    });
 });
