@@ -1,54 +1,49 @@
 Pong.EventsRemote.Publisher = function(transport) {
+    var packets = Pong.Packets;
     var lastPingTime = null;
     var latency = null;
     var moves = [];
     
     function joinGame(name) {
-        var packet = Pong.Packets.JoinGame();
-        packet.name(name);
-        sendPacket(packet);
+        sendPacket(packets.JoinGame().name(name));
     }
 
     function joinLeft() {
-        sendPacket(Pong.Packets.JoinLeft());
+        sendPacket(packets.JoinLeft());
     }
 
     function joinRight() {
-        sendPacket(Pong.Packets.JoinRight());
+        sendPacket(packets.JoinRight());
     }
 
     function ping() {
-        var packet = Pong.Packets.Ping();
-        packet.data({key: Utils.getUniqId()});
-        sendPacket(packet);
         lastPingTime = (new Date()).getTime();
+        sendPacket(packets.Ping().key(Utils.getUniqId()));
     }
     
     function pong(key) {
-        var packet = Pong.Packets.Pong();
-        packet.data({key: key});
-        sendPacket(packet);
+        sendPacket(packets.Pong().key(key));
     }
 
     function shieldMoveUp(side, y) {
-        var packet = Pong.Packets.ShieldMoveUp();
-        packet.data({side: side, key: moves.length});
-        sendPacket(packet);
+        sendPacket(packets.ShieldMoveUp({
+            side: side, key: moves.length
+        }));
         moves[moves.length] = y;
     }
 
     function shieldMoveDown(side, y) {
-        var packet = Pong.Packets.ShieldMoveDown();
-        packet.data({side: side, key: moves.length});
-        sendPacket(packet);
+        sendPacket(packets.ShieldMoveDown({
+            side: side, key: moves.length
+        }));
         moves[moves.length] = y;
     }
 
-    function shieldStop(side, y) {
-        var packet = Pong.Packets.ShieldStop();
-        packet.data({side: side, key: moves.length, y: y});
-        sendPacket(packet);
-        moves[moves.length] = y;
+    function shieldStop(side, coordY) {
+        sendPacket(packets.ShieldStop({
+            side: side, key: moves.length, coordY: coordY
+        }));
+        moves[moves.length] = coordY;
     }
 
     function sendPacket(packet) {
@@ -57,12 +52,12 @@ Pong.EventsRemote.Publisher = function(transport) {
         transport.sendMessage(payload);
     }
 
-    transport.subscribe(Pong.Packets.Pong.id, function(data) {
+    transport.subscribe(packets.Pong.id, function(data) {
         latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
         console.log('latency ' + latency);
     });
 
-    transport.subscribe(Pong.Packets.Ping.id, function(data) {
+    transport.subscribe(packets.Ping.id, function(data) {
         pong(data.key);
     });
 
@@ -74,15 +69,9 @@ Pong.EventsRemote.Publisher = function(transport) {
         shieldMoveUp: shieldMoveUp,
         shieldMoveDown: shieldMoveDown,
         shieldStop: shieldStop,
-        get lastPingTime() {
-            return lastPingTime;
-        },
-        get latency() {
-            return latency;
-        },
-        get moves() {
-            return moves;
-        }
+
+        get latency() { return latency; },
+        get moves() { return moves; }
     };
 
 };

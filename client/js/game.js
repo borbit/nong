@@ -38,17 +38,17 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.GAMESTATE, function(packetData) {
-        if (packetData.gameState == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
-            if (packetData.leftPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
+    remoteReceiver.subscribe(remoteReceiver.events.GAMESTATE, function(state) {
+        if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
+            if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
                 joinedMessage.addClass('left').show();
             }
-            if (packetData.rightPlayerState == Components.Constants.PLAYER_STATE_CONNECTED) {
+            if (state.rightPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonRight.hide();
                 joinedMessage.addClass('right').show();
             }
-        } else if(packetData.gameState == Components.Constants.GAME_STATE_IN_PROGRESS) {
+        } else if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
             stage.start();
         }

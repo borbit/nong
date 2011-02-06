@@ -45,9 +45,11 @@ exports.createGame = function() {
         });
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
+            player.ping();
         });
         player.on(Player.events.JOINRIGHT, function() {
             assignShield('right', player);
+            player.ping();
         });
 
         player.updateGameState(getState());
@@ -65,30 +67,30 @@ exports.createGame = function() {
             return;
         }
 
-        players[side] = player;
-
-        player.ping();
+        players[side] = player; 
 
         player.on(Player.events.GONE, function() {
             players[side] = null;
             updateGameState();
         });
 
+        var shield = shields[side];
+
         player.on(Player.events.MOVEUP, function(key) {
-            notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
-            player.shieldMovedUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy, key)
+            notifyShieldMoveUp(side, shield.region.y, shield.energy);
+            player.shieldMovedUp(side, shield.region.y, key)
         });
         player.on(Player.events.MOVEDOWN, function(key) {
-            notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
-            player.shieldMovedDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy, key)
+            notifyShieldMoveDown(side, shield.region.y, shield.energy);
+            player.shieldMovedDown(side, shield.region.y, key)
         });
         player.on(Player.events.STOP, function(key, y) {
-            shields[side].region.y = y;
-            notifyShieldStop(side, shields[side].region.x, shields[side].region.y);
-            player.shieldStoped(side, shields[side].region.x, shields[side].region.y, key)
+            shield.region.y = y;
+            notifyShieldStop(side, shield.region.y);
+            player.shieldStoped(side, shield.region.y, key)
         });
 
-        bindPlayerToShield(players[side], shields[side]);
+        bindPlayerToShield(player, shield);
 
         updateGameState();
     }
@@ -113,21 +115,21 @@ exports.createGame = function() {
         }
     }
 
-    function notifyShieldMoveUp(side, x, y, energy) {
+    function notifyShieldMoveUp(side, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveUp(side, x, y, energy);
+            spectators[i].shieldMoveUp(side, y, energy);
         }
     }
 
-    function notifyShieldMoveDown(side, x, y, energy) {
+    function notifyShieldMoveDown(side, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveDown(side, x, y, energy);
+            spectators[i].shieldMoveDown(side, y, energy);
         }
     }
 
-    function notifyShieldStop(side, x, y) {
+    function notifyShieldStop(side, y) {
         for (var i in spectators) {
-            spectators[i].shieldStop(side, x, y);
+            spectators[i].shieldStop(side, y);
         }
     }
 

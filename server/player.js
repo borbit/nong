@@ -38,7 +38,7 @@ exports.createPlayer = function(client) {
     });
 
     client.on(packets.ShieldStop.id, function(data) {
-        emitter.emit(events.STOP, data.key, data.y);
+        emitter.emit(events.STOP, data.key, data.coordY);
     });
 
     client.on(packets.JoinLeft.id, function() {
@@ -57,67 +57,62 @@ exports.createPlayer = function(client) {
         latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
     });
 
-    function updateGameState(gameState) {
-        var packet = packets.GameState();
-        packet.gameState(gameState.game);
-        packet.leftPlayerState(gameState.leftPlayer);
-        packet.rightPlayerState(gameState.rightPlayer);
-        client.send(packet);
+    function updateGameState(state) {
+        client.send(packets.GameState({
+            leftPlayer: state.leftPlayer,
+            rightPlayer: state.rightPlayer,
+            game: state.game
+        }));
     }
 
     function updateElements(elements) {
         var packet = packets.GameSnapshot();
-
         for (var i in elements) {
             packet.addEntityData(elements[i].id, elements[i]);
         }
-
         client.send(packet);
     }
 
-    function shieldMoveUp(side, x, y, energy) {
-        var packet = packets.ShieldMoveUp();
-        packet.data({side: side, x: x, y: y, energy: energy});
-        client.send(packet);
+    function shieldMoveUp(side, y, energy) {
+        client.send(packets.ShieldMoveUp({
+            y: y, side: side,
+            energy: energy
+        }));
     }
-    function shieldMoveDown(side, x, y, energy) {
-        var packet = packets.ShieldMoveDown();
-        packet.data({side: side, x: x, y: y, energy: energy});
-        client.send(packet);
+    function shieldMoveDown(side, y, energy) {
+        client.send(packets.ShieldMoveDown({
+            y: y, side: side,
+            energy: energy
+        }));
     }
     function shieldStop(side, x, y) {
-        var packet = packets.ShieldStop();
-        packet.data({side: side, x: x, y: y});
-        client.send(packet);
+        client.send(packets.ShieldStop({
+            x: x, side: side
+        }));
     }
 
-    function shieldMovedUp(side, x, y, energy, key) {
-        var packet = packets.ShieldMovedUp();
-        packet.data({side: side, x: x, y: y, energy: energy, key: key});
-        client.send(packet);
+    function shieldMovedUp(side, y, key) {
+        client.send(packets.ShieldMovedUp({
+            side: side, y: y, key: key
+        }));
     }
-    function shieldMovedDown(side, x, y, energy, key) {
-        var packet = packets.ShieldMovedDown();
-        packet.data({side: side, x: x, y: y, energy: energy, key: key});
-        client.send(packet);
+    function shieldMovedDown(side, y, key) {
+        client.send(packets.ShieldMovedDown({
+            side: side, y: y, key: key
+        }));
     }
-    function shieldStoped(side, x, y, key) {
-        var packet = packets.ShieldStoped();
-        packet.data({side: side, x: x, y: y, key: key});
-        client.send(packet);
+    function shieldStoped(side, y, key) {
+        client.send(packets.ShieldStoped({
+            side: side, y: y, key: key
+        }));
     }
 
     function ping(key) {
-        var packet = packets.Ping();
-        packet.data({key: utils.getUniqId()});
-        client.send(packet);
+        client.send(packets.Ping({key: utils.getUniqId()}));
         lastPingTime = (new Date()).getTime();
     }
-
     function pong(key) {
-        var packet = packets.Pong();
-        packet.data({key: key});
-        client.send(packet);
+        client.send(packets.Pong({key: key}));
     }
 
     function roundStarted(ballData) {

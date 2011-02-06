@@ -26,9 +26,33 @@ ns.Packet = function(packetId) {
 var packets = {};
 
 ns.createPacket = function(id, addons) {
-    function constructor() {
+    function constructor(packetData) {
         var packet = ns.Packet(id);
-        return utils._.extend(packet, addons);
+        var methods = {};
+
+        if(!utils._.isUndefined(packetData)) {
+            packet.data(packetData);
+        }
+
+        if(utils._.isArray(addons)) {
+            for(var i = 0, len = addons.length; i < len; i++) {
+                methods[addons[i]] = (function(name) {
+                    return function(value) {
+                        if (utils._.isUndefined(value))  {
+                            return this.data()[name];
+                        }
+                        var tmp = {};
+                        tmp[name] = value;
+                        this.data(tmp);
+                        return this;
+                    };
+                })(addons[i]);
+            }
+        } else {
+            methods = addons;
+        }
+        
+        return utils._.extend(packet, methods);
     }
     constructor.id = id;
     packets[id] = constructor;
