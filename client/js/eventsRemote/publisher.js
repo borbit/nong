@@ -5,7 +5,7 @@ Pong.EventsRemote.Publisher = function(transport) {
     var moves = [];
     
     function joinGame(name) {
-        sendPacket(packets.JoinGame().name(name));
+        sendPacket(packets.JoinGame({name: name}));
     }
 
     function joinLeft() {
@@ -18,11 +18,11 @@ Pong.EventsRemote.Publisher = function(transport) {
 
     function ping() {
         lastPingTime = (new Date()).getTime();
-        sendPacket(packets.Ping().key(Utils.getUniqId()));
+        sendPacket(packets.Ping({key: Utils.getUniqId()}));
     }
     
     function pong(key) {
-        sendPacket(packets.Pong().key(key));
+        sendPacket(packets.Pong({key: key}));
     }
 
     function shieldMoveUp(side, y) {

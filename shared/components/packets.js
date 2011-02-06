@@ -28,31 +28,15 @@ var packets = {};
 ns.createPacket = function(id, addons) {
     function constructor(packetData) {
         var packet = ns.Packet(id);
-        var methods = {};
 
         if(!utils._.isUndefined(packetData)) {
             packet.data(packetData);
         }
 
-        if(utils._.isArray(addons)) {
-            for(var i = 0, len = addons.length; i < len; i++) {
-                methods[addons[i]] = (function(name) {
-                    return function(value) {
-                        if (utils._.isUndefined(value))  {
-                            return this.data()[name];
-                        }
-                        var tmp = {};
-                        tmp[name] = value;
-                        this.data(tmp);
-                        return this;
-                    };
-                })(addons[i]);
-            }
-        } else {
-            methods = addons;
+        if(!utils._.isUndefined(addons)) {
+            packet = utils._.extend(packet, addons);
         }
-        
-        return utils._.extend(packet, methods);
+        return packet;
     }
     constructor.id = id;
     packets[id] = constructor;
