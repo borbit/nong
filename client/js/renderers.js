@@ -24,6 +24,12 @@
         });
     }
 
+    function updateSizes(element, node) {
+        node.css({
+            height: element.region.height
+        });
+    }
+
     Pong.Renderers = {};
     Pong.Renderers.Ball = function() {
         return {
@@ -33,7 +39,10 @@
 
     Pong.Renderers.Shield = function() {
         return {
-            render: updateCoordinates
+            render: function(element, node) {
+                updateCoordinates(element, node);
+                updateSizes(element, node);
+            }
         };
     };
     

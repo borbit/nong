@@ -14,7 +14,7 @@ exports.createClient = function(connection) {
         setTimeout(function() {
             var packet = Packets.unserialize(message);
             emitter.emit(events.PACKET, packet);
-            emitter.emit(packet.id(), packet);
+            emitter.emit(packet.id(), packet.data());
         }, Globals.SIMULATED_LAG);
     });
     

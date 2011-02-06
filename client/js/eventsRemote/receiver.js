@@ -3,6 +3,9 @@ Pong.EventsRemote.Receiver = function(transport) {
         STOP: 'stop',
         MOVEUP: 'moveUp',
         MOVEDOWN: 'moveDown',
+        STOPED: 'stoped',
+        MOVEDUP: 'movedUp',
+        MOVEDDOWN: 'movedDown',
         GAMESTATE: 'gameState',
         ROUNDSTARTED: 'roundStarted',
         GAMESNAPSHOT: 'gameSnapshot'
@@ -32,6 +35,16 @@ Pong.EventsRemote.Receiver = function(transport) {
 
     transport.subscribe(Pong.Packets.ShieldStop.id, function(data) {
         observer.fire(events.STOP, data);
+    });
+
+    transport.subscribe(Pong.Packets.ShieldMovedUp.id, function(data) {
+        observer.fire(events.MOVEDUP, data);
+    });
+    transport.subscribe(Pong.Packets.ShieldMovedDown.id, function(data) {
+        observer.fire(events.MOVEDDOWN, data);
+    });
+    transport.subscribe(Pong.Packets.ShieldStoped.id, function(data) {
+        observer.fire(events.STOPED, data);
     });
 
     return {

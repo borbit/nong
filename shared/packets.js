@@ -51,5 +51,9 @@ ns.RoundStarted = comps.Packets.createPacket('RoundStarted');
 ns.ShieldMoveUp = comps.Packets.createPacket('ShieldMoveUp');
 ns.ShieldMoveDown = comps.Packets.createPacket('ShieldMoveDown');
 ns.ShieldStop = comps.Packets.createPacket('ShieldStop');
+
+ns.ShieldMovedUp = comps.Packets.createPacket('ShieldMovedUp');
+ns.ShieldMovedDown = comps.Packets.createPacket('ShieldMovedDown');
+ns.ShieldStoped = comps.Packets.createPacket('ShieldStoped');
     
 }((typeof exports === 'undefined') ? window.Pong.Packets = {} : exports.Packets = {}));

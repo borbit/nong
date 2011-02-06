@@ -12,8 +12,8 @@ exports.createGame = function() {
     var stage = pong.Stage();
     var ball = new pong.Ball('ball');
     var shields = {
-        left: new pong.Shield(40, 250, 'left'),
-        right: new pong.Shield(750, 250, 'right')
+        left: new pong.Shield(40, 20, 'left'),
+        right: new pong.Shield(750, 20, 'right')
     };
 
     stage.addStaticElement(new pong.StageWall(0, -50, 800))
@@ -67,19 +67,25 @@ exports.createGame = function() {
 
         players[side] = player;
 
+        player.ping();
+
         player.on(Player.events.GONE, function() {
             players[side] = null;
             updateGameState();
         });
 
-        player.on(Player.events.MOVEUP, function() {
+        player.on(Player.events.MOVEUP, function(key) {
             notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
+            player.shieldMovedUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy, key)
         });
-        player.on(Player.events.MOVEDOWN, function() {
+        player.on(Player.events.MOVEDOWN, function(key) {
             notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
+            player.shieldMovedDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy, key)
         });
-        player.on(Player.events.STOP, function() {
+        player.on(Player.events.STOP, function(key, y) {
+            shields[side].region.y = y;
             notifyShieldStop(side, shields[side].region.x, shields[side].region.y);
+            player.shieldStoped(side, shields[side].region.x, shields[side].region.y, key)
         });
 
         bindPlayerToShield(players[side], shields[side]);

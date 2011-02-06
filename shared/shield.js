@@ -10,10 +10,10 @@ function Shield(x, y, id) {
     this.region = comps.Region({
         x: x, y: y,
         width: 10,
-        height: 80
+        height: 100
     });
 
-    this.speed = 500;
+    this.speed = 700;
     this.vy = 0;
 
     this.energy = 0;
@@ -34,7 +34,6 @@ utils._.extend(Shield.prototype, {
 
     update: function(delay) {
         if (this.isMoving()) {
-            //this.updateEnergy();
             this.updatePosition(delay);
             this.observer.fire(comps.Element.events.changed);
         }
@@ -42,7 +41,7 @@ utils._.extend(Shield.prototype, {
 
     updatePosition: function(delay) {
         var deltaT = delay / 1000;
-        this.region.y += /*this.energy * */ this.vy * this.speed * deltaT;
+        this.region.y += Math.floor(this.vy * this.speed * deltaT);
     },
 
     moveTo: function(y) {
@@ -63,17 +62,15 @@ utils._.extend(Shield.prototype, {
     },
 
     isMoving: function() {
-        return /*this.energy != 0 ||*/ this.vy != 0;
+        return this.vy != 0;
     },
 
     hitStageWall: function(wall) {
         if (this.vy < 0) {
-            this.region.y = wall.region.bottom();
+            this.region.y = wall.region.bottom() + 1;
         } else if (this.vy > 0) {
             this.region.y = wall.region.top() - this.region.height;
         }
-
-        //this.energy *= -1;
     },
 
     serialize: function() {

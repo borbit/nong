@@ -1,6 +1,7 @@
 Pong.EventsRemote.Publisher = function(transport) {
     var lastPingTime = null;
     var latency = null;
+    var moves = [];
     
     function joinGame(name) {
         var packet = Pong.Packets.JoinGame();
@@ -22,23 +23,32 @@ Pong.EventsRemote.Publisher = function(transport) {
         sendPacket(packet);
         lastPingTime = (new Date()).getTime();
     }
+    
+    function pong(key) {
+        var packet = Pong.Packets.Pong();
+        packet.data({key: key});
+        sendPacket(packet);
+    }
 
-    function shieldMoveUp(side) {
+    function shieldMoveUp(side, y) {
         var packet = Pong.Packets.ShieldMoveUp();
-        packet.data({side: side});
+        packet.data({side: side, key: moves.length});
         sendPacket(packet);
+        moves[moves.length] = y;
     }
 
-    function shieldMoveDown(side) {
+    function shieldMoveDown(side, y) {
         var packet = Pong.Packets.ShieldMoveDown();
-        packet.data({side: side});
+        packet.data({side: side, key: moves.length});
         sendPacket(packet);
+        moves[moves.length] = y;
     }
 
-    function shieldStop(side) {
+    function shieldStop(side, y) {
         var packet = Pong.Packets.ShieldStop();
-        packet.data({side: side});
+        packet.data({side: side, key: moves.length, y: y});
         sendPacket(packet);
+        moves[moves.length] = y;
     }
 
     function sendPacket(packet) {
@@ -50,6 +60,10 @@ Pong.EventsRemote.Publisher = function(transport) {
     transport.subscribe(Pong.Packets.Pong.id, function(data) {
         latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
         console.log('latency ' + latency);
+    });
+
+    transport.subscribe(Pong.Packets.Ping.id, function(data) {
+        pong(data.key);
     });
 
     return {
@@ -65,6 +79,9 @@ Pong.EventsRemote.Publisher = function(transport) {
         },
         get latency() {
             return latency;
+        },
+        get moves() {
+            return moves;
         }
     };
 
