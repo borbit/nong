@@ -1,7 +1,6 @@
 $(function() {
-    var transport = Pong.EventsRemote.Adapters.WS(),
-        remotePublisher = Pong.EventsRemote.Publisher(transport),
-        remoteReceiver = Pong.EventsRemote.Receiver(transport),
+    var transport = Pong.Transports.WS(),
+        player = Pong.Player(transport),
 
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
@@ -11,19 +10,19 @@ $(function() {
         menu = $('#menu');
 
     joinButtonLeft.click(function() {
-        remotePublisher.joinLeft();
-        remotePublisher.ping();
+        player.joinLeft();
+        player.ping();
         assignShield('left');
     });
 
     joinButtonRight.click(function() {
-        remotePublisher.joinRight();
-        remotePublisher.ping();
+        player.joinRight();
+        player.ping();
         assignShield('right');
     });
     
     transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
-        remotePublisher.joinGame('only');
+        player.joinGame('only');
         statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
@@ -38,7 +37,7 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.GAMESTATE, function(state) {
+    player.subscribe(player.events.GAMESTATE, function(state) {
         if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
@@ -54,62 +53,62 @@ $(function() {
         }
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.ROUNDSTARTED, function(data) {
+    player.subscribe(player.events.ROUNDSTARTED, function(data) {
         updateBallState(data.ball);
         
         setTimeout(function() {
             ball.pitch();
-        }, data.countdown * 1000 - remotePublisher.latency);
+        }, data.countdown * 1000 - player.latency);
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.GAMESNAPSHOT, function(data) {
+    player.subscribe(player.events.GAMESNAPSHOT, function(data) {
         if(ball.kx != data.ball.kx || ball.ky != data.ball.ky) {
             return;
         }
         updateBallState(data[ball.id]);
-        ball.updatePosition(remotePublisher.latency);
+        ball.updatePosition(player.latency);
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.MOVEUP, function(data) {
+    player.subscribe(player.events.MOVEUP, function(data) {
         if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].moveUp();
     });
-    remoteReceiver.subscribe(remoteReceiver.events.MOVEDOWN, function(data) {
+    player.subscribe(player.events.MOVEDOWN, function(data) {
         if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].moveDown();
     });
-    remoteReceiver.subscribe(remoteReceiver.events.STOP, function(data) {
+    player.subscribe(player.events.STOP, function(data) {
         if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
     });
 
-    remoteReceiver.subscribe(remoteReceiver.events.MOVEDUP, function(data) {
+    player.subscribe(player.events.MOVEDUP, function(data) {
         correctShieldPosition(data.key, data.y, data.side);
     });
-    remoteReceiver.subscribe(remoteReceiver.events.MOVEDDOWN, function(data) {
+    player.subscribe(player.events.MOVEDDOWN, function(data) {
         correctShieldPosition(data.key, data.y, data.side);
     });
-    remoteReceiver.subscribe(remoteReceiver.events.STOPED, function(data) {
+    player.subscribe(player.events.STOPED, function(data) {
         correctShieldPosition(data.key, data.y, data.side);
     });
 
     function correctShieldPosition(key, correctY, side) {
-        var move = remotePublisher.moves[key];
+        var move = player.moves[key];
         if(move && move == correctY) {
             return;
         }
 
-        var delta = correctY - remotePublisher.moves[key];
-        remotePublisher.moves[key++] = correctY;
+        var delta = correctY - player.moves[key];
+        player.moves[key++] = correctY;
 
-        for(; key < remotePublisher.moves.length; key++) {
-            remotePublisher.moves[key] += delta;
+        for(; key < player.moves.length; key++) {
+            player.moves[key] += delta;
         }
 
-        shields[side].region.y = remotePublisher.moves[key-1];
+        shields[side].region.y = player.moves[key-1];
     }
 
     statusMessage.text('CONNECTING').show();
@@ -128,15 +127,15 @@ $(function() {
         var keyboard = Pong.EventsClient.KeyboardReceiver;
 
         keyboard.subscribe(keyboard.events.MOVEUP, function() {
-            remotePublisher.shieldMoveUp(side, shields[side].region.y);
+            player.shieldMoveUp(side, shields[side].region.y);
             shields[side].moveUp();
         });
         keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
-            remotePublisher.shieldMoveDown(side, shields[side].region.y);
+            player.shieldMoveDown(side, shields[side].region.y);
             shields[side].moveDown();
         });
         keyboard.subscribe(keyboard.events.STOP, function() {
-            remotePublisher.shieldStop(side, shields[side].region.y);
+            player.shieldStop(side, shields[side].region.y);
             shields[side].stop();
         });
 

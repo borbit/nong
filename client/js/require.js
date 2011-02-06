@@ -2,8 +2,7 @@ window.Pong = {};
 window.Components = {};
 window.Utils = {};
 window.Pong.EventsClient = {};
-window.Pong.EventsRemote = {};
-window.Pong.EventsRemote.Adapters = {};
+window.Pong.Transports = {};
 
 function require(path) {
     path = path.replace('../', '');
