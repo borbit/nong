@@ -84,7 +84,7 @@ $(function() {
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
     });
-
+    
     player.subscribe(player.events.MOVEDUP, function(data) {
         correctShieldPosition(data.key, data.y, data.side);
     });
@@ -96,19 +96,19 @@ $(function() {
     });
 
     function correctShieldPosition(key, correctY, side) {
-        var move = player.moves[key];
+        var move = player.movesBuffer[key];
         if(move && move == correctY) {
             return;
         }
 
-        var delta = correctY - player.moves[key];
-        player.moves[key++] = correctY;
+        var delta = correctY - player.movesBuffer[key];
+        player.movesBuffer[key++] = correctY;
 
-        for(; key < player.moves.length; key++) {
-            player.moves[key] += delta;
+        for(; key < player.movesBuffer.length; key++) {
+            player.movesBuffer[key] += delta;
         }
 
-        shields[side].region.y = player.moves[key-1];
+        shields[side].region.y = player.movesBuffer[key-1];
     }
 
     statusMessage.text('CONNECTING').show();

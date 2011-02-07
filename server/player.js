@@ -85,9 +85,9 @@ exports.createPlayer = function(client) {
             energy: energy
         }));
     }
-    function shieldStop(side, x, y) {
+    function shieldStop(side, y) {
         client.send(packets.ShieldStop({
-            x: x, side: side
+            y: y, side: side
         }));
     }
 
