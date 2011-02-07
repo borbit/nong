@@ -85,7 +85,6 @@ exports.createGame = function() {
             player.shieldMovedDown(side, shield.region.y, key)
         });
         player.on(Player.events.STOP, function(key, y) {
-            shield.region.y = y;
             notifyShieldStop(side, shield.region.y);
             player.shieldStoped(side, shield.region.y, key)
         });

@@ -58,58 +58,25 @@ $(function() {
         
         setTimeout(function() {
             ball.pitch();
-        }, data.countdown * 1000 - player.latency);
+        }, data.countdown * 1000);
     });
 
     player.subscribe(player.events.GAMESNAPSHOT, function(data) {
-        if(ball.kx != data.ball.kx || ball.ky != data.ball.ky) {
-            return;
-        }
         updateBallState(data[ball.id]);
-        ball.updatePosition(player.latency);
     });
 
     player.subscribe(player.events.MOVEUP, function(data) {
-        if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].moveUp();
     });
     player.subscribe(player.events.MOVEDOWN, function(data) {
-        if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].moveDown();
     });
     player.subscribe(player.events.STOP, function(data) {
-        if(chosenSide == data.side) { return; }
         shields[data.side].region.y = data.y;
         shields[data.side].stop();
     });
-    
-    player.subscribe(player.events.MOVEDUP, function(data) {
-        correctShieldPosition(data.key, data.y, data.side);
-    });
-    player.subscribe(player.events.MOVEDDOWN, function(data) {
-        correctShieldPosition(data.key, data.y, data.side);
-    });
-    player.subscribe(player.events.STOPED, function(data) {
-        correctShieldPosition(data.key, data.y, data.side);
-    });
-
-    function correctShieldPosition(key, correctY, side) {
-        var move = player.movesBuffer[key];
-        if(move && move == correctY) {
-            return;
-        }
-
-        var delta = correctY - player.movesBuffer[key];
-        player.movesBuffer[key++] = correctY;
-
-        for(; key < player.movesBuffer.length; key++) {
-            player.movesBuffer[key] += delta;
-        }
-
-        shields[side].region.y = player.movesBuffer[key-1];
-    }
 
     statusMessage.text('CONNECTING').show();
     transport.connect();
@@ -138,8 +105,6 @@ $(function() {
             player.shieldStop(side, shields[side].region.y);
             shields[side].stop();
         });
-
-        chosenSide = side;
     }
 
     var shields = {
@@ -152,7 +117,6 @@ $(function() {
     };
     var ball = new Pong.Ball('ball');
     var stage = Pong.Stage();
-    var chosenSide = null;
 
     stage.addStaticElement(new Pong.StageWall(0, -50, 800))
          .addStaticElement(new Pong.StageWall(0, 600, 800))
