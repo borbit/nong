@@ -9,16 +9,16 @@ ns.Packet = function(packetId) {
         id: function(id) {
             if(!utils._.isUndefined(id))  {
                 packetId = id;
-            } else {
-                return packetId;
             }
+
+            return packetId;
         },
         data: function(data) {
             if(!utils._.isUndefined(data))  {
                 packetData = utils._.extend(packetData, data);
-            } else {
-                return packetData;
             }
+            
+            return packetData;
         }
     };
 };
@@ -59,5 +59,5 @@ ns.unserialize = function(payload) {
     packet.data(payload.data);
     return packet;
 };
-    
+
 }((typeof exports === 'undefined') ? window.Components.Packets = {} : exports.Packets = {}));
