@@ -58,11 +58,7 @@ exports.createPlayer = function(client) {
     });
 
     function updateGameState(state) {
-        client.send(packets.GameState({
-            leftPlayer: state.leftPlayer,
-            rightPlayer: state.rightPlayer,
-            game: state.game
-        }));
+        client.send(packets.GameState(state));
     }
 
     function updateElements(elements) {

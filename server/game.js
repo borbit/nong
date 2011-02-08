@@ -155,20 +155,14 @@ exports.createGame = function() {
     }
 
     function getState() {
-        var leftPlayerState = comps.Constants.PLAYER_STATE_FREE;
-        var rightPlayerState = comps.Constants.PLAYER_STATE_FREE;
-
-        if (players.left) {
-            leftPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
-        }
-        if (players.right) {
-            rightPlayerState = comps.Constants.PLAYER_STATE_CONNECTED;
-        }
-
+        var c =  comps.Constants;
+        
         return {
             game: gameState,
-            leftPlayer: leftPlayerState,
-            rightPlayer: rightPlayerState
+            players: {
+                'left': players.left ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE,
+                'right': players.right ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE
+            }
         };
     }
 
