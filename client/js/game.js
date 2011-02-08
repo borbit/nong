@@ -7,6 +7,10 @@ $(function() {
         waitingMessage = $('#menu .waiting'),
         joinedMessage = $('#menu .joined'),
         statusMessage = $('#menu .status'),
+        scores = {
+            'left': $('#score-left'),
+            'right': $('#score-right')
+        },
         menu = $('#menu');
 
     joinButtonLeft.click(function() {
@@ -55,6 +59,7 @@ $(function() {
 
     player.subscribe(player.events.ROUNDSTARTED, function(data) {
         updateBallState(data.ball);
+        updateScores(data.scores);
         
         setTimeout(function() {
             ball.pitch();
@@ -88,6 +93,12 @@ $(function() {
         ball.ky = data.ky;
         ball.angle = data.angle;
         ball.isMoving = data.isMoving;
+    }
+
+    function updateScores(scoresData) {
+        for (var key in scoresData) {
+            scores[key].html(scoresData[key]);
+        }
     }
 
     function assignShield(side) {
