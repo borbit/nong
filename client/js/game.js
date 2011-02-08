@@ -14,6 +14,7 @@ function Game() {
         menu = $('#menu');
 
     this.player = Pong.Player(transport);
+    this.opponent = Pong.Opponent(transport);
 
     joinButtonLeft.click(function() {
         that.player.joinLeft();
@@ -48,10 +49,16 @@ function Game() {
             if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
                 joinedMessage.addClass('left').show();
+                if (that.player.shield.id != 'left') {
+                    that.opponent.assignShield(that.shields.left);
+                }
             }
             if (state.rightPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonRight.hide();
                 joinedMessage.addClass('right').show();
+                if (that.player.shield.id != 'right') {
+                    that.opponent.assignShield(that.shields.right);
+                }
             }
         } else if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
@@ -69,18 +76,6 @@ function Game() {
     });
     this.player.subscribe(this.player.events.GAMESNAPSHOT, function(data) {
         that.updateBallState(data[that.ball.id]);
-    });
-    this.player.subscribe(this.player.events.MOVEUP, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].moveUp();
-    });
-    this.player.subscribe(this.player.events.MOVEDOWN, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].moveDown();
-    });
-    this.player.subscribe(this.player.events.STOP, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].stop();
     });
 
     statusMessage.text('CONNECTING').show();
