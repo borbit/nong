@@ -1,7 +1,11 @@
 $(function() {
-    var transport = Pong.Transports.WS(),
-        player = Pong.Player(transport),
 
+function Game() {
+
+    Game.superproto.constructor.call(this);
+
+    var that = this; console.log(that);
+    var transport = Pong.Transports.WS(),
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
         waitingMessage = $('#menu .waiting'),
@@ -9,20 +13,22 @@ $(function() {
         statusMessage = $('#menu .status'),
         menu = $('#menu');
 
+    this.player = Pong.Player(transport);
+
     joinButtonLeft.click(function() {
-        player.joinLeft();
-        player.ping();
-        assignShield('left');
+        that.player.joinLeft();
+        that.player.ping();
+        that.assignShield('left');
     });
 
     joinButtonRight.click(function() {
-        player.joinRight();
-        player.ping();
-        assignShield('right');
+        that.player.joinRight();
+        that.player.ping();
+        that.assignShield('right');
     });
     
     transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
-        player.joinGame('only');
+        that.player.joinGame('only');
         statusMessage.hide();
         joinButtonLeft.show();
         joinButtonRight.show();
@@ -37,7 +43,7 @@ $(function() {
         statusMessage.text('DISCONNECTED').show();
     });
 
-    player.subscribe(player.events.GAMESTATE, function(state) {
+    this.player.subscribe(this.player.events.GAMESTATE, function(state) {
         if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
@@ -49,87 +55,72 @@ $(function() {
             }
         } else if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
-            stage.start();
+            that.stage.start();
         }
     });
 
-    player.subscribe(player.events.ROUNDSTARTED, function(data) {
-        updateBallState(data.ball);
+    this.player.subscribe(this.player.events.ROUNDSTARTED, function(data) {
+        that.updateBallState(data.ball);
         
         setTimeout(function() {
-            ball.pitch();
+            that.ball.pitch();
         }, data.countdown * 1000);
     });
-
-    player.subscribe(player.events.GAMESNAPSHOT, function(data) {
-        updateBallState(data[ball.id]);
+    this.player.subscribe(this.player.events.GAMESNAPSHOT, function(data) {
+        that.updateBallState(data[that.ball.id]);
     });
-
-    player.subscribe(player.events.MOVEUP, function(data) {
-        shields[data.side].region.y = data.y;
-        shields[data.side].moveUp();
+    this.player.subscribe(this.player.events.MOVEUP, function(data) {
+        that.shields[data.side].region.y = data.y;
+        that.shields[data.side].moveUp();
     });
-    player.subscribe(player.events.MOVEDOWN, function(data) {
-        shields[data.side].region.y = data.y;
-        shields[data.side].moveDown();
+    this.player.subscribe(this.player.events.MOVEDOWN, function(data) {
+        that.shields[data.side].region.y = data.y;
+        that.shields[data.side].moveDown();
     });
-    player.subscribe(player.events.STOP, function(data) {
-        shields[data.side].region.y = data.y;
-        shields[data.side].stop();
+    this.player.subscribe(this.player.events.STOP, function(data) {
+        that.shields[data.side].region.y = data.y;
+        that.shields[data.side].stop();
     });
 
     statusMessage.text('CONNECTING').show();
     transport.connect();
 
-    function updateBallState(data) {
-        ball.region.x = data.x;
-        ball.region.y = data.y;
-        ball.kx = data.kx;
-        ball.ky = data.ky;
-        ball.angle = data.angle;
-        ball.isMoving = data.isMoving;
-    }
+    var view = Pong.View(that.stage);
+    var ballRenderer = Pong.Renderers.Ball();
+    var shieldRenderer = Pong.Renderers.Shield();
+    view.addRenderer(this.shields.left.id, $('#shield1'), shieldRenderer);
+    view.addRenderer(this.shields.right.id, $('#shield2'), shieldRenderer);
+    view.addRenderer(this.ball.id, $('#ball'), ballRenderer);
+};
 
-    function assignShield(side) {
+Utils.inherit(Game, Pong.Game);
+
+Utils._.extend(Game.prototype, {
+    updateBallState: function(data) {
+        this.ball.region.x = data.x;
+        this.ball.region.y = data.y;
+        this.ball.kx = data.kx;
+        this.ball.ky = data.ky;
+        this.ball.angle = data.angle;
+        this.ball.isMoving = data.isMoving;
+    },
+
+    assignShield: function(side) {
+        var that = this;
         var keyboard = Pong.EventsClient.KeyboardReceiver;
 
         keyboard.subscribe(keyboard.events.MOVEUP, function() {
-            player.shieldMoveUp(side, shields[side].region.y);
-            shields[side].moveUp();
+            that.player.shieldMoveUp(side, that.shields[side].region.y);
         });
         keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
-            player.shieldMoveDown(side, shields[side].region.y);
-            shields[side].moveDown();
+            that.player.shieldMoveDown(side, that.shields[side].region.y);
         });
         keyboard.subscribe(keyboard.events.STOP, function() {
-            player.shieldStop(side, shields[side].region.y);
-            shields[side].stop();
+            that.player.shieldStop(side, that.shields[side].region.y);
         });
     }
+});
 
-    var shields = {
-        left: new Pong.Shield(40, 20, 'left'),
-        right: new Pong.Shield(750, 20, 'right')
-    };
-    var goals = {
-        left: new Pong.Goal(-50, 0, 600),
-        right: new Pong.Goal(800, 0, 600)
-    };
-    var ball = new Pong.Ball('ball');
-    var stage = Pong.Stage();
+var game = new Game();
 
-    stage.addStaticElement(new Pong.StageWall(0, -50, 800))
-         .addStaticElement(new Pong.StageWall(0, 600, 800))
-         .addStaticElement(goals.left)
-         .addStaticElement(goals.right)
-         .addShield(shields.left)
-         .addShield(shields.right)
-         .addDynamicElement(ball);
-
-    var view = Pong.View(stage);
-    var ballRenderer = Pong.Renderers.Ball();
-    var shieldRenderer = Pong.Renderers.Shield();
-    view.addRenderer(shields.left.id, $('#shield1'), shieldRenderer);
-    view.addRenderer(shields.right.id, $('#shield2'), shieldRenderer);
-    view.addRenderer(ball.id, $('#ball'), ballRenderer);
 });
