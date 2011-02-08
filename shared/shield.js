@@ -13,35 +13,30 @@ function Shield(x, y, id) {
         height: 80
     });
 
-    this.speed = 100;
+    this.startingSpeed = 300;
+    this.currentSpeed = 0;
     this.vy = 0;
 
-    this.energy = 0;
+    this.acceleration = 5;
+    this.currentAcceleration = 0;
+    this.friction = 2;
+    this.movementTime = 0;
 }
 
 utils.inherit(Shield, comps.Element);
 
 utils._.extend(Shield.prototype, {
-    updateEnergy: function() {
-        if (this.vy == 0 && this.energy != 0) {
-            this.energy += - Math.round(this.energy / Math.abs(this.energy));
-        } else if (this.vy) {
-            if (Math.abs(this.energy + this.vy) <= 8) {
-                this.energy += this.vy;
-            }
-        }
-    },
-
     update: function() {
         if (this.isMoving()) {
-            this.updateEnergy();
             this.updatePosition();
             this.observer.fire(comps.Element.events.changed);
         }
     },
 
     updatePosition: function() {
-        this.region.y += this.energy * this.speed / pong.Globals.RFPS;
+        this.movementTime += 1;
+        this.currentSpeed = Math.max(this.currentSpeed + this.movementTime * (this.currentAcceleration - this.friction), 0);
+        this.region.y += this.vy * this.currentSpeed / pong.Globals.RFPS;
     },
 
     moveTo: function(y) {
@@ -50,29 +45,43 @@ utils._.extend(Shield.prototype, {
     },
 
     moveUp: function() {
+        if (this.vy > 0) {
+            this.stop();
+        }
         this.vy = -1;
+        this.startMovement();
     },
 
     moveDown: function() {
+        if (this.vy < 0) {
+            this.stop();
+        }
         this.vy = 1;
+        this.startMovement();
+    },
+
+    startMovement: function() {
+        this.currentAcceleration = this.acceleration;
+        this.currentSpeed = this.startingSpeed;
     },
 
     stop: function() {
-        this.vy = 0;
+        this.movementTime = 0;
+        this.currentAcceleration = 0;
     },
 
     isMoving: function() {
-        return this.energy != 0 || this.vy != 0;
+        return this.currentSpeed > 0;
     },
 
     hitStageWall: function(wall) {
-        if (this.energy < 0) {
+        if (this.vy < 0) {
             this.region.y = wall.region.bottom();
-        } else if (this.energy > 0) {
+        }
+        else if (this.vy > 0) {
             this.region.y = wall.region.top() - this.region.height;
         }
-
-        this.energy *= -1;
+        this.stop();
     },
 
     serialize: function() {

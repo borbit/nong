@@ -129,7 +129,7 @@ $(function() {
             }, 2000);
         }
 
-        startRound();
+        //startRound();
         
         stage.subscribe(Pong.Stage.events.goalHit, function(goal) {
             startRound();

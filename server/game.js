@@ -149,7 +149,7 @@ exports.createGame = function() {
             }, 2000);
         }
 
-        startRound();
+        //startRound();
         
         stage.subscribe(pong.Stage.events.goalHit, function(goal) {
             startRound();
