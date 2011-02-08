@@ -26,14 +26,10 @@ ns.GameLoop = function() {
             var count = elements.length;
 
             if(count > 0) {
-                var updated = [];
-
                 for(var i = 0; i < count; i++) {
-                    elements[i].update();
-                    updated.push(elements[i]);
+                    elements[i].update(1000 / pong.Globals.RFPS);
                 }
-
-                observer.fire(events.tickWithUpdates, updated);
+                observer.fire(events.tickWithUpdates, elements);
             }
         }
 

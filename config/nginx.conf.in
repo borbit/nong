@@ -2,10 +2,10 @@ server {
     server_name ${SERVER_NAME};
     
     location / {
-        root ${PROJECT_ROOT}/client;
+        root "${PROJECT_ROOT}/client";
     }
 
     location /shared/ {
-        root ${PROJECT_ROOT};
+        root "${PROJECT_ROOT}";
     }
 }

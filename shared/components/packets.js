@@ -26,9 +26,17 @@ ns.Packet = function(packetId) {
 var packets = {};
 
 ns.createPacket = function(id, addons) {
-    function constructor() {
+    function constructor(packetData) {
         var packet = ns.Packet(id);
-        return utils._.extend(packet, addons);
+
+        if(!utils._.isUndefined(packetData)) {
+            packet.data(packetData);
+        }
+
+        if(!utils._.isUndefined(addons)) {
+            packet = utils._.extend(packet, addons);
+        }
+        return packet;
     }
     constructor.id = id;
     packets[id] = constructor;

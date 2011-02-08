@@ -12,9 +12,21 @@ exports.createGame = function() {
     var stage = pong.Stage();
     var ball = new pong.Ball('ball');
     var shields = {
-        left: new pong.Shield(40, 250, 'left'),
-        right: new pong.Shield(750, 250, 'right')
+        left: new pong.Shield(40, 20, 'left'),
+        right: new pong.Shield(750, 20, 'right')
     };
+
+    stage.addStaticElement(new pong.StageWall(0, -50, 800))
+         .addStaticElement(new pong.StageWall(0, 600, 800))
+         .addStaticElement(new pong.Goal(-50, 0, 600))
+         .addStaticElement(new pong.Goal(800, 0, 600))
+         .addShield(shields.left)
+         .addShield(shields.right)
+         .addDynamicElement(ball);
+
+    stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+        restartGame();
+    });
 
     function joinPlayer(player) {
         var id = player.id;
@@ -28,12 +40,16 @@ exports.createGame = function() {
         player.on(Player.events.GONE, function() {
             freePlayer(id);
         });
-
+        player.on(Player.events.PING, function(key) {
+            player.pong(key);
+        });
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
+            player.ping();
         });
         player.on(Player.events.JOINRIGHT, function() {
             assignShield('right', player);
+            player.ping();
         });
 
         player.updateGameState(getState());
@@ -43,7 +59,6 @@ exports.createGame = function() {
         if (utils._.isUndefined(spectators[id])) {
             throw 'Tring to free not connected player: ' + id;
         }
-
         delete spectators[id];
     }
 
@@ -52,22 +67,29 @@ exports.createGame = function() {
             return;
         }
 
-        players[side] = player;
+        players[side] = player; 
 
         player.on(Player.events.GONE, function() {
             players[side] = null;
             updateGameState();
         });
 
-        player.on(Player.events.MOVEUP, function() {
-            notifyShieldMoveUp(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
+        var shield = shields[side];
+
+        player.on(Player.events.MOVEUP, function(key) {
+            notifyShieldMoveUp(side, shield.region.y, shield.energy);
+            player.shieldMovedUp(side, shield.region.y, key)
         });
-        player.on(Player.events.MOVEDOWN, function() {
-            notifyShieldMoveDown(side, shields[side].region.x, shields[side].region.y, shields[side].energy);
+        player.on(Player.events.MOVEDOWN, function(key) {
+            notifyShieldMoveDown(side, shield.region.y, shield.energy);
+            player.shieldMovedDown(side, shield.region.y, key)
         });
-        player.on(Player.events.STOP, function() {
-            notifyShieldStop(side, shields[side].region.x, shields[side].region.y);
+        player.on(Player.events.STOP, function(key, y) {
+            notifyShieldStop(side, shield.region.y);
+            player.shieldStoped(side, shield.region.y, key)
         });
+
+        bindPlayerToShield(player, shield);
 
         updateGameState();
     }
@@ -75,10 +97,10 @@ exports.createGame = function() {
     function updateGameState() {
         if (players.left && players.right) {
             gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
-            start();
+            startGame();
         } else if (gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
             gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-            stop();
+            stopGame();
         }
 
         for (var i in spectators) {
@@ -92,21 +114,27 @@ exports.createGame = function() {
         }
     }
 
-    function notifyShieldMoveUp(side, x, y, energy) {
+    function notifyShieldMoveUp(side, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveUp(side, x, y, energy);
+            spectators[i].shieldMoveUp(side, y, energy);
         }
     }
 
-    function notifyShieldMoveDown(side, x, y, energy) {
+    function notifyShieldMoveDown(side, y, energy) {
         for (var i in spectators) {
-            spectators[i].shieldMoveDown(side, x, y, energy);
+            spectators[i].shieldMoveDown(side, y, energy);
         }
     }
 
-    function notifyShieldStop(side, x, y) {
+    function notifyShieldStop(side, y) {
         for (var i in spectators) {
-            spectators[i].shieldStop(side, x, y);
+            spectators[i].shieldStop(side, y);
+        }
+    }
+
+    function notifyRoundStarted(ballData) {
+        for (var i in spectators) {
+            spectators[i].roundStarted(ballData);
         }
     }
 
@@ -128,47 +156,39 @@ exports.createGame = function() {
         };
     }
 
-    function start() {
-        bindPlayerToShield(players.left, shields.left);
-        bindPlayerToShield(players.right, shields.right);
-
-        stage.addStaticElement(new pong.StageWall(0, -50, 800))
-             .addStaticElement(new pong.StageWall(0, 600, 800))
-             .addStaticElement(new pong.Goal(-50, 0, 600))
-             .addStaticElement(new pong.Goal(800, 0, 600))
-             .addShield(shields.left)
-             .addShield(shields.right)
-             .addDynamicElement(ball)
-             .start();
-
-        //TODO: this should be a method of a shared Game object
-        function startRound() {
-            //TODO: implement pause and countdown
-            setTimeout(function() {
-                ball.pitch();
-            }, 2000);
-        }
-
-        //startRound();
-        
-        stage.subscribe(pong.Stage.events.goalHit, function(goal) {
-            startRound();
-        });
-
-        snapshotter = setInterval(function(elements) {
-            notifyElementsChanged(stage.getState());
-        }, 1000 / pong.Globals.SPS);
-    }
-
     function bindPlayerToShield(player, shield) {
         player.subscribe(Player.events.STOP, function() { shield.stop(); });
         player.subscribe(Player.events.MOVEUP, function() { shield.moveUp(); });
         player.subscribe(Player.events.MOVEDOWN, function() { shield.moveDown(); });
     }
 
-    function stop() {
-        stage.stop();
+    function startGame() {
+        ball.preparePitch();
 
+        notifyRoundStarted({
+            ball: ball.serialize(),
+            countdown: pong.Globals.COUNTDOWN
+        });
+
+        setTimeout(function() {
+            ball.pitch();
+
+            snapshotter = setInterval(function(elements) {
+                notifyElementsChanged(stage.getState());
+            }, 1000 / pong.Globals.SPS);
+            
+        }, pong.Globals.COUNTDOWN * 1000);
+
+        stage.start();
+    }
+
+    function restartGame() {
+        stopGame();
+        startGame();
+    }
+
+    function stopGame() {
+        stage.stop();
         clearInterval(snapshotter);
     }
 

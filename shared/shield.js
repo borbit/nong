@@ -10,33 +10,31 @@ function Shield(x, y, id) {
     this.region = comps.Region({
         x: x, y: y,
         width: 10,
-        height: 80
+        height: 100
     });
 
-    this.startingSpeed = 300;
+    this.startingSpeed = 500;
     this.currentSpeed = 0;
     this.vy = 0;
 
-    this.acceleration = 5;
-    this.currentAcceleration = 0;
-    this.friction = 2;
-    this.movementTime = 0;
+    this.friction = 50;
+    this.currentFriction = 0;
 }
 
 utils.inherit(Shield, comps.Element);
 
 utils._.extend(Shield.prototype, {
-    update: function() {
+    update: function(delay) {
         if (this.isMoving()) {
-            this.updatePosition();
+            this.updatePosition(delay);
             this.observer.fire(comps.Element.events.changed);
         }
     },
 
-    updatePosition: function() {
-        this.movementTime += 1;
-        this.currentSpeed = Math.max(this.currentSpeed + this.movementTime * (this.currentAcceleration - this.friction), 0);
-        this.region.y += this.vy * this.currentSpeed / pong.Globals.RFPS;
+    updatePosition: function(delay) {
+        var deltaT = delay / 1000;
+        this.currentSpeed = Math.max(this.currentSpeed - this.currentFriction, 0);
+        this.region.y += Math.floor(this.vy * this.currentSpeed * deltaT);
     },
 
     moveTo: function(y) {
@@ -61,13 +59,12 @@ utils._.extend(Shield.prototype, {
     },
 
     startMovement: function() {
-        this.currentAcceleration = this.acceleration;
         this.currentSpeed = this.startingSpeed;
+        this.currentFriction = 0;
     },
 
     stop: function() {
-        this.movementTime = 0;
-        this.currentAcceleration = 0;
+        this.currentFriction = this.friction;
     },
 
     isMoving: function() {
@@ -76,7 +73,7 @@ utils._.extend(Shield.prototype, {
 
     hitStageWall: function(wall) {
         if (this.vy < 0) {
-            this.region.y = wall.region.bottom();
+            this.region.y = wall.region.bottom() + 1;
         }
         else if (this.vy > 0) {
             this.region.y = wall.region.top() - this.region.height;
