@@ -45,16 +45,15 @@ function Game() {
         statusMessage.text('DISCONNECTED').show();
     });
 
-    transport.subscribe(packets.OpponentConnected.id, function(data) {
-        that.opponent.assignShield(that.shields[data.side]);
-    });
-
     transport.subscribe(packets.GameState.id, function(state) {
         if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             for (var key in state.players) {
                 if (state.players[key] == Components.Constants.PLAYER_STATE_CONNECTED) {
                     joinButtons[key].hide();
                     joinedMessage.addClass(key).show();
+                    if (!that.player.shield || that.player.shield.id != key) {
+                        that.opponent.assignShield(that.shields[key]);
+                    }
                 }
             }
         }
