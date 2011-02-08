@@ -15,16 +15,14 @@ function Game() {
         menu = $('#menu');
 
     this.player = Pong.Player(transport);
-    this.oponent = Pong.Player(transport);
+    this.opponent = Pong.Opponent(transport);
 
     joinButtonLeft.click(function() {
         that.player.joinLeft();
-        that.assignShield(that.shields.left);
     });
 
     joinButtonRight.click(function() {
         that.player.joinRight();
-        that.assignShield(that.shields.right);
     });
     
     transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
@@ -48,10 +46,18 @@ function Game() {
             if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
                 joinedMessage.addClass('left').show();
+                if (!that.player.shield || that.player.shield.id != 'left') {
+                    that.player.assignShield(that.shields.right);
+                    that.opponent.assignShield(that.shields.left);
+                }
             }
             if (state.rightPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonRight.hide();
                 joinedMessage.addClass('right').show();
+                if (!that.player.shield || that.player.shield.id != 'right') {
+                    that.player.assignShield(that.shields.left);
+                    that.opponent.assignShield(that.shields.right);
+                }
             }
         } else if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
@@ -93,10 +99,6 @@ Utils._.extend(Game.prototype, {
         this.ball.ky = data.ky;
         this.ball.angle = data.angle;
         this.ball.isMoving = data.isMoving;
-    },
-
-    assignShield: function(side) {
-        var that = this;
     },
 
     updateScores: function(scoresData) {
