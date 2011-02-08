@@ -10,22 +10,22 @@ ns.GameSnapshot = packets.createPacket('GameSnapshot', {
     }
 });
 
-
 ns.Pong = packets.createPacket('Pong');
 ns.Ping = packets.createPacket('Ping');
 
-ns.GameState        = packets.createPacket('GameState');
-ns.JoinGame         = packets.createPacket('JoinGame');
-ns.JoinLeft         = packets.createPacket('JoinLeft');
-ns.JoinRight        = packets.createPacket('JoinRight');
-ns.RoundStarted     = packets.createPacket('RoundStarted');
+ns.GameState         = packets.createPacket('GameState');
+ns.JoinGame          = packets.createPacket('JoinGame');
+ns.JoinLeft          = packets.createPacket('JoinLeft');
+ns.JoinRight         = packets.createPacket('JoinRight');
+ns.RoundStarted      = packets.createPacket('RoundStarted');
+ns.OpponentConnected = packets.createPacket('OpponentConnected');
 
-ns.ShieldMoveUp     = packets.createPacket('ShieldMoveUp');
-ns.ShieldMoveDown   = packets.createPacket('ShieldMoveDown');
-ns.ShieldStop       = packets.createPacket('ShieldStop');
+ns.ShieldMoveUp      = packets.createPacket('ShieldMoveUp');
+ns.ShieldMoveDown    = packets.createPacket('ShieldMoveDown');
+ns.ShieldStop        = packets.createPacket('ShieldStop');
 
-ns.ShieldMovedUp    = packets.createPacket('ShieldMovedUp');
-ns.ShieldMovedDown  = packets.createPacket('ShieldMovedDown');
-ns.ShieldStoped     = packets.createPacket('ShieldStoped');
+ns.ShieldMovedUp     = packets.createPacket('ShieldMovedUp');
+ns.ShieldMovedDown   = packets.createPacket('ShieldMovedDown');
+ns.ShieldStoped      = packets.createPacket('ShieldStoped');
     
 }((typeof exports === 'undefined') ? window.Pong.Packets = {} : exports.Packets = {}));

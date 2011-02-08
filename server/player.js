@@ -106,6 +106,9 @@ exports.createPlayer = function(client) {
             side: side, y: y, key: key
         }));
     }
+    function opponentConnected(side) {
+        client.send(packets.OpponentConnected({side: side}));
+    }
 
     function ping(key) {
         client.send(packets.Ping({key: utils.getUniqId()}));
@@ -143,6 +146,7 @@ exports.createPlayer = function(client) {
         shieldMovedDown: shieldMovedDown,
         shieldStoped: shieldStoped,
         roundStarted: roundStarted,
+        opponentConnected: opponentConnected,
         ping: ping
     };
 };
