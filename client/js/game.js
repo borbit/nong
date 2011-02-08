@@ -5,6 +5,7 @@ function Game() {
     Game.superproto.constructor.call(this);
 
     var that = this;
+    var packets = Pong.Packets;
     var transport = Pong.Transports.WS(),
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
@@ -14,17 +15,16 @@ function Game() {
         menu = $('#menu');
 
     this.player = Pong.Player(transport);
+    this.oponent = Pong.Player(transport);
 
     joinButtonLeft.click(function() {
         that.player.joinLeft();
-        that.player.ping();
-        that.assignShield('left');
+        that.assignShield(that.shields.left);
     });
 
     joinButtonRight.click(function() {
         that.player.joinRight();
-        that.player.ping();
-        that.assignShield('right');
+        that.assignShield(that.shields.right);
     });
     
     transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
@@ -43,7 +43,7 @@ function Game() {
         statusMessage.text('DISCONNECTED').show();
     });
 
-    this.player.subscribe(this.player.events.GAMESTATE, function(state) {
+    transport.subscribe(packets.GameState.id, function(state) {
         if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
             if (state.leftPlayer == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtonLeft.hide();
@@ -59,7 +59,7 @@ function Game() {
         }
     });
 
-    this.player.subscribe(this.player.events.ROUNDSTARTED, function(data) {
+    transport.subscribe(packets.RoundStarted.id, function(data) {
         that.updateBallState(data.ball);
         that.updateScores(data.scores);
         
@@ -67,20 +67,9 @@ function Game() {
             that.ball.pitch();
         }, data.countdown * 1000);
     });
-    this.player.subscribe(this.player.events.GAMESNAPSHOT, function(data) {
+    
+    transport.subscribe(packets.GameSnapshot.id, function(data) {
         that.updateBallState(data[that.ball.id]);
-    });
-    this.player.subscribe(this.player.events.MOVEUP, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].moveUp();
-    });
-    this.player.subscribe(this.player.events.MOVEDOWN, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].moveDown();
-    });
-    this.player.subscribe(this.player.events.STOP, function(data) {
-        that.shields[data.side].region.y = data.y;
-        that.shields[data.side].stop();
     });
 
     statusMessage.text('CONNECTING').show();
@@ -108,17 +97,6 @@ Utils._.extend(Game.prototype, {
 
     assignShield: function(side) {
         var that = this;
-        var keyboard = Pong.EventsClient.KeyboardReceiver;
-
-        keyboard.subscribe(keyboard.events.MOVEUP, function() {
-            that.player.shieldMoveUp(side, that.shields[side].region.y);
-        });
-        keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
-            that.player.shieldMoveDown(side, that.shields[side].region.y);
-        });
-        keyboard.subscribe(keyboard.events.STOP, function() {
-            that.player.shieldStop(side, that.shields[side].region.y);
-        });
     },
 
     updateScores: function(scoresData) {

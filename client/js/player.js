@@ -1,65 +1,43 @@
 Pong.Player = function(transport) {
+    var shield = null;
     var packets = Pong.Packets;
-    var movesBuffer = [];
-    var lastPingTime = null;
-    var latency = null;
+    var keyboard = Pong.EventsClient.KeyboardReceiver;
 
-    var events = {
-        STOP: 'stop',
-        MOVEUP: 'moveUp',
-        MOVEDOWN: 'moveDown',
-        STOPED: 'stoped',
-        MOVEDUP: 'movedUp',
-        MOVEDDOWN: 'movedDown',
-        GAMESTATE: 'gameState',
-        ROUNDSTARTED: 'roundStarted',
-        GAMESNAPSHOT: 'gameSnapshot'
-    };
+    keyboard.subscribe(keyboard.events.MOVEUP, function() {
+        sendPacket(packets.ShieldMoveUp({side: shield.id}));
+    });
+    keyboard.subscribe(keyboard.events.MOVEDOWN, function() {
+        sendPacket(packets.ShieldMoveDown({side: shield.id}));
+    });
+    keyboard.subscribe(keyboard.events.STOP, function() {
+        sendPacket(packets.ShieldStop({side: shield.id}));
+    });
 
-    var observer = Utils.Observer();
-
-    transport.subscribe(packets.GameState.id, function(data) {
-        observer.fire(events.GAMESTATE, data);
-    });
-    transport.subscribe(packets.RoundStarted.id, function(data) {
-        observer.fire(events.ROUNDSTARTED, data);
-    });
-    transport.subscribe(packets.GameSnapshot.id, function(data) {
-        observer.fire(events.GAMESNAPSHOT, data);
-    });
     transport.subscribe(packets.ShieldMoveUp.id, function(data) {
-        observer.fire(events.MOVEUP, data);
+        if(data.side == shield.id) {
+            shield.region.y = data.y;
+            shield.moveUp();
+        }
     });
     transport.subscribe(packets.ShieldMoveDown.id, function(data) {
-        observer.fire(events.MOVEDOWN, data);
+        if(data.side == shield.id) {
+            shield.region.y = data.y;
+            shield.moveDown();
+        }
     });
     transport.subscribe(packets.ShieldStop.id, function(data) {
-        observer.fire(events.STOP, data);
+        if(data.side == shield.id) {
+            shield.region.y = data.y;
+            shield.stop();
+        }
     });
-    transport.subscribe(packets.ShieldMovedUp.id, function(data) {
-        observer.fire(events.MOVEDUP, data);
-    });
-    transport.subscribe(packets.ShieldMovedDown.id, function(data) {
-        observer.fire(events.MOVEDDOWN, data);
-    });
-    transport.subscribe(packets.ShieldStoped.id, function(data) {
-        observer.fire(events.STOPED, data);
-    });
-    transport.subscribe(packets.Pong.id, function(data) {
-        latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
-        console.log('latency ' + latency);
-    });
-    transport.subscribe(packets.Ping.id, function(data) {
-        pong(data.key);
-    });
+    
+    /*
+    transport.subscribe(packets.ShieldMovedUp.id, function(data) {});
+    transport.subscribe(packets.ShieldMovedDown.id, function(data) {});
+    transport.subscribe(packets.ShieldStoped.id, function(data) {});
+     */
 
-    function ping() {
-        lastPingTime = (new Date()).getTime();
-        sendPacket(packets.Ping({key: Utils.getUniqId()}));
-    }
-    function pong(key) {
-        sendPacket(packets.Pong({key: key}));
-    }
     
     function joinGame(name) {
         sendPacket(packets.JoinGame({name: name}));
@@ -71,23 +49,8 @@ Pong.Player = function(transport) {
         sendPacket(packets.JoinRight());
     }
 
-    function shieldMoveUp(side, y) {
-        sendPacket(packets.ShieldMoveUp({
-            side: side, key: movesBuffer.length
-        }));
-        movesBuffer[movesBuffer.length] = y;
-    }
-    function shieldMoveDown(side, y) {
-        sendPacket(packets.ShieldMoveDown({
-            side: side, key: movesBuffer.length
-        }));
-        movesBuffer[movesBuffer.length] = y;
-    }
-    function shieldStop(side, coordY) {
-        sendPacket(packets.ShieldStop({
-            side: side, key: movesBuffer.length, coordY: coordY
-        }));
-        movesBuffer[movesBuffer.length] = coordY;
+    function assignShield(_shield) {
+        shield = _shield;
     }
 
     function sendPacket(packet) {
@@ -97,18 +60,10 @@ Pong.Player = function(transport) {
     }
 
     return {
-        ping: ping,
         joinGame: joinGame,
         joinLeft: joinLeft,
         joinRight: joinRight,
-        shieldMoveUp: shieldMoveUp,
-        shieldMoveDown: shieldMoveDown,
-        shieldStop: shieldStop,
-        subscribe: observer.subscribe,
-        events: events,
-
-        get latency() { return latency; },
-        get movesBuffer() { return movesBuffer; }
+        assignShield: assignShield,
+        get shield() { return shield; }
     };
-
 };
