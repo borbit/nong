@@ -55,17 +55,9 @@ exports.createGame = function() {
         });
         player.on(Player.events.JOINLEFT, function() {
             assignShield('left', player);
-
-            if(!utils._.isNull(players.right)) {
-                players.right.opponentConnected('left');
-            }
         });
         player.on(Player.events.JOINRIGHT, function() {
             assignShield('right', player);
-
-            if(!utils._.isNull(players.left)) {
-                players.left.opponentConnected('right');
-            }
         });
 
         player.updateGameState(getState());

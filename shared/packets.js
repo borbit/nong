@@ -18,7 +18,6 @@ ns.JoinGame          = packets.createPacket('JoinGame');
 ns.JoinLeft          = packets.createPacket('JoinLeft');
 ns.JoinRight         = packets.createPacket('JoinRight');
 ns.RoundStarted      = packets.createPacket('RoundStarted');
-ns.OpponentConnected = packets.createPacket('OpponentConnected');
 
 ns.ShieldMoveUp      = packets.createPacket('ShieldMoveUp');
 ns.ShieldMoveDown    = packets.createPacket('ShieldMoveDown');

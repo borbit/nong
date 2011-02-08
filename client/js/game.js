@@ -46,18 +46,17 @@ function Game() {
     });
 
     transport.subscribe(packets.GameState.id, function(state) {
-        if (state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
-            for (var key in state.players) {
-                if (state.players[key] == Components.Constants.PLAYER_STATE_CONNECTED) {
-                    joinButtons[key].hide();
-                    joinedMessage.addClass(key).show();
-                    if (!that.player.shield || that.player.shield.id != key) {
-                        that.opponent.assignShield(that.shields[key]);
-                    }
+        for (var key in state.players) {
+            if (state.players[key] == Components.Constants.PLAYER_STATE_CONNECTED) {
+                joinButtons[key].hide();
+                joinedMessage.addClass(key).show();
+                if (!that.opponent.shield && (!that.player.shield || that.player.shield.id != key)) {
+                    that.opponent.assignShield(that.shields[key]);
                 }
             }
         }
-        else if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
+        
+        if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
             that.stage.start();
         }
