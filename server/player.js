@@ -115,9 +115,9 @@ exports.createPlayer = function(client) {
         client.send(packets.Pong({key: key}));
     }
 
-    function roundStarted(ballData) {
+    function roundStarted(data) {
         var packet = packets.RoundStarted();
-        packet.data(ballData);
+        packet.data(data);
         client.send(packet);
     }
 

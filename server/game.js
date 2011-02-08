@@ -9,22 +9,32 @@ exports.createGame = function() {
     var gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
     var snapshotter = null;
 
+    var scores = {
+        left: 0,
+        right: 0
+    };
+    
     var stage = pong.Stage();
     var ball = new pong.Ball('ball');
     var shields = {
         left: new pong.Shield(40, 20, 'left'),
         right: new pong.Shield(750, 20, 'right')
     };
+    var goals = {
+        left: new pong.Goal(-50, 0, 600),
+        right: new pong.Goal(800, 0, 600)
+    };
 
     stage.addStaticElement(new pong.StageWall(0, -50, 800))
          .addStaticElement(new pong.StageWall(0, 600, 800))
-         .addStaticElement(new pong.Goal(-50, 0, 600))
-         .addStaticElement(new pong.Goal(800, 0, 600))
+         .addStaticElement(goals.left)
+         .addStaticElement(goals.right)
          .addShield(shields.left)
          .addShield(shields.right)
          .addDynamicElement(ball);
 
     stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+        updateScores(goal);
         restartGame();
     });
 
@@ -132,9 +142,9 @@ exports.createGame = function() {
         }
     }
 
-    function notifyRoundStarted(ballData) {
+    function notifyRoundStarted(data) {
         for (var i in spectators) {
-            spectators[i].roundStarted(ballData);
+            spectators[i].roundStarted(data);
         }
     }
 
@@ -167,7 +177,8 @@ exports.createGame = function() {
 
         notifyRoundStarted({
             ball: ball.serialize(),
-            countdown: pong.Globals.COUNTDOWN
+            countdown: pong.Globals.COUNTDOWN,
+            scores: scores
         });
 
         setTimeout(function() {
@@ -185,6 +196,14 @@ exports.createGame = function() {
     function restartGame() {
         stopGame();
         startGame();
+    }
+
+    function updateScores(goal) {
+        for (var key in goals) {
+            if (goals[key] == goal) {
+                scores[key] += 1;
+            }
+        }
     }
 
     function stopGame() {

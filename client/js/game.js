@@ -4,7 +4,7 @@ function Game() {
 
     Game.superproto.constructor.call(this);
 
-    var that = this; console.log(that);
+    var that = this;
     var transport = Pong.Transports.WS(),
         joinButtonLeft = $('#menu .button.left'),
         joinButtonRight = $('#menu .button.right'),
@@ -61,6 +61,7 @@ function Game() {
 
     this.player.subscribe(this.player.events.ROUNDSTARTED, function(data) {
         that.updateBallState(data.ball);
+        that.updateScores(data.scores);
         
         setTimeout(function() {
             that.ball.pitch();
@@ -118,6 +119,17 @@ Utils._.extend(Game.prototype, {
         keyboard.subscribe(keyboard.events.STOP, function() {
             that.player.shieldStop(side, that.shields[side].region.y);
         });
+    },
+
+    updateScores: function(scoresData) {
+        var scores = {
+            'left': $('#score-left'),
+            'right': $('#score-right')
+        };
+
+        for (var key in scoresData) {
+            scores[key].html(scoresData[key]);
+        }
     }
 });
 
