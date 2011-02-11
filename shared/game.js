@@ -1,20 +1,22 @@
 (function(ns) {
 
+var pong = require('../shared/pong');
+
 ns.Game = function() {
     this.shields = {
-        left: new ns.Shield(40, 20, 'left'),
-        right: new ns.Shield(750, 20, 'right')
+        left: new pong.Shield(40, 20, 'left'),
+        right: new pong.Shield(750, 20, 'right')
     };
     this.goals = {
-        left: new ns.Goal(-50, 0, 600),
-        right: new ns.Goal(800, 0, 600)
+        left: new pong.Goal(-50, 0, 600),
+        right: new pong.Goal(800, 0, 600)
     };
     
-    this.ball = new Pong.Ball('ball');
-    this.stage = Pong.Stage();
+    this.ball = new pong.Ball('ball');
+    this.stage = pong.Stage();
 
-    this.stage.addStaticElement(new ns.StageWall(0, -50, 800))
-              .addStaticElement(new ns.StageWall(0, 600, 800))
+    this.stage.addStaticElement(new pong.StageWall(0, -50, 800))
+              .addStaticElement(new pong.StageWall(0, 600, 800))
               .addStaticElement(this.goals.left)
               .addStaticElement(this.goals.right)
               .addDynamicElement(this.shields.left)

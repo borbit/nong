@@ -4,7 +4,7 @@ var Player = require('./player');
 var Game = require('./game');
 
 exports.createServer = function() {
-    var game = Game.createGame();
+    var game = Game.create();
     var server = ws.createServer();
     
     server.addListener('connection', function(connection) {

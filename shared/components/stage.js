@@ -47,7 +47,7 @@ ns.Stage = function Stage() {
         return this;
     }
 
-    function getState() {
+    function serialize() {
         var result = {};
         for(var i in elementsDynamic) {
             result[i] = elementsDynamic[i].serialize();
@@ -69,7 +69,7 @@ ns.Stage = function Stage() {
         collisionsDetector: collisionsDetector,
         addStaticElement: addStaticElement,
         addDynamicElement: addDynamicElement,
-        getState: getState,
+        serialize: serialize,
         start: start,
         stop: stop,
         subscribe: observer.subscribe

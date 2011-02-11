@@ -1,209 +1,135 @@
 var pong = require('../shared/pong'),
     comps = require('../shared/components'),
     utils = require('../shared/utils'),
+    Players = require('./players'),
     Player = require('./player');
 
-exports.createGame = function() {
-    var spectators = {};
-    var players = {left: null, right: null};
-    var gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-    var snapshotter = null;
+exports.create = function() {
+    return new Game();
+};
 
-    var scores = {
-        left: 0,
-        right: 0
-    };
+function Game() {
     
-    var stage = pong.Stage();
-    var ball = new pong.Ball('ball');
-    var shields = {
-        left: new pong.Shield(40, 20, 'left'),
-        right: new pong.Shield(750, 20, 'right')
-    };
-    var goals = {
-        left: new pong.Goal(-50, 0, 600),
-        right: new pong.Goal(800, 0, 600)
-    };
+    Game.superproto.constructor.call(this);
+    
+    this.players = Players.create();
+    this.active = {left: null, right: null};
+    this.scores = {left: 0, right: 0};
+    this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+    this.snapshotter = null;
+    
+    var that = this;
+    
+    this.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+        for (var key in that.goals) {
+            if (that.goals[key] == goal) {
+                that.scores[key] += 1;
+            }
+        }
+        that.restartGame();
+    });
+}
 
-    stage.addStaticElement(new pong.StageWall(0, -50, 800))
-         .addStaticElement(new pong.StageWall(0, 600, 800))
-         .addStaticElement(goals.left)
-         .addStaticElement(goals.right)
-         .addShield(shields.left)
-         .addShield(shields.right)
-         .addDynamicElement(ball);
+utils.inherit(Game, pong.Game);
 
-    stage.subscribe(pong.Stage.events.goalHit, function(goal) {
-        updateScores(goal);
-        restartGame();
+Game.prototype.joinPlayer = function(player) {
+    var that = this;
+    that.players.add(player);
+
+    player.on(Player.events.GONE, function() { that.players.remove(player.id); });
+    player.on(Player.events.JOINLEFT, function() { that.assignShield('left', player); });
+    player.on(Player.events.JOINRIGHT, function() { that.assignShield('right', player); });
+    player.on(Player.events.PING, function(key) { player.pong(key); });
+
+    player.gameState(that.getState());
+};
+
+Game.prototype.assignShield = function(side, player) {
+    if (!utils._.isNull(this.active[side])) {
+        return;
+    }
+
+    var that = this;
+
+    player.on(Player.events.GONE, function() {
+        that.active[side] = null;
+        that.updateGameState();
     });
 
-    function joinPlayer(player) {
-        var id = player.id;
+    var shield = that.shields[side];
 
-        if (!utils._.isUndefined(spectators[id])) {
-            throw 'Tring to connect already connected player: ' + id;
-        }
+    player.on(Player.events.MOVEUP, function(key) {
+        shield.moveUp();
+        that.players.shieldMoveUp(side, shield.region.y);
+        player.shieldMovedUp(side, shield.region.y, key)
+    });
+    player.on(Player.events.MOVEDOWN, function(key) {
+        shield.moveDown();
+        that.players.shieldMoveDown(side, shield.region.y);
+        player.shieldMovedDown(side, shield.region.y, key)
+    });
+    player.on(Player.events.STOP, function(key) {
+        shield.stop();
+        that.players.shieldStop(side, shield.region.y);
+        player.shieldStoped(side, shield.region.y, key)
+    });
 
-        spectators[id] = player;
+    that.active[side] = player;
+    that.updateGameState();
+};
 
-        player.on(Player.events.GONE, function() {
-            freePlayer(id);
-        });
-        player.on(Player.events.PING, function(key) {
-            player.pong(key);
-        });
-        player.on(Player.events.JOINLEFT, function() {
-            assignShield('left', player);
-        });
-        player.on(Player.events.JOINRIGHT, function() {
-            assignShield('right', player);
-        });
-
-        player.updateGameState(getState());
+Game.prototype.updateGameState = function() {
+    if (this.active.left && this.active.right) {
+        this.gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
+        this.startGame();
+    } else if (this.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
+        this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+        this.stopGame();
     }
 
-    function freePlayer(id) {
-        if (utils._.isUndefined(spectators[id])) {
-            throw 'Tring to free not connected player: ' + id;
-        }
-        delete spectators[id];
-    }
+    this.players.gameState(this.getState());
+};
 
-    function assignShield(side, player) {
-        if (players[side]) {
-            return;
-        }
-
-        players[side] = player; 
-
-        player.on(Player.events.GONE, function() {
-            players[side] = null;
-            updateGameState();
-        });
-
-        var shield = shields[side];
-
-        player.on(Player.events.MOVEUP, function(key) {
-            notifyShieldMoveUp(side, shield.region.y, shield.energy);
-            player.shieldMovedUp(side, shield.region.y, key)
-        });
-        player.on(Player.events.MOVEDOWN, function(key) {
-            notifyShieldMoveDown(side, shield.region.y, shield.energy);
-            player.shieldMovedDown(side, shield.region.y, key)
-        });
-        player.on(Player.events.STOP, function(key, y) {
-            notifyShieldStop(side, shield.region.y);
-            player.shieldStoped(side, shield.region.y, key)
-        });
-
-        bindPlayerToShield(player, shield);
-
-        updateGameState();
-    }
-
-    function updateGameState() {
-        if (players.left && players.right) {
-            gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
-            startGame();
-        } else if (gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
-            gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-            stopGame();
-        }
-
-        for (var i in spectators) {
-            spectators[i].updateGameState(getState());
-        }
-    }
-
-    function notifyElementsChanged(elements) {
-        for (var i in spectators) {
-            spectators[i].updateElements(elements);
-        }
-    }
-
-    function notifyShieldMoveUp(side, y, energy) {
-        for (var i in spectators) {
-            spectators[i].shieldMoveUp(side, y, energy);
-        }
-    }
-
-    function notifyShieldMoveDown(side, y, energy) {
-        for (var i in spectators) {
-            spectators[i].shieldMoveDown(side, y, energy);
-        }
-    }
-
-    function notifyShieldStop(side, y) {
-        for (var i in spectators) {
-            spectators[i].shieldStop(side, y);
-        }
-    }
-
-    function notifyRoundStarted(data) {
-        for (var i in spectators) {
-            spectators[i].roundStarted(data);
-        }
-    }
-
-    function getState() {
-        var c =  comps.Constants;
-        
-        return {
-            game: gameState,
-            players: {
-                'left': players.left ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE,
-                'right': players.right ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE
-            }
-        };
-    }
-
-    function bindPlayerToShield(player, shield) {
-        player.subscribe(Player.events.STOP, function() { shield.stop(); });
-        player.subscribe(Player.events.MOVEUP, function() { shield.moveUp(); });
-        player.subscribe(Player.events.MOVEDOWN, function() { shield.moveDown(); });
-    }
-
-    function startGame() {
-        ball.preparePitch();
-
-        notifyRoundStarted({
-            ball: ball.serialize(),
-            countdown: pong.Globals.COUNTDOWN,
-            scores: scores
-        });
-
-        setTimeout(function() {
-            ball.pitch();
-
-            snapshotter = setInterval(function(elements) {
-                notifyElementsChanged(stage.getState());
-            }, 1000 / pong.Globals.SPS);
-            
-        }, pong.Globals.COUNTDOWN * 1000);
-
-        stage.start();
-    }
-
-    function restartGame() {
-        stopGame();
-        startGame();
-    }
-
-    function updateScores(goal) {
-        for (var key in goals) {
-            if (goals[key] == goal) {
-                scores[key] += 1;
-            }
-        }
-    }
-
-    function stopGame() {
-        stage.stop();
-        clearInterval(snapshotter);
-    }
+Game.prototype.getState = function() {
+    var c = comps.Constants;
 
     return {
-        joinPlayer: joinPlayer
+        game: this.gameState,
+        players: {
+            'left': this.active.left ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE,
+            'right': this.active.right ? c.PLAYER_STATE_CONNECTED : c.PLAYER_STATE_FREE
+        }
     };
+};
+
+Game.prototype.startGame = function() {
+    var that = this;
+    that.ball.preparePitch();
+
+    that.players.roundStarted({
+        ball: that.ball.serialize(),
+        countdown: pong.Globals.COUNTDOWN,
+        scores: that.scores
+    });
+
+    setTimeout(function() {
+        that.ball.pitch();
+
+        that.snapshotter = setInterval(function(elements) {
+            that.players.gameSnapshot(that.stage.serialize());
+        }, 1000 / pong.Globals.SPS);
+
+    }, pong.Globals.COUNTDOWN * 1000);
+
+    that.stage.start();
+};
+
+Game.prototype.stopGame = function() {
+    this.stage.stop();
+    clearInterval(this.snapshotter);
+};
+
+Game.prototype.restartGame = function() {
+    this.stopGame();
+    this.startGame();
 };

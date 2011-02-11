@@ -57,11 +57,11 @@ exports.createPlayer = function(client) {
         latency = Math.floor(((new Date()).getTime() - lastPingTime) / 2);
     });
 
-    function updateGameState(state) {
+    function gameState(state) {
         client.send(packets.GameState(state));
     }
 
-    function updateElements(elements) {
+    function gameSnapshot(elements) {
         var packet = packets.GameSnapshot();
         for (var i in elements) {
             packet.addEntityData(elements[i].id, elements[i]);
@@ -130,8 +130,8 @@ exports.createPlayer = function(client) {
         get score() { return score; },
         get latency() { return latency; },
 
-        updateGameState: updateGameState,
-        updateElements: updateElements,
+        gameState: gameState,
+        gameSnapshot: gameSnapshot,
         shieldMoveUp: shieldMoveUp,
         shieldMoveDown: shieldMoveDown,
         shieldStop: shieldStop,
