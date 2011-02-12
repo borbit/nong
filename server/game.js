@@ -53,6 +53,8 @@ Game.prototype.assignShield = function(side, player) {
 
     player.on(Player.events.GONE, function() {
         that.active[side] = null;
+        that.stopGame();
+        that.resetGame();
         that.updateGameState();
     });
 
@@ -132,4 +134,9 @@ Game.prototype.stopGame = function() {
 Game.prototype.restartGame = function() {
     this.stopGame();
     this.startGame();
+};
+
+Game.prototype.resetGame = function() {
+    this.scores.left = 0;
+    this.scores.right = 0;
 };

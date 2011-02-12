@@ -6,18 +6,16 @@ function Game() {
 
     var that = this;
     var packets = Pong.Packets;
-    var transport = Pong.Transports.WS(),
-        joinButtons = {
-            'left': $('#menu .button.left'),
-            'right': $('#menu .button.right')
-        },
-        waitingMessage = $('#menu .waiting'),
-        joinedMessage = $('#menu .joined'),
-        statusMessage = $('#menu .status'),
-        menu = $('#menu');
-
+    var transport = Pong.Transports.WS()
     this.player = Pong.Player(transport);
     this.opponent = Pong.Opponent(transport);
+    
+    var joinButtons = {left: $('#menu .button.left'), right: $('#menu .button.right')};
+    var waiting = {left: $('#menu .waiting.left'), right: $('#menu .waiting.right')};
+    var joined = {left: $('#menu .joined.left'), right: $('#menu .joined.right')};
+    
+    var status = $('#menu .status');
+    var menu = $('#menu');
 
     joinButtons.left.click(function() {
         that.player.joinLeft();
@@ -31,7 +29,7 @@ function Game() {
     
     transport.subscribe(Pong.WSAdapter.events.CONNECTED, function() {
         that.player.joinGame('only');
-        statusMessage.hide();
+        status.hide();
         joinButtons.left.show();
         joinButtons.right.show();
     });
@@ -40,25 +38,33 @@ function Game() {
         menu.show();
         joinButtons.left.hide();
         joinButtons.right.hide();
-        waitingMessage.hide();
-        joinedMessage.hide();
-        statusMessage.text('DISCONNECTED').show();
+        joined.left.hide();
+        joined.right.hide();
+        status.text('DISCONNECTED').show();
     });
 
     transport.subscribe(packets.GameState.id, function(state) {
         for (var key in state.players) {
             if (state.players[key] == Components.Constants.PLAYER_STATE_CONNECTED) {
                 joinButtons[key].hide();
-                joinedMessage.addClass(key).show();
+                joined[key].show();
                 if (!that.opponent.shield && (!that.player.shield || that.player.shield.id != key)) {
                     that.opponent.assignShield(that.shields[key]);
                 }
+            } else {
+                joinButtons[key].show();
+                joined[key].hide();
             }
         }
         
         if(state.game == Components.Constants.GAME_STATE_IN_PROGRESS) {
             menu.hide();
             that.stage.start();
+        }
+
+        if(state.game == Components.Constants.GAME_STATE_WAITING_FOR_PLAYERS) {
+            menu.show();
+            that.stage.stop();
         }
     });
 
@@ -75,7 +81,7 @@ function Game() {
         that.updateBallState(data[that.ball.id]);
     });
 
-    statusMessage.text('CONNECTING').show();
+    status.text('CONNECTING').show();
     transport.connect();
 
     var view = Pong.View(that.stage);
@@ -88,28 +94,26 @@ function Game() {
 
 Utils.inherit(Game, Pong.Game);
 
-Utils._.extend(Game.prototype, {
-    updateBallState: function(data) {
-        this.ball.region.x = data.x;
-        this.ball.region.y = data.y;
-        this.ball.kx = data.kx;
-        this.ball.ky = data.ky;
-        this.ball.angle = data.angle;
-        this.ball.isMoving = data.isMoving;
-    },
+Game.prototype.updateBallState = function(data) {
+    this.ball.region.x = data.x;
+    this.ball.region.y = data.y;
+    this.ball.kx = data.kx;
+    this.ball.ky = data.ky;
+    this.ball.angle = data.angle;
+    this.ball.isMoving = data.isMoving;
+};
 
-    updateScores: function(scoresData) {
-        var scores = {
-            'left': $('#score-left'),
-            'right': $('#score-right')
-        };
+Game.prototype.updateScores = function(scoresData) {
+    var scores = {
+        'left': $('#score-left'),
+        'right': $('#score-right')
+    };
 
-        for (var key in scoresData) {
-            scores[key].html(scoresData[key]);
-        }
+    for (var key in scoresData) {
+        scores[key].html(scoresData[key]);
     }
-});
+};
 
-var game = new Game();
+new Game();
 
 });
