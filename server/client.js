@@ -39,6 +39,7 @@ exports.createClient = function(connection) {
     
     return {
         send: send,
+        sendPacket: send,
         on: addEventsListener,
         subscribe: addEventsListener,
         fire: fireEvent

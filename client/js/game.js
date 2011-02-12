@@ -40,6 +40,7 @@ function Game() {
         joinButtons.right.hide();
         joined.left.hide();
         joined.right.hide();
+        
         status.text('DISCONNECTED').show();
     });
 

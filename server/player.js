@@ -1,5 +1,6 @@
 var utils = require('../shared/utils'),
     packets = require('../shared/pong').Packets,
+    Pinger = require('../shared/latency').Pinger,
     Emitter = require('events').EventEmitter,
     Client = require('./client');
 
@@ -19,13 +20,15 @@ exports.createPlayer = function(client) {
     var emitter = new Emitter();
     var lastPingTime = null;
     var latency = null;
-    var score = 0;
+    var pinger = new Pinger(client);
 
     client.on(Client.events.DISCONNECTED, function() {
+        pinger.stop();
         emitter.emit(events.GONE);
     });
 
     client.on(packets.JoinGame.id, function(data) {
+        pinger.start();
         emitter.emit(events.JOINGAME, data.gameId);
     });
 

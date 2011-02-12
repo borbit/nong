@@ -1,4 +1,5 @@
 Pong.Player = function(transport) {
+    var ping = null;
     var shield = null;
     var packets = Pong.Packets;
     var keyboard = Pong.EventsClient.KeyboardReceiver;
@@ -31,14 +32,18 @@ Pong.Player = function(transport) {
             shield.stop();
         }
     });
+    transport.subscribe(packets.Ping.id, function(data) {
+        if (data.ping !== undefined) {
+            ping = data.ping;
+            console.log(ping);
+        }
+        sendPacket(packets.Pong({id: data.id}));
+    });
     
-    /*
     transport.subscribe(packets.ShieldMovedUp.id, function(data) {});
     transport.subscribe(packets.ShieldMovedDown.id, function(data) {});
     transport.subscribe(packets.ShieldStoped.id, function(data) {});
-     */
 
-    
     function joinGame(name) {
         sendPacket(packets.JoinGame({name: name}));
     }
@@ -60,10 +65,12 @@ Pong.Player = function(transport) {
     }
 
     return {
+        ping: ping,
         joinGame: joinGame,
         joinLeft: joinLeft,
         joinRight: joinRight,
         assignShield: assignShield,
-        get shield() { return shield; }
+        get shield() { return shield; },
+        get ping() { return ping; }
     };
 };

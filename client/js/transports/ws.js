@@ -54,11 +54,16 @@ Pong.Transports.WS = function() {
         ws.send(message);
     }
 
+    function sendPacket(packet) {
+        ws.send(Components.Packets.serialize(packet));
+    }
+
     return {
         connect: connect,
         disconnect: disconnect,
         sendMessage: sendMessage,
-        subscribe: observer.subscribe
+        subscribe: observer.subscribe,
+        on: observer.subscribe
     };
 
 };
