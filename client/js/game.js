@@ -1,7 +1,6 @@
 $(function() {
 
 function Game() {
-
     Game.superproto.constructor.call(this);
 
     var that = this;
