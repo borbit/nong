@@ -9,6 +9,10 @@ function Game(transport) {
     transport.subscribe(Pong.Packets.RoundStarted.id, function(data) {
         that.updateBallState(data.ball);
         that.updateScores(data.scores);
+
+        for(var side in data.shields) {
+            that.updateShieldState(side, data.shields[side]);
+        }
         
         setTimeout(function() {
             that.ball.pitch();
@@ -47,6 +51,10 @@ Game.prototype.updateBallState = function(data) {
     this.ball.ky = data.ky;
     this.ball.angle = data.angle;
     this.ball.isMoving = data.isMoving;
+};
+
+Game.prototype.updateShieldState = function(side, data) {
+    this.shields[side].region.y = data.y;
 };
 
 Game.prototype.updateScores = function(scoresData) {

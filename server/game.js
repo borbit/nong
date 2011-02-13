@@ -9,7 +9,6 @@ exports.create = function() {
 };
 
 function Game() {
-    
     Game.superproto.constructor.call(this);
     
     this.players = Players.create();
@@ -17,6 +16,7 @@ function Game() {
     this.scores = {left: 0, right: 0};
     this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
     this.snapshotter = null;
+    this.resetGame();
     
     var that = this;
     
@@ -52,9 +52,9 @@ Game.prototype.assignShield = function(side, player) {
     var that = this;
 
     player.on(Player.events.GONE, function() {
-        that.active[side] = null;
         that.stopGame();
         that.resetGame();
+        that.active[side] = null;
         that.updateGameState();
     });
 
@@ -109,6 +109,10 @@ Game.prototype.startGame = function() {
     that.ball.preparePitch();
 
     that.players.roundStarted({
+        shields: {
+            left: that.shields.left.serialize(),
+            right: that.shields.right.serialize()
+        },
         ball: that.ball.serialize(),
         countdown: pong.Globals.COUNTDOWN,
         scores: that.scores
@@ -137,6 +141,8 @@ Game.prototype.restartGame = function() {
 };
 
 Game.prototype.resetGame = function() {
+    this.shields.left.region.y = 250;
+    this.shields.right.region.y = 250;
     this.scores.left = 0;
     this.scores.right = 0;
 };

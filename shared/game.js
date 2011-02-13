@@ -4,8 +4,8 @@ var pong = require('../shared/pong');
 
 ns.Game = function() {
     this.shields = {
-        left: new pong.Shield(40, 20, 'left'),
-        right: new pong.Shield(750, 20, 'right')
+        left: new pong.Shield(40, 0, 'left'),
+        right: new pong.Shield(750, 0, 'right')
     };
     this.goals = {
         left: new pong.Goal(-50, 0, 600),

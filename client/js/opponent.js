@@ -21,7 +21,7 @@ Pong.Opponent = function(transport) {
         }
     });
 
-    function assignShield(_shield) {console.log(_shield);
+    function assignShield(_shield) {
         shield = _shield;
     }
 
