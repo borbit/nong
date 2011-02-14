@@ -26,10 +26,6 @@ Pong.Player = function(transport) {
 }
 
 Pong.Player.prototype = {
-    shield: function() {
-        return this.shield;
-    },
-
     assignShield: function(shield) {
         this.shield = shield;
     }

@@ -1,6 +1,8 @@
-function Game(transport) {
+function Game(transport, menu, statusMessage) {
     Game.superproto.constructor.call(this);
 
+    this.menu = menu;
+    this.statusMessage = statusMessage;
     this.player = new Pong.LocalPlayer(transport);
     this.opponent = new Pong.Opponent(transport);
 
@@ -8,15 +10,18 @@ function Game(transport) {
 
     transport.subscribe(Pong.Packets.RoundStarted.id, function(data) {
         that.updateBallState(data.ball);
-        that.updateScores(data.scores);
 
         for(var side in data.shields) {
             that.updateShieldState(side, data.shields[side]);
         }
-        
+
         setTimeout(function() {
             that.ball.pitch();
         }, data.countdown * 1000);
+    });
+
+    transport.subscribe(Pong.Packets.ScoresChanged.id, function(data) {
+        that.updateScores(data.scores);
     });
     
     transport.subscribe(Pong.Packets.GameSnapshot.id, function(data) {

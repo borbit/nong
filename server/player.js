@@ -117,6 +117,18 @@ exports.createPlayer = function(client) {
         client.send(packet);
     }
 
+    function scoresChanged(data) {
+        var packet = packets.ScoresChanged();
+        packet.data(data);
+        client.send(packet);
+    }
+
+    function gameFinished(data) {
+        var packet = packets.GameFinished();
+        packet.data(data);
+        client.send(packet);
+    }
+
     function on(event, callback) {
         emitter.on(event, callback);
     }
@@ -139,6 +151,8 @@ exports.createPlayer = function(client) {
         shieldMovedDown: shieldMovedDown,
         shieldStoped: shieldStoped,
         roundStarted: roundStarted,
+        scoresChanged: scoresChanged,
+        gameFinished: gameFinished,
         ping: ping
     };
 };

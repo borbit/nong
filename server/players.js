@@ -58,5 +58,17 @@ _.extend(Players.prototype, {
         _.each(this.players, function(player) {
             player.roundStarted(data);
         });
+    },
+
+    scoresChanged: function(data) {
+        _.each(this.players, function(player) {
+            player.scoresChanged(data);
+        });
+    },
+
+    gameFinished: function(data) {
+        _.each(this.players, function(player) {
+            player.gameFinished(data);
+        });
     }
 });
