@@ -18,30 +18,26 @@ function Game(config) {
     this.scores = {left: 0, right: 0};
     this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
     this.snapshotter = null;
-    this.resetGame();
+    this.reset();
     
-    var that = this;
+    var game = this;
     
     this.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
-        var finishedGame = false;
-        
-        for (var key in that.goals) {
-            if (that.goals[key] == goal) {
-                that.scores[key] += 1;
+        for (var key in game.goals) {
+            if (game.goals[key] == goal) {
+                game.scores[key] += 1;
 
-                that.players.scoresChanged({
-                    scores: that.scores
+                game.players.scoresChanged({
+                    scores: game.scores
                 });
-                
-                if (that.scores[key] >= that.config.ROUNDS_TO_WIN) {
-                    that.finishGame();
-                    finishedGame = true;
-                }
             }
         }
 
-        if (!finishedGame) {
-            that.restartRound();
+        if (game.canBeFinished()) {
+            game.finish();
+        }
+        else {
+            game.restartRound();
         }
     });
 }
@@ -65,35 +61,35 @@ Game.prototype.assignShield = function(side, player) {
         return;
     }
 
-    var that = this;
+    var game = this;
 
     player.on(Player.events.GONE, function() {
-        that.pauseGame();
-        that.resetGame();
-        that.active[side] = null;
-        that.updateGameState();
+        game.pause();
+        game.reset();
+        game.active[side] = null;
+        game.updateGameState();
     });
 
-    var shield = that.shields[side];
+    var shield = game.shields[side];
 
     player.on(Player.events.MOVEUP, function(key) {
         shield.moveUp();
-        that.players.shieldMoveUp(side, shield.region.y);
+        game.players.shieldMoveUp(side, shield.region.y);
         player.shieldMovedUp(side, shield.region.y, key)
     });
     player.on(Player.events.MOVEDOWN, function(key) {
         shield.moveDown();
-        that.players.shieldMoveDown(side, shield.region.y);
+        game.players.shieldMoveDown(side, shield.region.y);
         player.shieldMovedDown(side, shield.region.y, key)
     });
     player.on(Player.events.STOP, function(key) {
         shield.stop();
-        that.players.shieldStop(side, shield.region.y);
+        game.players.shieldStop(side, shield.region.y);
         player.shieldStoped(side, shield.region.y, key)
     });
 
-    that.active[side] = player;
-    that.updateGameState();
+    game.active[side] = player;
+    game.updateGameState();
 };
 
 Game.prototype.updateGameState = function() {
@@ -102,7 +98,7 @@ Game.prototype.updateGameState = function() {
         this.startRound();
     } else if (this.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
         this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-        this.pauseGame();
+        this.pause();
     }
 
     this.players.gameState(this.getState());
@@ -145,24 +141,47 @@ Game.prototype.startRound = function() {
     that.stage.start();
 };
 
-Game.prototype.pauseGame = function() {
+Game.prototype.pause = function() {
     this.stage.stop();
     clearInterval(this.snapshotter);
 };
 
 Game.prototype.restartRound = function() {
-    this.pauseGame();
+    this.pause();
     this.startRound();
 };
 
-Game.prototype.finishGame = function() {
-    this.pauseGame();
+Game.prototype.canBeFinished = function() {
+    for (var key in this.scores) {
+        if (this.scores[key] >= this.config.ROUNDS_TO_WIN) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+Game.prototype.getWinner = function() {
+    var winner = null;
+
+    for (var key in this.scores) {
+        if (this.scores[key] >= this.config.ROUNDS_TO_WIN) {
+            winner = key;
+            break;
+        }
+    }
+    
+    return winner;
+};
+
+Game.prototype.finish = function() {
+    this.pause();
     this.players.gameFinished({
-        winner: this.scores.left == this.config.ROUNDS_TO_WIN ? 'left': 'right'
+        winner: this.getWinner()
     });
 }
 
-Game.prototype.resetGame = function() {
+Game.prototype.reset = function() {
     this.shields.left.region.y = 250;
     this.shields.right.region.y = 250;
     this.scores.left = 0;
