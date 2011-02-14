@@ -1,8 +1,8 @@
 function Game(transport) {
     Game.superproto.constructor.call(this);
 
-    this.player = Pong.Player(transport);
-    this.opponent = Pong.Opponent(transport);
+    this.player = new Pong.LocalPlayer(transport);
+    this.opponent = new Pong.Opponent(transport);
 
     var that = this;
 
