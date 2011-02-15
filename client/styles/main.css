@@ -29,7 +29,7 @@ body {
 
 #stage .shield {
     position:absolute;
-    height:80px;
+    height:100px;
     width:10px;
     background:#fff;
 }

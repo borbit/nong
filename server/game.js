@@ -4,29 +4,41 @@ var pong = require('../shared/pong'),
     Players = require('./players'),
     Player = require('./player');
 
-exports.create = function() {
-    return new Game();
+exports.create = function(config) {
+    return new Game(config);
 };
 
-function Game() {
-    
+function Game(config) {
     Game.superproto.constructor.call(this);
+
+    this.config = config;
     
     this.players = Players.create();
     this.active = {left: null, right: null};
     this.scores = {left: 0, right: 0};
     this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
     this.snapshotter = null;
+    this.reset();
     
-    var that = this;
+    var game = this;
     
     this.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
-        for (var key in that.goals) {
-            if (that.goals[key] == goal) {
-                that.scores[key] += 1;
+        for (var key in game.goals) {
+            if (game.goals[key] == goal) {
+                game.scores[key] += 1;
+
+                game.players.scoresChanged({
+                    scores: game.scores
+                });
             }
         }
-        that.restartGame();
+
+        if (game.canBeFinished()) {
+            game.finish();
+        }
+        else {
+            game.restartRound();
+        }
     });
 }
 
@@ -49,44 +61,44 @@ Game.prototype.assignShield = function(side, player) {
         return;
     }
 
-    var that = this;
+    var game = this;
 
     player.on(Player.events.GONE, function() {
-        that.active[side] = null;
-        that.stopGame();
-        that.resetGame();
-        that.updateGameState();
+        game.pause();
+        game.reset();
+        game.active[side] = null;
+        game.updateGameState();
     });
 
-    var shield = that.shields[side];
+    var shield = game.shields[side];
 
     player.on(Player.events.MOVEUP, function(key) {
         shield.moveUp();
-        that.players.shieldMoveUp(side, shield.region.y);
+        game.players.shieldMoveUp(side, shield.region.y);
         player.shieldMovedUp(side, shield.region.y, key)
     });
     player.on(Player.events.MOVEDOWN, function(key) {
         shield.moveDown();
-        that.players.shieldMoveDown(side, shield.region.y);
+        game.players.shieldMoveDown(side, shield.region.y);
         player.shieldMovedDown(side, shield.region.y, key)
     });
     player.on(Player.events.STOP, function(key) {
         shield.stop();
-        that.players.shieldStop(side, shield.region.y);
+        game.players.shieldStop(side, shield.region.y);
         player.shieldStoped(side, shield.region.y, key)
     });
 
-    that.active[side] = player;
-    that.updateGameState();
+    game.active[side] = player;
+    game.updateGameState();
 };
 
 Game.prototype.updateGameState = function() {
     if (this.active.left && this.active.right) {
         this.gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
-        this.startGame();
+        this.startRound();
     } else if (this.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
         this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
-        this.stopGame();
+        this.pause();
     }
 
     this.players.gameState(this.getState());
@@ -104,14 +116,17 @@ Game.prototype.getState = function() {
     };
 };
 
-Game.prototype.startGame = function() {
+Game.prototype.startRound = function() {
     var that = this;
     that.ball.preparePitch();
 
     that.players.roundStarted({
+        shields: {
+            left: that.shields.left.serialize(),
+            right: that.shields.right.serialize()
+        },
         ball: that.ball.serialize(),
-        countdown: pong.Globals.COUNTDOWN,
-        scores: that.scores
+        countdown: pong.Globals.COUNTDOWN
     });
 
     setTimeout(function() {
@@ -126,17 +141,49 @@ Game.prototype.startGame = function() {
     that.stage.start();
 };
 
-Game.prototype.stopGame = function() {
+Game.prototype.pause = function() {
     this.stage.stop();
     clearInterval(this.snapshotter);
 };
 
-Game.prototype.restartGame = function() {
-    this.stopGame();
-    this.startGame();
+Game.prototype.restartRound = function() {
+    this.pause();
+    this.startRound();
 };
 
-Game.prototype.resetGame = function() {
+Game.prototype.canBeFinished = function() {
+    for (var key in this.scores) {
+        if (this.scores[key] >= this.config.ROUNDS_TO_WIN) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+Game.prototype.getWinner = function() {
+    var winner = null;
+
+    for (var key in this.scores) {
+        if (this.scores[key] >= this.config.ROUNDS_TO_WIN) {
+            winner = key;
+            break;
+        }
+    }
+    
+    return winner;
+};
+
+Game.prototype.finish = function() {
+    this.pause();
+    this.players.gameFinished({
+        winner: this.getWinner()
+    });
+}
+
+Game.prototype.reset = function() {
+    this.shields.left.region.y = 250;
+    this.shields.right.region.y = 250;
     this.scores.left = 0;
     this.scores.right = 0;
 };

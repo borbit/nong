@@ -3,8 +3,8 @@ var Client = require('./client');
 var Player = require('./player');
 var Game = require('./game');
 
-exports.createServer = function() {
-    var game = Game.create();
+exports.createServer = function(gameConfig) {
+    var game = Game.create(gameConfig);
     var server = ws.createServer();
     
     server.addListener('connection', function(connection) {

@@ -37,7 +37,7 @@ process.on('SIGINT', stop);
 process.on('SIGTERM', stop);
 
 // creating websocket server
-var server = Server.createServer();
+var server = Server.createServer(config.game);
 
 // listening for websocket connections
 server.listen(config.WS_PORT);
