@@ -1,13 +1,14 @@
 function Game(transport) {
     Game.superproto.constructor.call(this);
-    
+    this.ball.client = true;
+
     this.player = new Pong.LocalPlayer(transport);
     this.opponent = new Pong.Opponent(transport);
 
     var that = this;
 
     transport.subscribe(Pong.Packets.RoundStarted.id, function(data) {
-        that.updateBallState(data.ball);
+        that.ball.updateState(data.ball);
 
         for(var side in data.shields) {
             that.updateShieldState(side, data.shields[side]);
@@ -23,7 +24,7 @@ function Game(transport) {
     });
     
     transport.subscribe(Pong.Packets.GameSnapshot.id, function(data) {
-        that.updateBallState(data[that.ball.id]);
+        that.ball.snapshotsBuffer.push({data: data[that.ball.id], timestamp: (new Date()).getTime()});
     });
 
     transport.subscribe(Pong.Packets.GameState.id, function(state) {
@@ -46,15 +47,6 @@ function Game(transport) {
 }
 
 Utils.inherit(Game, Pong.Game);
-
-Game.prototype.updateBallState = function(data) {
-    this.ball.region.x = data.x;
-    this.ball.region.y = data.y;
-    this.ball.kx = data.kx;
-    this.ball.ky = data.ky;
-    this.ball.angle = data.angle;
-    this.ball.isMoving = data.isMoving;
-};
 
 Game.prototype.updateShieldState = function(side, data) {
     this.shields[side].region.y = data.y;

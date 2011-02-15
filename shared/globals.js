@@ -8,7 +8,7 @@
     }
 
     ns.Globals= {};
-    ns.Globals.SPS = 10; // snapshots per second
+    ns.Globals.SPS = 5; // snapshots per second
     ns.Globals.FPS = 30;
     ns.Globals.RFPS = 30;
     ns.Globals.COUNTDOWN = 3;
