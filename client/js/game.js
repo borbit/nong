@@ -1,8 +1,6 @@
-function Game(transport, menu, statusMessage) {
+function Game(transport) {
     Game.superproto.constructor.call(this);
 
-    this.menu = menu;
-    this.statusMessage = statusMessage;
     this.player = new Pong.LocalPlayer(transport);
     this.opponent = new Pong.Opponent(transport);
 
