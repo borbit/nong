@@ -84,9 +84,18 @@ utils._.extend(Shield.prototype, {
     serialize: function() {
         return {
             id: this.id,
-            x: this.region.x,
-            y: this.region.y
+            y: this.region.y,
+            vy: this.vy,
+            currentSpeed: this.currentSpeed,
+            currentFriction: this.currentFriction
         };
+    },
+
+    setState: function(state) {
+        this.region.y = state.y;
+        this.vy = state.vy;
+        this.currentSpeed = state.currentSpeed;
+        this.currentFriction = state.currentFriction;
     }
 });
 

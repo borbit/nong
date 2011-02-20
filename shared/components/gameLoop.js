@@ -3,14 +3,14 @@
 var pong = require('../pong'),
     utils = require('../utils');
 
-ns.GameLoop = function() {
+ns.GameLoop = function(dynamics) {
     var observer = utils.Observer(),
         events = ns.GameLoop.events,
         timerId = null, prevTick = 0,
         elements = [];
 
     function start() {
-        timerId = setInterval(tick, parseInt(1000 / pong.Globals.FPS));
+        timerId = setInterval(tick, Math.floor(1000 / pong.Globals.FPS));
     }
 
     function stop() {
@@ -20,20 +20,18 @@ ns.GameLoop = function() {
     }
 
     function tick() {
-        pong.Globals.RFPS = Math.round(1000 / (+(new Date()) - prevTick));
+        var delta = (new Date()).getTime() - prevTick;
+        console.log(delta);
 
-        if (pong.Globals.RFPS) {
-            var count = elements.length;
+        var count = elements.length;
 
-            if(count > 0) {
-                for(var i = 0; i < count; i++) {
-                    elements[i].update(1000 / pong.Globals.RFPS);
-                }
-                observer.fire(events.tickWithUpdates, elements);
-            }
+        for(var i = 0; i < count; i++) {
+            elements[i].update(delta);
         }
+        
+        //observer.fire(events.tickWithUpdates, elements);
 
-        prevTick = +(new Date());
+        prevTick = (new Date()).getTime();
     }
 
     function addElement(element) {

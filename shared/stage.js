@@ -4,8 +4,8 @@ var pong = require('./pong'),
     utils = require('./utils'),
     comps = require('./components');
 
-ns.Stage = function Stage() {
-    var base = comps.Stage();
+ns.Stage = function Stage(dynamics) {
+    var base = comps.Stage(dynamics);
     var shields = [];
 
     base.addShield = function(shield) {

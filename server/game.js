@@ -95,9 +95,11 @@ Game.prototype.assignShield = function(side, player) {
 Game.prototype.updateGameState = function() {
     if (this.active.left && this.active.right) {
         this.gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
+        this.startSnapshotter();
         this.startRound();
     } else if (this.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
         this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+        this.stopSnapshotter();
         this.pause();
     }
 
@@ -131,11 +133,6 @@ Game.prototype.startRound = function() {
 
     setTimeout(function() {
         that.ball.pitch();
-
-        that.snapshotter = setInterval(function(elements) {
-            that.players.gameSnapshot(that.stage.serialize());
-        }, 1000 / pong.Globals.SPS);
-
     }, pong.Globals.COUNTDOWN * 1000);
 
     that.stage.start();
@@ -143,7 +140,6 @@ Game.prototype.startRound = function() {
 
 Game.prototype.pause = function() {
     this.stage.stop();
-    clearInterval(this.snapshotter);
 };
 
 Game.prototype.restartRound = function() {
@@ -172,6 +168,22 @@ Game.prototype.getWinner = function() {
     }
     
     return winner;
+};
+
+Game.prototype.startSnapshotter = function() {return;
+    var that = this;
+    var last = (new Date()).getTime();
+    
+    this.snapshotter = setInterval(function(elements) {
+        that.players.gameSnapshot(that.stage.serialize());
+        var now = (new Date()).getTime();
+        console.log(now - last);
+        last = now;
+    }, 1000 / pong.Globals.SPS);
+};
+
+Game.prototype.stopSnapshotter = function() {
+    clearInterval(this.snapshotter);
 };
 
 Game.prototype.finish = function() {
