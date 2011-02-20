@@ -5,4 +5,4 @@ client/js/config.js
 client/jquery.js
 server.pid
 node_modules
-
+.vagrant

@@ -1,0 +1,6 @@
+[submodule "chef/mdxp-cookbooks"]
+	path = chef/mdxp-cookbooks
+	url = git@github.com:LaggyLuke/mdxp-cookbooks.git
+[submodule "chef/opscode-cookbooks"]
+	path = chef/opscode-cookbooks
+	url = git@github.com:LaggyLuke/opscode-cookbooks.git
