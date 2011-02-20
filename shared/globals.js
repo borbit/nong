@@ -8,9 +8,9 @@
     }
 
     ns.Globals= {};
-    ns.Globals.SPS = 5; // snapshots per second
-    ns.Globals.FPS = 30;
-    ns.Globals.RFPS = 30;
+    ns.Globals.SPS = 10; // snapshots per second
+    ns.Globals.FPS = 20;
+    ns.Globals.RFPS = 20;
     ns.Globals.COUNTDOWN = 3;
     ns.Globals.SIMULATED_LAG = 100;
 })();

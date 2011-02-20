@@ -3,12 +3,13 @@ function Game(transport) {
     this.ball.client = true;
 
     this.player = new Pong.LocalPlayer(transport);
-    this.opponent = new Pong.Opponent(transport);
+    this.opponent = false;
+    this.dynamics.addElement(this.ball);
 
     var that = this;
 
     transport.subscribe(Pong.Packets.RoundStarted.id, function(data) {
-        that.ball.updateState(data.ball);
+        that.ball.setState(data.ball);
 
         for(var side in data.shields) {
             that.updateShieldState(side, data.shields[side]);
@@ -24,7 +25,7 @@ function Game(transport) {
     });
     
     transport.subscribe(Pong.Packets.GameSnapshot.id, function(data) {
-        that.ball.snapshotsBuffer.push({data: data[that.ball.id], timestamp: (new Date()).getTime()});
+        that.dynamics.pushSnapshot(data);
     });
 
     transport.subscribe(Pong.Packets.GameState.id, function(state) {
@@ -32,16 +33,19 @@ function Game(transport) {
         
         for (var key in state.players) {
             if (state.players[key] == c.PLAYER_STATE_CONNECTED) {
-                if (!that.opponent.shield && (!that.player.shield || that.player.shield.id != key)) {
-                    that.opponent.assignShield(that.shields[key]);
+                if (!that.opponent && (!that.player.shield || that.player.shield.id != key)) {
+                    that.dynamics.addElement(that.shields[key]);
+                    that.opponent = true;
                 }
             }
         }
 
         if(state.game == c.GAME_STATE_IN_PROGRESS) {
             that.stage.start();
+            that.dynamics.start();
         } else {
             that.stage.stop();
+            that.dynamics.stop();
         }
     });
 }

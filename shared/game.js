@@ -1,6 +1,7 @@
 (function(ns) {
 
-var pong = require('../shared/pong');
+var pong = require('./pong');
+var latency = require('./latency');
 
 ns.Game = function() {
     this.shields = {
@@ -13,7 +14,9 @@ ns.Game = function() {
     };
     
     this.ball = new pong.Ball('ball');
-    this.stage = pong.Stage();
+    this.dynamics = new latency.Dynamics();
+    this.stage = pong.Stage(this.dynamics);
+
 
     this.stage.addStaticElement(new pong.StageWall(0, -50, 800))
               .addStaticElement(new pong.StageWall(0, 600, 800))

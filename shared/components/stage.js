@@ -3,9 +3,9 @@
 var utils = require('../utils'),
     components = require('../components')
 
-ns.Stage = function Stage() {
+ns.Stage = function Stage(dynamics) {
     var observer = utils.Observer(),
-        gameLoop = components.GameLoop(),
+        gameLoop = components.GameLoop(dynamics),
         elementsDynamic = {}, elementsStatic = {},
         collisionsDetector = components.CollisionsDetector(),
         gameLoopEvents = components.GameLoop.events,

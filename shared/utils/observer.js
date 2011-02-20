@@ -20,12 +20,10 @@ ns.Observer = function() {
         subscribers[eventName].push(trigger);
     }
 
-    var self = {
+    return {
         fire: fire,
         subscribe: subscribe
     };
-
-    return self;
 };
 
 }((typeof exports === 'undefined') ? window.Utils : exports));
