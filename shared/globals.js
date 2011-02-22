@@ -13,4 +13,5 @@
     ns.Globals.RFPS = 20;
     ns.Globals.COUNTDOWN = 3;
     ns.Globals.SIMULATED_LAG = 100;
+    ns.Globals.ROUNDS_TO_WIN = 5;
 })();

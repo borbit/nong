@@ -1,28 +1,29 @@
 var pong = require('../shared/pong'),
+    webworkerGame = require('./webworkerGame'),
     comps = require('../shared/components'),
     utils = require('../shared/utils'),
     Players = require('./players'),
     Player = require('./player');
 
-exports.create = function(config) {
-    return new Game(config);
+exports.create = function() {
+    return new Game();
 };
 
-function Game(config) {
-
-    this.config = config;
-    this.base = new pong.Game();
+function Game() {
+    this.webworkerGame = new WebworkerGame();
 
     this.players = Players.create();
     this.active = {left: null, right: null};
-    this.scores = {left: 0, right: 0};
     this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
     this.snapshotter = null;
     this.reset();
+
+    //TODO: subscribe to webworker events:
+    //scoresChanged, gameFinished, roundStarted
+
+    /*var game = this;
     
-    var game = this;
-    
-    this.base.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+    this.webworkerGame.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
         for (var key in game.goals) {
             if (game.goals[key] == goal) {
                 game.scores[key] += 1;
@@ -39,7 +40,7 @@ function Game(config) {
         else {
             game.restartRound();
         }
-    });
+    });*/
 }
 
 Game.prototype.joinPlayer = function(player) {
@@ -62,28 +63,32 @@ Game.prototype.assignShield = function(side, player) {
     var game = this;
 
     player.on(Player.events.GONE, function() {
-        game.pause();
-        game.reset();
+        /*game.pause();
+        game.reset();*/
+        //TODO: post "playerGone" message to webworker
         game.active[side] = null;
         game.updateGameState();
     });
 
-    var shield = game.base.shields[side];
+    var shield = game.webworkerGame.shields[side];
 
     player.on(Player.events.MOVEUP, function(key) {
-        shield.moveUp();
-        game.players.shieldMoveUp(side, shield.region.y);
-        player.shieldMovedUp(side, shield.region.y, key)
+        //TODO: post "shieldMoveUp" message to webworker
+        //shield.moveUp();
+        //game.players.shieldMoveUp(side, shield.region.y);
+        //player.shieldMovedUp(side, shield.region.y, key)
     });
     player.on(Player.events.MOVEDOWN, function(key) {
-        shield.moveDown();
-        game.players.shieldMoveDown(side, shield.region.y);
-        player.shieldMovedDown(side, shield.region.y, key)
+        //TODO: post "shieldMoveDow" message to webworker
+        //shield.moveDown();
+        //game.players.shieldMoveDown(side, shield.region.y);
+        //player.shieldMovedDown(side, shield.region.y, key)
     });
     player.on(Player.events.STOP, function(key) {
-        shield.stop();
-        game.players.shieldStop(side, shield.region.y);
-        player.shieldStoped(side, shield.region.y, key)
+        //TODO: post "shieldStop" message to webworker
+        //shield.stop();
+        //game.players.shieldStop(side, shield.region.y);
+        //player.shieldStoped(side, shield.region.y, key)
     });
 
     game.active[side] = player;
@@ -93,12 +98,14 @@ Game.prototype.assignShield = function(side, player) {
 Game.prototype.updateGameState = function() {
     if (this.active.left && this.active.right) {
         this.gameState = comps.Constants.GAME_STATE_IN_PROGRESS;
+        //TODO: post "startRound" message to webworker
         this.startSnapshotter();
-        this.startRound();
+        //this.startRound();
     } else if (this.gameState == comps.Constants.GAME_STATE_IN_PROGRESS) {
         this.gameState = comps.Constants.GAME_STATE_WAITING_FOR_PLAYERS;
+        //TODO: post "pause" message to webworker
         this.stopSnapshotter();
-        this.pause();
+        //this.pause();
     }
 
     this.players.gameState(this.getState());
@@ -116,28 +123,28 @@ Game.prototype.getState = function() {
     };
 };
 
-Game.prototype.startRound = function() {
+/*Game.prototype.startRound = function() {
     var that = this;
-    that.base.ball.preparePitch();
+    that.webworkerGame.ball.preparePitch();
 
     that.players.roundStarted({
         shields: {
-            left: that.base.shields.left.serialize(),
-            right: that.base.shields.right.serialize()
+            left: that.webworkerGame.shields.left.serialize(),
+            right: that.webworkerGame.shields.right.serialize()
         },
-        ball: that.base.ball.serialize(),
+        ball: that.webworkerGame.ball.serialize(),
         countdown: pong.Globals.COUNTDOWN
     });
 
     setTimeout(function() {
-        that.base.ball.pitch();
+        that.webworkerGame.ball.pitch();
     }, pong.Globals.COUNTDOWN * 1000);
 
-    that.base.stage.start();
+    that.webworkerGame.stage.start();
 };
 
 Game.prototype.pause = function() {
-    this.base.stage.stop();
+    this.webworkerGame.stage.stop();
 };
 
 Game.prototype.restartRound = function() {
@@ -166,21 +173,25 @@ Game.prototype.getWinner = function() {
     }
     
     return winner;
-};
+};*/
 
 Game.prototype.startSnapshotter = function() {return;
-    var that = this;
+    /*TODO: subscribe to "element changed" event from webworker
+    store changed elements in internal "state"
+    send internal "state" within snapshot packets by interval*/
+
+    /*var that = this;
     
     this.snapshotter = setInterval(function(elements) {
-        that.players.gameSnapshot(that.base.stage.serialize());
-    }, 1000 / pong.Globals.SPS);
+        that.players.gameSnapshot(that.webworkerGame.stage.serialize());
+    }, 1000 / pong.Globals.SPS);*/
 };
 
 Game.prototype.stopSnapshotter = function() {
     clearInterval(this.snapshotter);
 };
 
-Game.prototype.finish = function() {
+/*Game.prototype.finish = function() {
     this.pause();
     this.players.gameFinished({
         winner: this.getWinner()
@@ -188,8 +199,8 @@ Game.prototype.finish = function() {
 }
 
 Game.prototype.reset = function() {
-    this.base.shields.left.region.y = 250;
-    this.base.shields.right.region.y = 250;
+    this.webworkerGame.shields.left.region.y = 250;
+    this.webworkerGame.shields.right.region.y = 250;
     this.scores.left = 0;
     this.scores.right = 0;
-};
+};*/
