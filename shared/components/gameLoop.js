@@ -21,7 +21,6 @@ ns.GameLoop = function(dynamics) {
 
     function tick() {
         var delta = (new Date()).getTime() - prevTick;
-        console.log(delta);
 
         var count = elements.length;
 
@@ -29,7 +28,7 @@ ns.GameLoop = function(dynamics) {
             elements[i].update(delta);
         }
         
-        //observer.fire(events.tickWithUpdates, elements);
+        observer.fire(events.tickWithUpdates, elements);
 
         prevTick = (new Date()).getTime();
     }

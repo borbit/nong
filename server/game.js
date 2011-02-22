@@ -9,10 +9,10 @@ exports.create = function(config) {
 };
 
 function Game(config) {
-    Game.superproto.constructor.call(this);
 
     this.config = config;
-    
+    this.base = new pong.Game();
+
     this.players = Players.create();
     this.active = {left: null, right: null};
     this.scores = {left: 0, right: 0};
@@ -22,7 +22,7 @@ function Game(config) {
     
     var game = this;
     
-    this.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
+    this.base.stage.subscribe(pong.Stage.events.goalHit, function(goal) {
         for (var key in game.goals) {
             if (game.goals[key] == goal) {
                 game.scores[key] += 1;
@@ -41,8 +41,6 @@ function Game(config) {
         }
     });
 }
-
-utils.inherit(Game, pong.Game);
 
 Game.prototype.joinPlayer = function(player) {
     var that = this;
@@ -70,7 +68,7 @@ Game.prototype.assignShield = function(side, player) {
         game.updateGameState();
     });
 
-    var shield = game.shields[side];
+    var shield = game.base.shields[side];
 
     player.on(Player.events.MOVEUP, function(key) {
         shield.moveUp();
@@ -120,26 +118,26 @@ Game.prototype.getState = function() {
 
 Game.prototype.startRound = function() {
     var that = this;
-    that.ball.preparePitch();
+    that.base.ball.preparePitch();
 
     that.players.roundStarted({
         shields: {
-            left: that.shields.left.serialize(),
-            right: that.shields.right.serialize()
+            left: that.base.shields.left.serialize(),
+            right: that.base.shields.right.serialize()
         },
-        ball: that.ball.serialize(),
+        ball: that.base.ball.serialize(),
         countdown: pong.Globals.COUNTDOWN
     });
 
     setTimeout(function() {
-        that.ball.pitch();
+        that.base.ball.pitch();
     }, pong.Globals.COUNTDOWN * 1000);
 
-    that.stage.start();
+    that.base.stage.start();
 };
 
 Game.prototype.pause = function() {
-    this.stage.stop();
+    this.base.stage.stop();
 };
 
 Game.prototype.restartRound = function() {
@@ -172,13 +170,9 @@ Game.prototype.getWinner = function() {
 
 Game.prototype.startSnapshotter = function() {return;
     var that = this;
-    var last = (new Date()).getTime();
     
     this.snapshotter = setInterval(function(elements) {
-        that.players.gameSnapshot(that.stage.serialize());
-        var now = (new Date()).getTime();
-        console.log(now - last);
-        last = now;
+        that.players.gameSnapshot(that.base.stage.serialize());
     }, 1000 / pong.Globals.SPS);
 };
 
@@ -194,8 +188,8 @@ Game.prototype.finish = function() {
 }
 
 Game.prototype.reset = function() {
-    this.shields.left.region.y = 250;
-    this.shields.right.region.y = 250;
+    this.base.shields.left.region.y = 250;
+    this.base.shields.right.region.y = 250;
     this.scores.left = 0;
     this.scores.right = 0;
 };
